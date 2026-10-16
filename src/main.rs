@@ -44,6 +44,9 @@ enum TokenKind {
     Colon,
     LeftParen,
     RightParen,
+    Newline,
+    Indent,
+    Dedent,
     Eof,
 }
 
@@ -227,11 +230,83 @@ fn lex(source: &str) -> Result<Vec<Token>, Diagnostic> {
         ));
     }
 
+    let eof_location = Location { line, column };
+    let mut tokens = apply_indentation(source, tokens, eof_location.clone())?;
     tokens.push(Token {
         kind: TokenKind::Eof,
-        location: Location { line, column },
+        location: eof_location,
     });
     Ok(tokens)
+}
+
+// Add line and indentation tokens after lexing, so comments and strings cannot
+// accidentally create block boundaries. Blank/comment-only lines are ignored.
+fn apply_indentation(
+    source: &str,
+    tokens: Vec<Token>,
+    eof_location: Location,
+) -> Result<Vec<Token>, Diagnostic> {
+    let lines: Vec<&str> = source.lines().collect();
+    let mut output = Vec::with_capacity(tokens.len() + 8);
+    let mut indent_stack = vec![0usize];
+    let mut previous_line: Option<usize> = None;
+
+    for token in tokens {
+        let line = token.location.line;
+        if previous_line != Some(line) {
+            if previous_line.is_some() {
+                output.push(Token {
+                    kind: TokenKind::Newline,
+                    location: Location { line, column: 1 },
+                });
+            }
+
+            let source_line = lines.get(line.saturating_sub(1)).copied().unwrap_or("");
+            let mut indentation = 0usize;
+            for ch in source_line.chars() {
+                match ch {
+                    ' ' => indentation += 1,
+                    '\t' => indentation += 4 - (indentation % 4),
+                    _ => break,
+                }
+            }
+
+            let current_indent = *indent_stack.last().unwrap_or(&0);
+            if indentation > current_indent {
+                indent_stack.push(indentation);
+                output.push(Token {
+                    kind: TokenKind::Indent,
+                    location: Location { line, column: 1 },
+                });
+            } else if indentation < current_indent {
+                while indentation < *indent_stack.last().unwrap_or(&0) {
+                    indent_stack.pop();
+                    output.push(Token {
+                        kind: TokenKind::Dedent,
+                        location: Location { line, column: 1 },
+                    });
+                }
+                if indentation != *indent_stack.last().unwrap_or(&0) {
+                    return Err(Diagnostic::new(
+                        Location { line, column: 1 },
+                        "Indentasi tidak cocok dengan tingkat blok sebelumnya. Gunakan indentasi yang konsisten.",
+                    ));
+                }
+            }
+            previous_line = Some(line);
+        }
+        output.push(token);
+    }
+
+    while indent_stack.len() > 1 {
+        indent_stack.pop();
+        output.push(Token {
+            kind: TokenKind::Dedent,
+            location: eof_location.clone(),
+        });
+    }
+
+    Ok(output)
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -434,16 +509,33 @@ impl Parser {
         }
     }
 
+    fn skip_newlines(&mut self) {
+        while matches!(&self.current().kind, TokenKind::Newline) {
+            self.position += 1;
+        }
+    }
+
     fn parse_program(&mut self) -> Result<Program, Diagnostic> {
         let mut statements = Vec::new();
+        self.skip_newlines();
 
         while !matches!(&self.current().kind, TokenKind::Eof) {
+            match &self.current().kind {
+                TokenKind::Indent => return Err(self.error_here(
+                    "Indentasi tidak terduga. Gunakan indentasi hanya di dalam blok 'Jika'.",
+                )),
+                TokenKind::Dedent => return Err(self.error_here(
+                    "Indentasi menutup blok yang tidak sedang terbuka.",
+                )),
+                _ => {}
+            }
             if self.phrase_at("selesai jika") {
                 return Err(self.error_here(
-                    "Penanda 'Selesai jika.' tidak memiliki blok kondisi yang terbuka.",
+                    "'Selesai jika' tidak diperlukan lagi. Blok 'Jika' berakhir saat indentasi kembali ke tingkat sebelumnya.",
                 ));
             }
             statements.push(self.parse_statement()?);
+            self.skip_newlines();
         }
 
         if statements.is_empty() {
@@ -540,18 +632,42 @@ impl Parser {
         self.expect_phrase("maka", "Tambahkan kata 'maka' setelah koma.")?;
         self.expect_colon()?;
 
+        if !matches!(&self.current().kind, TokenKind::Newline) {
+            return Err(self.error_here(
+                "Mulai isi blok 'Jika' pada baris baru, lalu gunakan indentasi.",
+            ));
+        }
+        self.skip_newlines();
+        if !matches!(&self.current().kind, TokenKind::Indent) {
+            return Err(self.error_here(
+                "Blok 'Jika' membutuhkan setidaknya satu instruksi yang menjorok ke dalam.",
+            ));
+        }
+        self.position += 1;
+
         let mut body = Vec::new();
-        while !self.phrase_at("selesai jika") {
-            if matches!(&self.current().kind, TokenKind::Eof) {
+        self.skip_newlines();
+        while !matches!(&self.current().kind, TokenKind::Dedent | TokenKind::Eof) {
+            if matches!(&self.current().kind, TokenKind::Indent) {
                 return Err(self.error_here(
-                    "Blok 'Jika' belum ditutup. Tambahkan 'Selesai jika.'.",
+                    "Indentasi tambahan harus diawali oleh blok baru, misalnya 'Jika'.",
+                ));
+            }
+            if self.phrase_at("selesai jika") {
+                return Err(self.error_here(
+                    "'Selesai jika' tidak diperlukan. Hapus baris itu; indentasi menutup blok secara otomatis.",
                 ));
             }
             body.push(self.parse_statement()?);
+            self.skip_newlines();
         }
 
-        self.expect_phrase("selesai jika", "Diharapkan 'Selesai jika'.")?;
-        self.expect_period()?;
+        if body.is_empty() {
+            return Err(self.error_here("Blok 'Jika' tidak boleh kosong."));
+        }
+        if matches!(&self.current().kind, TokenKind::Dedent) {
+            self.position += 1;
+        }
 
         Ok(Statement::If { condition, body })
     }
@@ -785,11 +901,31 @@ komentar panjang
     }
 
     #[test]
-    fn accepts_conditional_and_word_based_comparison() {
+    fn accepts_indentation_closed_conditional() {
         let program = parse_ok(
-            r#"Tetapkan umur sebagai angka dengan nilai 20. Jika umur lebih dari 17, maka: Tampilkan teks "Dewasa". Selesai jika."#,
+            "Tetapkan umur sebagai angka dengan nilai 20.\\n\\nJika umur lebih dari 17, maka:\\n    Tampilkan teks \\\"Dewasa\\\".\\nTampilkan teks \\\"Selesai\\\".",
         );
-        assert_eq!(program.instruction_count(), 3);
+        assert_eq!(program.instruction_count(), 4);
+    }
+
+    #[test]
+    fn accepts_nested_conditionals_closed_by_indentation() {
+        let program = parse_ok(
+            "Jika umur lebih dari 17, maka:\\n    Jika umur kurang dari 60, maka:\\n        Tampilkan teks \\\"Usia produktif\\\".\\n    Tampilkan teks \\\"Di dalam kondisi luar\\\".",
+        );
+        assert_eq!(program.instruction_count(), 4);
+    }
+
+    #[test]
+    fn rejects_unexpected_top_level_indentation() {
+        let error = parse_source("    Tampilkan teks \\\"Halo\\\".").unwrap_err();
+        assert!(error.message.contains("Indentasi tidak terduga"));
+    }
+
+    #[test]
+    fn rejects_empty_conditional_body() {
+        let error = parse_source("Jika umur lebih dari 17, maka:\\nTampilkan teks \\\"Halo\\\".").unwrap_err();
+        assert!(error.message.contains("membutuhkan setidaknya satu instruksi"));
     }
 
     #[test]
@@ -828,18 +964,17 @@ komentar panjang
     }
 
     #[test]
-    fn rejects_unclosed_conditional() {
-        let error = parse_source(
-            r#"Jika umur lebih dari 17, maka: Tampilkan teks "Dewasa"."#,
-        )
-        .unwrap_err();
-        assert!(error.message.contains("Blok 'Jika' belum ditutup"));
+    fn conditional_body_ends_at_end_of_file() {
+        let program = parse_ok(
+            "Jika umur lebih dari 17, maka:\\n    Tampilkan teks \\\"Dewasa\\\".",
+        );
+        assert_eq!(program.instruction_count(), 2);
     }
 
     #[test]
-    fn rejects_lonely_conditional_terminator() {
+    fn rejects_legacy_conditional_terminator() {
         let error = parse_source("Selesai jika.").unwrap_err();
-        assert!(error.message.contains("tidak memiliki blok kondisi"));
+        assert!(error.message.contains("Selesai jika"));
     }
 
     #[test]
