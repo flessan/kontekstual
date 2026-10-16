@@ -1,0 +1,12 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { runKontekstual } from "./interpreter.js";
+test("contoh halo menghasilkan output yang diharapkan Rust",()=>{const r=runKontekstual('{- Contoh kecil -}\nTetapkan umur sebagai angka dengan nilai 20.\nJika umur lebih dari 17, maka:\n    Tampilkan teks "Halo dunia!".\nTampilkan teks "Program selesai.".');assert.deepEqual(r.output,["Halo dunia!","Program selesai."]);});
+test("variabel angka, teks, dan logika",()=>{const r=runKontekstual('Tetapkan umur sebagai angka dengan nilai 20.\nTetapkan nama sebagai teks dengan nilai "Thio".\nTetapkan aktif sebagai logika dengan nilai benar.\nTampilkan nilai umur.\nTampilkan nilai nama.\nTampilkan nilai aktif.');assert.deepEqual(r.output,["20","Thio","benar"]);});
+test("presedensi dan tanda kurung",()=>{const r=runKontekstual("Tetapkan a sebagai angka dengan nilai 10 ditambah 5 dikali 2.\nTetapkan b sebagai angka dengan nilai (10 ditambah 5) dikali 2.\nTampilkan nilai a.\nTampilkan nilai b.");assert.deepEqual(r.output,["20","30"]);});
+test("kondisi salah dan blok bersarang",()=>{const r=runKontekstual('Tetapkan umur sebagai angka dengan nilai 20.\nJika umur lebih dari 17, maka:\n    Tampilkan teks "Dewasa".\n    Jika umur kurang dari 60, maka:\n        Tampilkan teks "Produktif".\nJika umur kurang dari 18, maka:\n    Tampilkan teks "Tidak muncul".');assert.deepEqual(r.output,["Dewasa","Produktif"]);});
+test("komentar dalam teks tetap literal",()=>{const r=runKontekstual('Tampilkan teks "Teks {- bukan komentar -}".');assert.deepEqual(r.output,["Teks {- bukan komentar -}"]);});
+test("variabel tidak dikenal ditolak",()=>assert.throws(()=>runKontekstual("Tampilkan nilai hantu."),/belum ditetapkan/));
+test("tipe awal yang tidak cocok ditolak",()=>assert.throws(()=>runKontekstual('Tetapkan umur sebagai angka dengan nilai "dua puluh".'),/memerlukan tipe/));
+test("pembagian nol ditolak",()=>assert.throws(()=>runKontekstual("Tetapkan hasil sebagai angka dengan nilai 10 dibagi (3 dikurangi 3)."),/Pembagian dengan nol/));
+test("deklarasi ganda dalam scope sama ditolak",()=>assert.throws(()=>runKontekstual("Tetapkan umur sebagai angka dengan nilai 20.\nTetapkan umur sebagai angka dengan nilai 21."),/sudah ditetapkan/));
