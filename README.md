@@ -4,7 +4,7 @@
 
 Source files use the `.konteks` extension.
 
-> Status: language design and grammar are still drafts. A working compiler is not available yet.
+> Status: a Rust syntax-checker prototype is available. Execution, semantic type-checking, and native compilation are not implemented yet.
 
 ## Design goals
 
@@ -42,6 +42,17 @@ Akhiri program.
 
 Statements end with periods, so multiple instructions can appear in one paragraph or on separate lines. Line breaks and indentation help people read the code, but do not replace the language grammar.
 
+## Try the syntax checker
+
+Install stable Rust, then run these commands from the repository root:
+
+```sh
+cargo test --all-targets
+cargo run -- check examples/halo.konteks
+```
+
+The `check` command reports whether the file follows the current draft grammar. It does not run the program or produce an executable.
+
 ## Repository guide
 
 - [SPECIFICATION.md](SPECIFICATION.md) — language design and draft rules
@@ -51,7 +62,7 @@ Statements end with periods, so multiple instructions can appear in one paragrap
 
 ## Current scope
 
-The planned first version covers program boundaries, text output, integer variables, arithmetic expressions, comparisons, and conditional execution. The grammar is being revised before compiler implementation. Loops, user-defined functions, modules, and a stable native backend are planned for later milestones.
+The parser prototype recognizes program boundaries, text output, declarations, value output, arithmetic expressions, comparisons, and conditional blocks. It checks syntax only; it does not execute programs or yet verify declared names and value types. Loops, user-defined functions, modules, and a native backend remain future work.
 
 ## Contributing
 
