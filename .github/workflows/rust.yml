@@ -28,3 +28,20 @@ jobs:
           expected="$(printf 'Halo dunia!\nProgram selesai.')"
           test "$actual" = "$expected"
           printf '%s\n' "$actual"
+
+  playground:
+    name: Browser playground compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test browser interpreter
+        run: npm test
+      - name: Install playground dependencies
+        run: npm install
+      - name: Build browser playground
+        run: npm run build
