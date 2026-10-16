@@ -78,7 +78,7 @@ primary           = INTEGER
 identifier        = IDENTIFIER ;
 ```
 
-A conditional body must contain at least one statement. The `DEDENT` token closes the block; the source author does not write a closing keyword or period for the block itself. Each statement inside it still ends with a period. End-of-file closes remaining indentation levels.
+A conditional body must contain at least one statement. The `DEDENT` token closes the block; the source author does not write a closing keyword or period for the block itself. Each statement inside it still ends with a period. End-of-file closes remaining indentation levels. Spaces count as one column each, while a tab advances to the next multiple of four columns. Four spaces per nesting level are recommended.
 
 ## 3. Reading the grammar
 
@@ -148,4 +148,4 @@ Tampilkan teks "Halo".
 2. The checker validates syntactic structure only; it does not execute programs or verify variable declarations and types.
 3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, and conditional blocks, but parsing a construct does not imply runtime behavior exists.
 4. The initial draft does not support nested comments, multiline string literals, reassignment, or an alternate conditional branch.
-5. Identifier Unicode details, tab-versus-space policy, and a source formatter still need a formal decision.
+5. Identifier Unicode details and a source formatter still need a formal decision.
