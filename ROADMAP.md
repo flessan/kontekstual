@@ -19,13 +19,13 @@ This roadmap separates language design from implementation so the grammar can be
 - [x] Recognize quoted strings and basic escape sequences
 - [x] Recognize and skip single-line and multiline comments
 - [x] Tokenize words, reserved phrases, identifiers, integers, and punctuation
-- [x] Parse program boundaries and text output
+- [x] Parse EOF-terminated programs and text output
 - [x] Parse declarations and value output
 - [x] Parse arithmetic expressions and conditional blocks
 - [x] Add automated lexer and parser tests
 - [x] Produce beginner-friendly Indonesian syntax diagnostics
 
-**Exit criteria:** the included example passes the syntax checker; malformed strings, comments, punctuation, and program boundaries produce clear errors. Semantic checks and code execution are separate future phases.
+**Exit criteria:** the included example passes the syntax checker; malformed strings, comments, punctuation, and unfinished conditional blocks produce clear errors. Semantic checks and code execution are separate future phases.
 
 ## Phase 2 — Variables and semantic checks
 
