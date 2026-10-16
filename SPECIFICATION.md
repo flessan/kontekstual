@@ -71,7 +71,7 @@ Comments are treated as whitespace by the lexer. They may appear between tokens,
 
 | Punctuation | Meaning |
 | --- | --- |
-| `.` | Ends a complete instruction or program marker. |
+| `.` | Ends a complete instruction. |
 | `,` | Separates parts of a clause; for example, before `maka` in a condition. |
 | `:` | Introduces the body of a block such as a conditional. |
 | `"..." ` | Delimits a text literal, including spaces and ordinary punctuation. |
@@ -197,6 +197,7 @@ The nested condition closes when indentation returns to the outer block's level;
 - Newlines are emitted as layout tokens when source lines change. Blank and comment-only lines do not create blocks.
 - Indentation introduces and closes blocks. Each nested block must use a consistent indentation level; unmatched indentation is an error.
 - A conditional body must begin on the line after its colon and contain at least one indented instruction.
+- Leading spaces count as one column each; a tab advances to the next multiple of four columns. Four spaces per nesting level are recommended, and indentation must return to a level already used.
 - Reserved keywords and multiword phrases are recognized case-insensitively.
 - Identifiers must start with a letter and may contain letters and digits afterward. Support for the full Unicode letter range must be specified and tested before release.
 - Parentheses must be balanced and may only be used in expressions in the initial grammar.
@@ -241,7 +242,9 @@ The compiler must not silently guess the author's intent.
 
 The initial reserved set includes phrases and words such as:
 
-`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `selesai jika`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `atau`.
+`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `atau`.
+
+The old `Selesai jika.` form is not part of the syntax. The checker gives it a migration message directing authors to remove it and let indentation close the block.
 
 The lexer/parser must recognize multiword phrases deterministically and must not interpret a keyword embedded in a longer identifier as a keyword.
 
