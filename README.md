@@ -4,7 +4,7 @@
 
 Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program—no artificial start/end wrapper is needed.
 
-> Status: a Rust checker prototype validates syntax, variable declarations and scope, and expression types. It does not execute programs or generate native executables yet.
+> Status: an early Rust interpreter can run text output, variables, arithmetic, comparisons, and indentation-based conditional blocks. Static semantic checking rejects unknown variables and incompatible types. Native executable generation is not implemented yet.
 
 ## Design goals
 
@@ -35,16 +35,24 @@ Tampilkan teks "Lanjut di luar kondisi.".
 
 Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. The block closes automatically when indentation returns to the previous level—or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
-## Try the syntax checker
+## Check and run a program
 
 Install stable Rust, then run these commands from the repository root:
 
 ```sh
 cargo test --all-targets
 cargo run -- check examples/halo.konteks
+cargo run -- run examples/halo.konteks
 ```
 
-The `check` command validates syntax plus static semantic rules: variables must be declared before use, names cannot be declared twice in the same block, and expression types must fit the declared type. It does not run the program or produce an executable.
+The `check` command validates syntax and static semantic rules without executing the program. The `run` command executes the supported subset through the interpreter. Its output for the included example is:
+
+```text
+Halo dunia!
+Program selesai.
+```
+
+The interpreter uses signed 64-bit integers, reports division by zero and arithmetic overflow, and prints logical values as `benar` or `salah`.
 
 ## Repository guide
 
@@ -55,7 +63,7 @@ The `check` command validates syntax plus static semantic rules: variables must 
 
 ## Current scope
 
-The prototype recognizes period-terminated instructions, text output, declarations, value output, arithmetic expressions, comparisons, and indentation-based conditional blocks. Its static semantic checker validates variable visibility, duplicate declarations, initializer types, arithmetic operand types, and comparison operand types. Runtime evaluation, loops, user-defined functions, modules, and a native backend remain future work.
+The prototype recognizes period-terminated instructions, text output, declarations, value output, arithmetic expressions, comparisons, and indentation-based conditional blocks. Its interpreter executes that subset after static semantic checking. Loops, variable reassignment, user-defined functions, modules, user input, and native executable generation remain future work.
 
 ## Contributing
 
