@@ -1,26 +1,31 @@
 # Kontekstual Roadmap
 
-This roadmap separates language design from implementation so syntax can stabilize before the compiler grows.
+This roadmap separates language design from implementation so the grammar can be reviewed before the compiler grows.
 
-## Phase 0 — Repository and specification
+## Phase 0 — Repository and language design
 
 - [x] Create the public repository
 - [x] Define the project purpose and `.konteks` extension
-- [x] Draft the v0.1 language specification
-- [x] Draft the initial grammar and example
-- [ ] Review ambiguities and freeze the first parser subset
+- [x] Draft the first language specification
+- [x] Revise syntax toward structured Indonesian sentences and paragraphs
+- [x] Propose comment syntax using `{- ... -}`
+- [x] Draft the punctuation-aware grammar and examples
+- [ ] Review ambiguities and freeze a minimal parser subset
 
-## Phase 1 — Minimal compiler front end
+## Phase 1 — Lexer and parser
 
 - [ ] Choose the compiler implementation language and build setup
 - [ ] Read UTF-8 `.konteks` files
-- [ ] Validate allowed characters and report source locations
-- [ ] Tokenize words, keywords, identifiers, and integer literals
+- [ ] Recognize quoted strings and escape sequences
+- [ ] Recognize and skip single-line and multiline comments
+- [ ] Tokenize words, reserved phrases, identifiers, integers, and punctuation
 - [ ] Parse program boundaries and text output
+- [ ] Parse declarations and value output
+- [ ] Parse arithmetic expressions and conditionals
 - [ ] Add automated lexer and parser tests
 - [ ] Produce beginner-friendly Indonesian diagnostics
 
-**Exit criteria:** valid minimal programs parse; invalid characters and malformed program boundaries produce clear errors.
+**Exit criteria:** examples parse deterministically; malformed strings, comments, punctuation, and program boundaries produce clear errors.
 
 ## Phase 2 — Variables and semantic checks
 
@@ -38,7 +43,7 @@ This roadmap separates language design from implementation so syntax can stabili
 - [ ] Implement word-based arithmetic operators
 - [ ] Define precedence and associativity in tests
 - [ ] Implement comparison expressions
-- [ ] Implement `kalau` / `maka` / `selesai`
+- [ ] Implement `Jika` / `maka` / `Selesai jika`
 - [ ] Add nested conditional tests
 - [ ] Define integer overflow and division-by-zero behavior
 
@@ -67,20 +72,20 @@ This roadmap separates language design from implementation so syntax can stabili
 ## Phase 6 — Developer experience
 
 - [ ] Add a stable command-line interface
-- [ ] Add formatter or source validator
+- [ ] Add a source formatter or validator
 - [ ] Add editor syntax highlighting
-- [ ] Publish tutorials for beginners
+- [ ] Publish beginner tutorials
 - [ ] Add a versioned language reference
 - [ ] Prepare tagged releases and installation instructions
 
-## Deferred beyond v0.1
+## Deferred beyond draft v0.1
 
 - Loops
 - User-defined functions
 - Lists and collections
 - Standard library
 - Modules and package management
-- Multiline text
-- Input from users
+- Multiline text literals
+- User input
 - Debugger and language server
 - Additional target architectures
