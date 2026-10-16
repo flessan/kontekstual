@@ -1,0 +1,15 @@
+# Build output
+build/
+dist/
+target/
+out/
+
+# Test and coverage output
+coverage/
+test-results/
+
+# Local editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
