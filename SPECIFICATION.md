@@ -34,7 +34,7 @@ Source files are UTF-8 text and use the `.konteks` extension. They may contain:
 
 Punctuation is valid only where the grammar allows it or inside a quoted text literal or comment. An arbitrary symbol in an invalid position should produce a clear syntax error.
 
-Line breaks and indentation are for readability. A complete instruction ends with a period, so several instructions may appear in one paragraph. Formatting each instruction on its own line is recommended for beginners.
+A complete instruction ends with a period, so ordinary instructions may appear in one paragraph or on separate lines. Indentation is meaningful when a block is introduced: the first instruction in a block must be on the next line and indented farther than its parent.
 
 ## 4. Comments
 
@@ -94,7 +94,7 @@ Every instruction ends with a period. A source file is one program: after the la
 Tampilkan teks "Halo dunia!".
 ```
 
-One source file contains one program. A non-empty program must contain at least one instruction, and every instruction must end with a period. A conditional block must still be closed explicitly with `Selesai jika.` before the file ends.
+One source file contains one program. A non-empty program must contain at least one instruction, and every instruction must end with a period. A conditional block closes automatically when indentation returns to the indentation level where that block began, or when the file ends. No extra closing sentence is required.
 
 Keywords and reserved phrases are case-insensitive, so capitalization at the beginning of a sentence is allowed. Identifiers are case-sensitive in this draft; lowercase names are recommended.
 
@@ -175,24 +175,28 @@ These expressions are proposed syntax, not implemented compiler features.
 
 ## 11. Conditional execution
 
-A conditional block starts with `Jika`, uses a comma before `maka`, and a colon to introduce its body. It ends with `Selesai jika.`.
+A conditional block starts with `Jika`, uses a comma before `maka`, and a colon to introduce its body. Its body starts on the next line and is indented. The block closes when indentation returns to its parent's level.
 
 ```text
 Tetapkan umur sebagai angka dengan nilai 20.
 
 Jika umur lebih dari 17, maka:
     Tampilkan teks "Kamu sudah dewasa!".
-Selesai jika.
+    Jika umur kurang dari 60, maka:
+        Tampilkan teks "Usia produktif".
+Tampilkan teks "Instruksi di luar kondisi".
 ```
 
-A conditional body may contain supported instructions and nested conditional blocks. The condition must evaluate to a logical value. An alternate branch equivalent to `else` is not included in draft v0.1.
+The nested condition closes when indentation returns to the outer block's level; the outer block closes when indentation returns to the top level. End-of-file also closes any open indentation blocks. An alternate branch equivalent to `else` is not included in draft v0.1.
 
 ## 12. Draft lexical and parsing rules
 
 - The lexer recognizes quoted strings before treating punctuation as syntax.
 - Comments are removed as whitespace before parsing, except that comment markers inside quoted strings are ordinary text.
 - Periods outside strings and comments terminate statements.
-- Newlines and indentation are whitespace and do not determine block boundaries.
+- Newlines are emitted as layout tokens when source lines change. Blank and comment-only lines do not create blocks.
+- Indentation introduces and closes blocks. Each nested block must use a consistent indentation level; unmatched indentation is an error.
+- A conditional body must begin on the line after its colon and contain at least one indented instruction.
 - Reserved keywords and multiword phrases are recognized case-insensitively.
 - Identifiers must start with a letter and may contain letters and digits afterward. Support for the full Unicode letter range must be specified and tested before release.
 - Parentheses must be balanced and may only be used in expressions in the initial grammar.
@@ -227,7 +231,7 @@ Useful diagnostic categories include:
 - Instruksi tidak dikenal
 - Variabel belum ditetapkan
 - Tipe nilai tidak sesuai
-- Blok `Jika` belum ditutup dengan `Selesai jika.`
+- Isi blok `Jika` tidak memiliki indentasi yang benar atau tidak berisi instruksi
 - Ekspresi tidak lengkap
 - Pembagian dengan nol
 
