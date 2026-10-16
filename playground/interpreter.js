@@ -36,7 +36,8 @@ export function runKontekstual(source){
   const lines=stripComments(source).split(/\r?\n/),scopes=[new Map()],blocks=[],output=[];
   for(let i=0;i<lines.length;i++){const raw=lines[i];if(!raw.trim())continue;const indent=raw.match(/^\s*/)[0].replace(/\t/g,"    ").length,line=raw.trim(),num=i+1;
     while(blocks.length&&indent<blocks[blocks.length-1].indent){blocks.pop();scopes.pop();}
-    if(blocks.length&&indent>blocks[blocks.length-1].indent)throw new KontekstualError("Indentasi blok tidak konsisten.",num);
+    const expectedIndent=blocks.length?blocks[blocks.length-1].indent:0;
+    if(indent!==expectedIndent)throw new KontekstualError("Indentasi blok tidak konsisten.",num);
     if(/^Jika\s+/i.test(line)){const m=line.match(/^Jika\s+(.+),\s*maka\s*:\s*$/i);if(!m)throw new KontekstualError("Gunakan format 'Jika kondisi, maka:'.",num);const parentActive=blocks.every(b=>b.active);let condition=false;if(parentActive){const vars=new Map();for(const scope of scopes)for(const [k,v]of scope)vars.set(k,v);condition=expr(m[1],num,vars);if(typeof condition!=="boolean")throw new KontekstualError("Kondisi Jika harus menghasilkan logika.",num);}blocks.push({indent:indent+4,active:parentActive&&condition});scopes.push(new Map());continue;}
     if(blocks.some(b=>!b.active))continue;
     const pt=line.match(/^Tampilkan\s+teks\s+"((?:\\.|[^"\\])*)"\s*\.$/i);if(pt){output.push(pt[1].replace(/\\(["\\])/g,"$1"));continue;}
