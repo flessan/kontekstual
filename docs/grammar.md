@@ -1,94 +1,134 @@
-# Kontekstual v0.1 Grammar
+# Kontekstual Draft Grammar
 
-This is a draft grammar for the first parser. The specification takes precedence if an inconsistency is found; update both documents together.
+This is a draft grammar for the proposed sentence-based syntax. The specification takes precedence if an inconsistency is found; update both documents together.
 
-The grammar uses EBNF notation for describing the language. The notation itself contains punctuation, but that punctuation is documentation syntax and is not typed into a `.konteks` program.
+The examples below show actual Kontekstual source. The EBNF punctuation is only notation used to describe the grammar.
 
 ## 1. Lexical conventions
 
-- `WORD`: an alphabetic keyword or identifier
+- `IDENTIFIER`: a user-defined name beginning with a letter and followed by letters or digits
 - `INTEGER`: one or more decimal digits
-- `TEXT_REMAINDER`: all permitted text after the phrase `tampilkan teks` until the end of the current line
-- `NEWLINE`: a line break
-- `INDENT`: leading spaces used for readability
-- `EOF`: end of file
+- `STRING`: a double-quoted, single-line text literal
+- `PERIOD`: `.`, which terminates a statement
+- `COMMA`: `,`, used between a condition and `maka`
+- `COLON`: `:`, which introduces a conditional body
+- `LPAREN`, `RPAREN`: parentheses for expression grouping
+- `COMMENT`: text delimited by `{-` and `-}`, treated as whitespace
+- `WHITESPACE`: spaces, tabs, and line breaks
 
-The strict source format permits letters, spaces, line breaks, and decimal digits. It does not permit symbolic operators or punctuation.
+Keywords and reserved phrases are case-insensitive. Identifiers are case-sensitive in this draft. Comment markers are not recognized inside quoted strings. Comments cannot be nested.
 
 ## 2. EBNF
 
 ```ebnf
-program          = blank_lines, "mulai", NEWLINE,
-                   { blank_lines, statement, NEWLINE },
-                   blank_lines, "akhir", NEWLINE, { blank_lines }, EOF ;
+program           = whitespace, "mulai program", ".", whitespace,
+                    { statement, whitespace },
+                    "akhiri program", ".", whitespace, EOF ;
 
-statement        = declaration
-                 | text_output
-                 | value_output
-                 | conditional ;
+statement         = declaration
+                  | text_output
+                  | value_output
+                  | conditional ;
 
-declaration      = "tetapkan", identifier, "sebagai", type,
-                   "bernilai", INTEGER ;
+declaration       = "tetapkan", identifier, "sebagai", type,
+                    "dengan nilai", expression, "." ;
 
-type             = "angka" | "teks" | "benar salah" ;
+type              = "angka" | "teks" | "logika" ;
 
-text_output      = "tampilkan teks", TEXT_REMAINDER ;
-value_output     = "tampilkan nilai", identifier ;
+text_output       = "tampilkan teks", STRING, "." ;
+value_output      = "tampilkan nilai", identifier, "." ;
 
-conditional      = "kalau", condition, "maka", NEWLINE,
-                   { blank_lines, statement, NEWLINE },
-                   blank_lines, "selesai" ;
+conditional       = "jika", expression, ",", "maka", ":",
+                    whitespace, { statement, whitespace },
+                    "selesai jika", "." ;
 
-condition        = operand, comparison, operand ;
+expression        = comparison_expression ;
 
-comparison       = "lebih dari"
-                 | "kurang dari"
-                 | "sama dengan"
-                 | "tidak sama dengan"
-                 | "lebih dari atau sama dengan"
-                 | "kurang dari atau sama dengan" ;
+comparison_expression
+                  = additive_expression,
+                    [ comparison_operator, additive_expression ] ;
 
-operand          = identifier | INTEGER ;
+comparison_operator
+                  = "lebih dari"
+                  | "kurang dari"
+                  | "sama dengan"
+                  | "tidak sama dengan"
+                  | "lebih dari atau sama dengan"
+                  | "kurang dari atau sama dengan" ;
 
-identifier       = WORD ;
-blank_lines      = { NEWLINE } ;
+additive_expression
+                  = multiplicative_expression,
+                    { ("ditambah" | "dikurangi"),
+                      multiplicative_expression } ;
+
+multiplicative_expression
+                  = primary,
+                    { ("dikali" | "dibagi"), primary } ;
+
+primary           = INTEGER
+                  | identifier
+                  | "(", expression, ")" ;
+
+identifier        = IDENTIFIER ;
+whitespace        = { WHITESPACE | COMMENT } ;
 ```
 
-## 3. Notes and known limitations
+The grammar sketch describes intended recognition, not a working parser. In an actual parser, whitespace between tokens is handled lexically, and a conditional body continues until its matching `selesai jika.` token. Statements end at periods outside strings and comments.
 
-1. This grammar is intentionally small. Arithmetic expressions are listed in the language specification as a planned feature, but are not yet included in this parser grammar.
-2. The `teks` and `benar salah` declaration forms are reserved for future complete type support; the first parser may initially implement only `angka`.
-3. A text literal consumes the remainder of its line, so it cannot currently be followed by another instruction on the same line.
-4. Multiword keywords must be recognized as sequences, not as one token with embedded spaces.
-5. The compiler must distinguish reserved phrases from identifiers deterministically.
-6. The exact treatment of indentation should be enforced by parser tests before the grammar is called stable.
+## 3. Reading the grammar
 
-## 4. Valid initial example
+A minimal program:
 
 ```text
-mulai
-tampilkan teks halo dunia
-akhir
+Mulai program.
+Tampilkan teks "Halo dunia!".
+Akhiri program.
 ```
 
-## 5. Invalid examples
-
-A missing program start is invalid:
+A paragraph-style program is also valid because periods, not line breaks, separate statements:
 
 ```text
-tampilkan teks halo dunia
-akhir
+Mulai program. Tetapkan umur sebagai angka dengan nilai 20. Jika umur lebih dari 17, maka: Tampilkan teks "Kamu sudah dewasa!". Selesai jika. Akhiri program.
 ```
 
-A symbolic operator is invalid:
+A multiline comment is valid:
 
 ```text
-mulai
-tetapkan umur sebagai angka bernilai 20
-kalau umur > 17 maka
-    tampilkan teks halo
-selesai
-akhir
+{-
+Komentar ini bisa menjelaskan tujuan program
+tanpa ikut dijalankan.
+-}
+Tampilkan teks "Halo dunia!".
 ```
 
-The compiler should explain that `>` is not allowed and suggest `lebih dari`.
+## 4. Invalid examples
+
+The program-start phrase is required:
+
+```text
+Tampilkan teks "Halo dunia!".
+Akhiri program.
+```
+
+This condition uses invalid symbolic comparison syntax; comparisons are expressed with words:
+
+```text
+Mulai program.
+Jika umur > 17, maka:
+    Tampilkan teks "Halo".
+Selesai jika.
+Akhiri program.
+```
+
+The compiler should report the unexpected `>` and suggest `lebih dari`.
+
+An unterminated string or comment is also invalid. The lexer should identify the opening location and explain how to close it.
+
+## 5. Known limitations and decisions still required
+
+1. The grammar is a design draft and has not been implemented or tested by a real parser.
+2. Arithmetic and comparison syntax are planned; they are not currently working compiler features.
+3. The initial declaration grammar supports expression values syntactically, but semantic checks must enforce the declared type.
+4. Conditional bodies and nested conditionals need dedicated parser tests to verify matching block terminators.
+5. The exact Unicode rules for identifiers and detailed string escape semantics must be finalized.
+6. Draft v0.1 does not support nested comments, multiline text literals, or an alternate conditional branch.
