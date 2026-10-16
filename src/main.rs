@@ -925,13 +925,14 @@ Tampilkan teks "Selesai"."#,
 
     #[test]
     fn rejects_unexpected_top_level_indentation() {
-        let error = parse_source("    Tampilkan teks \\\"Halo\\\".").unwrap_err();
+        let error = parse_source(r#"    Tampilkan teks "Halo"."#).unwrap_err();
         assert!(error.message.contains("Indentasi tidak terduga"));
     }
 
     #[test]
     fn rejects_empty_conditional_body() {
-        let error = parse_source("Jika umur lebih dari 17, maka:\\nTampilkan teks \\\"Halo\\\".").unwrap_err();
+        let error = parse_source(r#"Jika umur lebih dari 17, maka:
+Tampilkan teks "Halo"."#).unwrap_err();
         assert!(error.message.contains("membutuhkan setidaknya satu instruksi"));
     }
 
@@ -973,7 +974,8 @@ Tampilkan teks "Selesai"."#,
     #[test]
     fn conditional_body_ends_at_end_of_file() {
         let program = parse_ok(
-            "Jika umur lebih dari 17, maka:\\n    Tampilkan teks \\\"Dewasa\\\".",
+            r#"Jika umur lebih dari 17, maka:
+    Tampilkan teks "Dewasa"."#,
         );
         assert_eq!(program.instruction_count(), 2);
     }
