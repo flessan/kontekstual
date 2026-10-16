@@ -27,16 +27,16 @@ This roadmap separates language design from implementation so the grammar can be
 
 **Exit criteria:** the included example passes the syntax checker; malformed strings, comments, punctuation, and invalid indentation produce clear errors. Conditional blocks close by indentation or end-of-file. Semantic checks and code execution are separate future phases.
 
-## Phase 2 — Variables and semantic checks
+## Phase 2 — Static semantic checks
 
-- [ ] Implement integer declarations
-- [ ] Track variable scope and declarations
-- [ ] Implement variable output
-- [ ] Detect duplicate declarations and unknown variables
-- [ ] Add type checking
-- [ ] Add semantic tests
+- [x] Track declared variable types and lexical scope
+- [x] Require variables to be declared before they are read
+- [x] Detect duplicate declarations in the same scope
+- [x] Validate declared types against initializer values
+- [x] Validate arithmetic and comparison operand types
+- [x] Add semantic tests for scope, declarations, and type errors
 
-**Exit criteria:** declarations and variable reads behave deterministically, with no execution after a compile-time error.
+**Exit criteria:** semantically invalid programs are rejected with an actionable Indonesian diagnostic before any execution begins. Runtime declaration and variable behavior remains part of the interpreter milestone.
 
 ## Phase 3 — Expression semantics and conditionals
 
