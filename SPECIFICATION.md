@@ -65,7 +65,7 @@ An inline comment is also allowed after a complete instruction:
 Tampilkan teks "Halo dunia!". {- Menampilkan sapaan. -}
 ```
 
-Comments are treated as whitespace by the lexer. In draft v0.1, comments cannot be nested and must not split a keyword phrase or a quoted string. The closing marker `-}` ends a comment; it is not an instruction terminator.
+Comments are treated as whitespace by the lexer. They may appear between tokens, including between the words of a multiword phrase, but must not be placed inside an identifier or a quoted string. In draft v0.1, comments cannot be nested. The closing marker `-}` ends a comment; it is not an instruction terminator.
 
 ## 5. Punctuation and text literals
 
