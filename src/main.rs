@@ -1478,7 +1478,7 @@ Jika benar tidak sama dengan salah, maka:
     #[test]
     fn interpreter_rejects_integer_literals_outside_i64_range() {
         let error = execute_source(
-            "Tetapkan terlalu_besar sebagai angka dengan nilai 999999999999999999999999999999999999.",
+            "Tetapkan terlalubesar sebagai angka dengan nilai 999999999999999999999999999999999999.",
         ).expect_err("literal di luar rentang harus gagal");
         assert!(error.message.contains("di luar rentang bilangan bulat 64-bit"));
     }
