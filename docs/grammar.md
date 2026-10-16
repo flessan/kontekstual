@@ -21,7 +21,7 @@ Keywords and reserved phrases are case-insensitive. Identifiers are case-sensiti
 ## 2. EBNF
 
 ```ebnf
-program           = whitespace, statement, { whitespace, statement, whitespace }, EOF ;
+program           = whitespace, statement, { whitespace, statement }, whitespace, EOF ;
 
 statement         = declaration
                   | text_output
@@ -99,10 +99,10 @@ Tampilkan teks "Halo dunia!".
 
 ## 4. Invalid examples
 
-The program-start phrase is required:
+An empty file or a file containing only comments is invalid. Every program must contain at least one complete instruction:
 
 ```text
-Tampilkan teks "Halo dunia!".
+{- Program ini belum memiliki instruksi. -}
 ```
 
 This condition uses invalid symbolic comparison syntax; comparisons are expressed with words:
