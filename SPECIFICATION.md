@@ -106,7 +106,7 @@ The planned basic types are:
 - `teks` — text values
 - `logika` — Boolean values, written as `benar` or `salah`
 
-The current static semantic checker verifies declared types, variable visibility, arithmetic operand types, and comparison operand types. It does not evaluate values at runtime. A feature is not considered implemented until it is backed by tests.
+The current prototype statically checks declared types, variable visibility, arithmetic operand types, and comparison operand types. Its early interpreter evaluates supported expressions and executes output and conditional instructions. A feature is not considered implemented until it is backed by tests.
 
 Positive integer literals are written using decimal digits, for example `20`. Negative numbers and decimal fractions are deferred until their exact syntax and numeric behavior are defined.
 
@@ -171,9 +171,9 @@ Example:
 Tetapkan hasil sebagai angka dengan nilai (10 ditambah 5) dikali 2.
 ```
 
-Parentheses group expressions. Multiplication and division have higher precedence than addition and subtraction. Comparisons have lower precedence than arithmetic. Operators of equal precedence are left-associative. Division behavior, overflow, and division-by-zero diagnostics must be documented and tested before release.
+Parentheses group expressions. Multiplication and division have higher precedence than addition and subtraction. Comparisons have lower precedence than arithmetic. Operators of equal precedence are left-associative. The interpreter uses signed 64-bit integers, truncating integer division, and reports division by zero and arithmetic overflow as errors.
 
-The parser recognizes these expressions and the static checker validates their operand types. Values are not evaluated at runtime yet. Arithmetic operations require numeric operands; order comparisons require numeric operands; equality comparisons require both operands to have the same type.
+The parser recognizes these expressions, the static checker validates operand types, and the interpreter evaluates them. Arithmetic operations require numeric operands; order comparisons require numeric operands; equality comparisons require both operands to have the same type.
 
 ## 11. Conditional execution
 
@@ -218,7 +218,7 @@ The intended compiler pipeline is:
 5. Lower supported instructions into an intermediate representation.
 6. Eventually generate and link a native executable for a supported target.
 
-A small interpreter or temporary backend may be used to validate semantics before native code generation is implemented. Such a prototype must be labeled honestly.
+The current prototype uses a small interpreter to validate program behavior before native code generation is implemented. This interpreter is a development milestone, not a stable native compiler.
 
 ## 14. Diagnostics
 
@@ -236,7 +236,7 @@ Useful diagnostic categories include:
 - Tipe nilai tidak sesuai
 - Isi blok `Jika` tidak memiliki indentasi yang benar atau tidak berisi instruksi
 - Ekspresi tidak lengkap
-- Pembagian dengan nol
+- Pembagian dengan nol atau luapan bilangan bulat saat program dijalankan
 
 The compiler must not silently guess the author's intent.
 
