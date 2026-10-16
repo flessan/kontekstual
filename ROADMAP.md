@@ -21,11 +21,11 @@ This roadmap separates language design from implementation so the grammar can be
 - [x] Tokenize words, reserved phrases, identifiers, integers, and punctuation
 - [x] Parse EOF-terminated programs and text output
 - [x] Parse declarations and value output
-- [x] Parse arithmetic expressions and conditional blocks
+- [x] Parse arithmetic expressions and indentation-based conditional blocks
 - [x] Add automated lexer and parser tests
 - [x] Produce beginner-friendly Indonesian syntax diagnostics
 
-**Exit criteria:** the included example passes the syntax checker; malformed strings, comments, punctuation, and unfinished conditional blocks produce clear errors. Semantic checks and code execution are separate future phases.
+**Exit criteria:** the included example passes the syntax checker; malformed strings, comments, punctuation, and invalid indentation produce clear errors. Conditional blocks close by indentation or end-of-file. Semantic checks and code execution are separate future phases.
 
 ## Phase 2 — Variables and semantic checks
 
@@ -43,7 +43,7 @@ This roadmap separates language design from implementation so the grammar can be
 - [ ] Implement word-based arithmetic operators
 - [ ] Define precedence and associativity in tests
 - [ ] Implement comparison expressions
-- [ ] Implement `Jika` / `maka` / `Selesai jika`
+- [x] Parse `Jika` / `maka:` blocks that close by indentation
 - [ ] Add nested conditional tests
 - [ ] Define integer overflow and division-by-zero behavior
 
