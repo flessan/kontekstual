@@ -38,16 +38,16 @@ This roadmap separates language design from implementation so the grammar can be
 
 **Exit criteria:** declarations and variable reads behave deterministically, with no execution after a compile-time error.
 
-## Phase 3 — Expressions and conditionals
+## Phase 3 — Expression semantics and conditionals
 
-- [ ] Implement word-based arithmetic operators
-- [ ] Define precedence and associativity in tests
-- [ ] Implement comparison expressions
+- [ ] Evaluate word-based arithmetic operators
+- [ ] Assert precedence and associativity in AST tests
+- [ ] Evaluate comparison expressions
 - [x] Parse `Jika` / `maka:` blocks that close by indentation
-- [ ] Add nested conditional tests
+- [x] Add nested conditional parser tests
 - [ ] Define integer overflow and division-by-zero behavior
 
-**Exit criteria:** supported expressions and conditional blocks pass unit and integration tests.
+**Exit criteria:** arithmetic and comparison expressions have defined runtime behavior, with unit tests for precedence, invalid values, and numeric edge cases.
 
 ## Phase 4 — Execution prototype
 
