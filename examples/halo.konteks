@@ -1,3 +1,7 @@
-{- Contoh sederhana untuk menampilkan sapaan. -}
+{- Contoh kecil: variabel, kondisi, dan instruksi berbahasa Indonesia. -}
 
-Tampilkan teks "Halo dunia!".
+Tetapkan umur sebagai angka dengan nilai 20.
+
+Jika umur lebih dari 17, maka:
+    Tampilkan teks "Halo dunia!".
+Tampilkan teks "Program selesai.".
