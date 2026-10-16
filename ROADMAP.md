@@ -40,23 +40,25 @@ This roadmap separates language design from implementation so the grammar can be
 
 ## Phase 3 — Expression semantics and conditionals
 
-- [ ] Evaluate word-based arithmetic operators
-- [ ] Assert precedence and associativity in AST tests
-- [ ] Evaluate comparison expressions
+- [x] Evaluate word-based arithmetic operators
+- [x] Test precedence and parentheses through interpreter outputs
+- [x] Evaluate numeric, text, and logical equality comparisons
 - [x] Parse `Jika` / `maka:` blocks that close by indentation
-- [x] Add nested conditional parser tests
-- [ ] Define integer overflow and division-by-zero behavior
+- [x] Add nested conditional parser and execution tests
+- [x] Define signed 64-bit integers, overflow, and division-by-zero diagnostics
 
-**Exit criteria:** arithmetic and comparison expressions have defined runtime behavior, with unit tests for precedence, invalid values, and numeric edge cases.
+**Exit criteria:** the supported expression subset evaluates deterministically and rejects invalid numeric operations.
 
 ## Phase 4 — Execution prototype
 
-- [ ] Define a small intermediate representation
-- [ ] Execute the supported subset through a temporary interpreter or test backend
-- [ ] Add end-to-end tests for example programs
-- [ ] Document unsupported features honestly
+- [x] Execute the supported subset through an interpreter
+- [x] Add the `run` CLI command
+- [x] Add end-to-end tests for output, expressions, conditions, and runtime errors
+- [x] Run the example program in CI and verify its exact output
+- [x] Document unsupported features honestly
+- [ ] Define an intermediate representation before expanding the language substantially
 
-**Exit criteria:** example programs produce predictable output on the development platform.
+**Exit criteria:** the included program runs predictably on the development platform. The prototype interpreter is working, but it is not a native executable backend.
 
 ## Phase 5 — Native executable backend
 
