@@ -937,6 +937,18 @@ Tampilkan teks "Halo"."#).unwrap_err();
     }
 
     #[test]
+    fn rejects_indentation_that_does_not_match_an_open_level() {
+        let error = parse_source(
+            r#"Jika umur lebih dari 17, maka:
+    Jika umur kurang dari 60, maka:
+        Tampilkan teks "Ya".
+      Tampilkan teks "Indentasi meleset"."#,
+        )
+        .unwrap_err();
+        assert!(error.message.contains("Indentasi tidak cocok"));
+    }
+
+    #[test]
     fn accepts_parenthesized_arithmetic() {
         let program = parse_ok(
             "Tetapkan total sebagai angka dengan nilai (10 ditambah 5) dikali 2.",
