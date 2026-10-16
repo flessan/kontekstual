@@ -14,18 +14,18 @@ This roadmap separates language design from implementation so the grammar can be
 
 ## Phase 1 — Lexer and parser
 
-- [ ] Choose the compiler implementation language and build setup
-- [ ] Read UTF-8 `.konteks` files
-- [ ] Recognize quoted strings and escape sequences
-- [ ] Recognize and skip single-line and multiline comments
-- [ ] Tokenize words, reserved phrases, identifiers, integers, and punctuation
-- [ ] Parse program boundaries and text output
-- [ ] Parse declarations and value output
-- [ ] Parse arithmetic expressions and conditionals
-- [ ] Add automated lexer and parser tests
-- [ ] Produce beginner-friendly Indonesian diagnostics
+- [x] Choose Rust and add a Cargo build setup
+- [x] Read UTF-8 `.konteks` files
+- [x] Recognize quoted strings and basic escape sequences
+- [x] Recognize and skip single-line and multiline comments
+- [x] Tokenize words, reserved phrases, identifiers, integers, and punctuation
+- [x] Parse program boundaries and text output
+- [x] Parse declarations and value output
+- [x] Parse arithmetic expressions and conditional blocks
+- [x] Add automated lexer and parser tests
+- [x] Produce beginner-friendly Indonesian syntax diagnostics
 
-**Exit criteria:** examples parse deterministically; malformed strings, comments, punctuation, and program boundaries produce clear errors.
+**Exit criteria:** the included example passes the syntax checker; malformed strings, comments, punctuation, and program boundaries produce clear errors. Semantic checks and code execution are separate future phases.
 
 ## Phase 2 — Variables and semantic checks
 
