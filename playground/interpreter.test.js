@@ -10,3 +10,6 @@ test("variabel tidak dikenal ditolak",()=>assert.throws(()=>runKontekstual("Tamp
 test("tipe awal yang tidak cocok ditolak",()=>assert.throws(()=>runKontekstual('Tetapkan umur sebagai angka dengan nilai "dua puluh".'),/memerlukan tipe/));
 test("pembagian nol ditolak",()=>assert.throws(()=>runKontekstual("Tetapkan hasil sebagai angka dengan nilai 10 dibagi (3 dikurangi 3)."),/Pembagian dengan nol/));
 test("deklarasi ganda dalam scope sama ditolak",()=>assert.throws(()=>runKontekstual("Tetapkan umur sebagai angka dengan nilai 20.\nTetapkan umur sebagai angka dengan nilai 21."),/sudah ditetapkan/));
+
+test("kondisi bersarang di dalam cabang salah tidak dievaluasi",()=>{const r=runKontekstual('Jika 1 lebih dari 2, maka:\n    Jika variabelhilang lebih dari 0, maka:\n        Tampilkan teks "Tidak muncul".\nTampilkan teks "Tetap jalan".');assert.deepEqual(r.output,["Tetap jalan"]);});
+test("indentasi tidak konsisten ditolak",()=>assert.throws(()=>runKontekstual('Jika benar sama dengan benar, maka:\n    Tampilkan teks "A".\n  Tampilkan teks "B".'),/Indentasi blok tidak konsisten/));
