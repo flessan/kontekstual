@@ -54,7 +54,7 @@ The `check` command reports whether the file follows the current draft grammar. 
 
 ## Current scope
 
-The parser prototype recognizes program boundaries, text output, declarations, value output, arithmetic expressions, comparisons, and conditional blocks. It checks syntax only; it does not execute programs or yet verify declared names and value types. Loops, user-defined functions, modules, and a native backend remain future work.
+The parser prototype recognizes period-terminated instructions, text output, declarations, value output, arithmetic expressions, comparisons, and conditional blocks. It checks syntax only; it does not execute programs or yet verify declared names and value types. Loops, user-defined functions, modules, and a native backend remain future work.
 
 ## Contributing
 
