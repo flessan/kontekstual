@@ -29,10 +29,11 @@ Tetapkan umur sebagai angka dengan nilai 20.
 
 Jika umur lebih dari 17, maka:
     Tampilkan teks "Kamu sudah dewasa!".
-Selesai jika.
+
+Tampilkan teks "Lanjut di luar kondisi.".
 ```
 
-Every instruction ends with a period, so instructions can appear in one paragraph or on separate lines. A block such as a conditional has its own closing sentence, like `Selesai jika.`. Once the final instruction ends, the file simply stops. Line breaks and indentation help people read the code, but do not change its meaning.
+Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. The block closes automatically when indentation returns to the previous level—or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
 ## Try the syntax checker
 
