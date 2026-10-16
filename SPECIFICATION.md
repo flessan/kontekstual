@@ -88,15 +88,13 @@ In a quoted string, a double quote and backslash are escaped as `\"` and `\\`, r
 
 ## 6. Program structure
 
-Every complete program begins with `Mulai program.` and ends with `Akhiri program.`.
+Every instruction ends with a period. A source file is one program: after the last complete instruction, end-of-file marks the end of the program. There is no separate `Mulai program.` or `Akhiri program.` wrapper.
 
 ```text
-Mulai program.
 Tampilkan teks "Halo dunia!".
-Akhiri program.
 ```
 
-Only one top-level program is permitted in a file. Non-comment instructions outside the program boundary are errors, apart from whitespace.
+One source file contains one program. A non-empty program must contain at least one instruction, and every instruction must end with a period. A conditional block must still be closed explicitly with `Selesai jika.` before the file ends.
 
 Keywords and reserved phrases are case-insensitive, so capitalization at the beginning of a sentence is allowed. Identifiers are case-sensitive in this draft; lowercase names are recommended.
 
@@ -180,15 +178,11 @@ These expressions are proposed syntax, not implemented compiler features.
 A conditional block starts with `Jika`, uses a comma before `maka`, and a colon to introduce its body. It ends with `Selesai jika.`.
 
 ```text
-Mulai program.
-
 Tetapkan umur sebagai angka dengan nilai 20.
 
 Jika umur lebih dari 17, maka:
     Tampilkan teks "Kamu sudah dewasa!".
 Selesai jika.
-
-Akhiri program.
 ```
 
 A conditional body may contain supported instructions and nested conditional blocks. The condition must evaluate to a logical value. An alternate branch equivalent to `else` is not included in draft v0.1.
@@ -225,8 +219,8 @@ Compiler diagnostics should be in Indonesian and include the file name and line/
 
 Useful diagnostic categories include:
 
-- Program tidak diawali dengan `Mulai program.`
-- Program tidak diakhiri dengan `Akhiri program.`
+- Program kosong atau tidak memiliki instruksi.
+- Instruksi terakhir belum diakhiri dengan tanda titik.
 - Tanda baca berada di posisi yang tidak tepat
 - Tanda kutip teks belum ditutup
 - Komentar belum ditutup
@@ -243,7 +237,7 @@ The compiler must not silently guess the author's intent.
 
 The initial reserved set includes phrases and words such as:
 
-`mulai program`, `akhiri program`, `tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `selesai jika`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `atau`.
+`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `selesai jika`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `atau`.
 
 The lexer/parser must recognize multiword phrases deterministically and must not interpret a keyword embedded in a longer identifier as a keyword.
 
