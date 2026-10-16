@@ -137,10 +137,7 @@ fn lex(source: &str) -> Result<Vec<Token>, Diagnostic> {
                             Some(other) => {
                                 return Err(Diagnostic::new(
                                     escape_location,
-                                    format!(
-                                        "Urutan pelolosan \\{} belum didukung. Gunakan \\" atau \\\\.",
-                                        other
-                                    ),
+                                    format!("Urutan pelolosan setelah garis miring terbalik belum didukung: '{}'. Gunakan hanya pelolosan tanda kutip atau garis miring terbalik.", other),
                                 ));
                             }
                             None => {
@@ -363,7 +360,7 @@ impl Parser {
     }
 
     fn expect_period(&mut self) -> Result<(), Diagnostic> {
-        if matches!(self.current().kind, TokenKind::Period) {
+        if matches!(&self.current().kind, TokenKind::Period) {
             self.position += 1;
             Ok(())
         } else {
@@ -374,7 +371,7 @@ impl Parser {
     }
 
     fn expect_comma(&mut self) -> Result<(), Diagnostic> {
-        if matches!(self.current().kind, TokenKind::Comma) {
+        if matches!(&self.current().kind, TokenKind::Comma) {
             self.position += 1;
             Ok(())
         } else {
@@ -385,7 +382,7 @@ impl Parser {
     }
 
     fn expect_colon(&mut self) -> Result<(), Diagnostic> {
-        if matches!(self.current().kind, TokenKind::Colon) {
+        if matches!(&self.current().kind, TokenKind::Colon) {
             self.position += 1;
             Ok(())
         } else {
@@ -396,7 +393,7 @@ impl Parser {
     }
 
     fn expect_left_paren(&mut self) -> Result<(), Diagnostic> {
-        if matches!(self.current().kind, TokenKind::LeftParen) {
+        if matches!(&self.current().kind, TokenKind::LeftParen) {
             self.position += 1;
             Ok(())
         } else {
@@ -405,7 +402,7 @@ impl Parser {
     }
 
     fn expect_right_paren(&mut self) -> Result<(), Diagnostic> {
-        if matches!(self.current().kind, TokenKind::RightParen) {
+        if matches!(&self.current().kind, TokenKind::RightParen) {
             self.position += 1;
             Ok(())
         } else {
@@ -446,7 +443,7 @@ impl Parser {
 
         let mut statements = Vec::new();
         while !self.phrase_at("akhiri program") {
-            if matches!(self.current().kind, TokenKind::Eof) {
+            if matches!(&self.current().kind, TokenKind::Eof) {
                 return Err(self.error_here(
                     "Program belum diakhiri. Tambahkan 'Akhiri program.'.",
                 ));
@@ -465,7 +462,7 @@ impl Parser {
         )?;
         self.expect_period()?;
 
-        if !matches!(self.current().kind, TokenKind::Eof) {
+        if !matches!(&self.current().kind, TokenKind::Eof) {
             return Err(self.error_here(
                 "Tidak boleh ada instruksi setelah 'Akhiri program.'.",
             ));
@@ -560,7 +557,7 @@ impl Parser {
 
         let mut body = Vec::new();
         while !self.phrase_at("selesai jika") {
-            if matches!(self.current().kind, TokenKind::Eof)
+            if matches!(&self.current().kind, TokenKind::Eof)
                 || self.phrase_at("akhiri program")
             {
                 return Err(self.error_here(
