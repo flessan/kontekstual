@@ -106,7 +106,7 @@ The planned basic types are:
 - `teks` — text values
 - `logika` — Boolean values, written as `benar` or `salah`
 
-The first implementation may support only integer variables and text output. A feature is not considered implemented until it is backed by tests.
+The current static semantic checker verifies declared types, variable visibility, arithmetic operand types, and comparison operand types. It does not evaluate values at runtime. A feature is not considered implemented until it is backed by tests.
 
 Positive integer literals are written using decimal digits, for example `20`. Negative numbers and decimal fractions are deferred until their exact syntax and numeric behavior are defined.
 
@@ -125,8 +125,10 @@ Rules:
 
 - A variable must be declared before it is read.
 - A variable name cannot be a reserved keyword or phrase.
+- A name may be declared only once within the same scope.
 - The initial draft initializes a variable once; reassignment will require a separately defined instruction.
-- Type mismatches must be reported instead of guessed.
+- The initializer must match the declared type.
+- A conditional creates a local scope: it can read variables from outer scopes, but variables declared inside it are not available after the block closes.
 - Parentheses may group an expression used as a value.
 
 ## 9. Output
@@ -171,7 +173,7 @@ Tetapkan hasil sebagai angka dengan nilai (10 ditambah 5) dikali 2.
 
 Parentheses group expressions. Multiplication and division have higher precedence than addition and subtraction. Comparisons have lower precedence than arithmetic. Operators of equal precedence are left-associative. Division behavior, overflow, and division-by-zero diagnostics must be documented and tested before release.
 
-These expressions are proposed syntax, not implemented compiler features.
+The parser recognizes these expressions and the static checker validates their operand types. Values are not evaluated at runtime yet. Arithmetic operations require numeric operands; order comparisons require numeric operands; equality comparisons require both operands to have the same type.
 
 ## 11. Conditional execution
 
