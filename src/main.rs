@@ -333,7 +333,7 @@ enum BinaryOperator {
 
 #[derive(Clone, Debug, PartialEq)]
 enum Expression {
-    Integer(String),
+    Integer { value: String, location: Location },
     Text(String),
     Logical(bool),
     Variable {
@@ -770,8 +770,9 @@ impl Parser {
         let token = self.current().clone();
         match token.kind {
             TokenKind::Integer(value) => {
+                let location = token.location;
                 self.position += 1;
-                Ok(Expression::Integer(value))
+                Ok(Expression::Integer { value, location })
             }
             TokenKind::Text(value) => {
                 self.position += 1;
@@ -829,6 +830,141 @@ fn check_source(source: &str) -> Result<Program, Diagnostic> {
     let program = parse_source(source)?;
     SemanticAnalyzer::new().check_program(&program)?;
     Ok(program)
+}
+
+fn execute_source(source: &str) -> Result<Vec<String>, Diagnostic> {
+    let program = check_source(source)?;
+    Interpreter::new().execute_program(&program)
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum RuntimeValue {
+    Number(i64),
+    Text(String),
+    Logical(bool),
+}
+
+impl RuntimeValue {
+    fn display(&self) -> String {
+        match self {
+            RuntimeValue::Number(value) => value.to_string(),
+            RuntimeValue::Text(value) => value.clone(),
+            RuntimeValue::Logical(value) => if *value { "benar" } else { "salah" }.to_string(),
+        }
+    }
+}
+
+struct Interpreter {
+    scopes: Vec<HashMap<String, RuntimeValue>>,
+    output: Vec<String>,
+}
+
+impl Interpreter {
+    fn new() -> Self {
+        Self { scopes: vec![HashMap::new()], output: Vec::new() }
+    }
+
+    fn execute_program(mut self, program: &Program) -> Result<Vec<String>, Diagnostic> {
+        self.execute_statements(&program.statements)?;
+        Ok(self.output)
+    }
+
+    fn execute_statements(&mut self, statements: &[Statement]) -> Result<(), Diagnostic> {
+        for statement in statements {
+            match statement {
+                Statement::Declare { name, initial_value, location, .. } => {
+                    let value = self.evaluate(initial_value)?;
+                    let scope = self.scopes.last_mut().expect("scope global selalu ada");
+                    if scope.contains_key(name) {
+                        return Err(Diagnostic::new(location.clone(), format!("Variabel '{}' sudah ditetapkan pada blok ini.", name)));
+                    }
+                    scope.insert(name.clone(), value);
+                }
+                Statement::PrintText(value) => self.output.push(value.clone()),
+                Statement::PrintValue { name, location } => {
+                    let value = self.lookup(name).cloned().ok_or_else(|| {
+                        Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name))
+                    })?;
+                    self.output.push(value.display());
+                }
+                Statement::If { condition, body, location } => {
+                    match self.evaluate(condition)? {
+                        RuntimeValue::Logical(true) => {
+                            self.scopes.push(HashMap::new());
+                            let result = self.execute_statements(body);
+                            self.scopes.pop();
+                            result?;
+                        }
+                        RuntimeValue::Logical(false) => {}
+                        other => return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Kondisi 'Jika' harus menghasilkan logika, bukan {}.", runtime_type_name(&other)),
+                        )),
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn lookup(&self, name: &str) -> Option<&RuntimeValue> {
+        self.scopes.iter().rev().find_map(|scope| scope.get(name))
+    }
+
+    fn evaluate(&self, expression: &Expression) -> Result<RuntimeValue, Diagnostic> {
+        match expression {
+            Expression::Integer { value, location } => {
+                let parsed = value.parse::<i64>().map_err(|_| Diagnostic::new(
+                    location.clone(),
+                    format!("Angka '{}' berada di luar rentang bilangan bulat 64-bit.", value),
+                ))?;
+                Ok(RuntimeValue::Number(parsed))
+            }
+            Expression::Text(value) => Ok(RuntimeValue::Text(value.clone())),
+            Expression::Logical(value) => Ok(RuntimeValue::Logical(*value)),
+            Expression::Variable { name, location } => self.lookup(name).cloned().ok_or_else(|| {
+                Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name))
+            }),
+            Expression::Group(inner) => self.evaluate(inner),
+            Expression::Binary { operator, left, right, location } => {
+                let left = self.evaluate(left)?;
+                let right = self.evaluate(right)?;
+                self.evaluate_binary(operator, left, right, location)
+            }
+        }
+    }
+
+    fn evaluate_binary(
+        &self,
+        operator: &BinaryOperator,
+        left: RuntimeValue,
+        right: RuntimeValue,
+        location: &Location,
+    ) -> Result<RuntimeValue, Diagnostic> {
+        let error = |message: String| Diagnostic::new(location.clone(), message);
+        match (operator, left, right) {
+            (BinaryOperator::Add, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_add(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil penjumlahan melampaui rentang angka 64-bit.".to_string())),
+            (BinaryOperator::Subtract, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_sub(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil pengurangan melampaui rentang angka 64-bit.".to_string())),
+            (BinaryOperator::Multiply, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_mul(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil perkalian melampaui rentang angka 64-bit.".to_string())),
+            (BinaryOperator::Divide, RuntimeValue::Number(_), RuntimeValue::Number(0)) => Err(error("Pembagian dengan nol tidak diperbolehkan.".to_string())),
+            (BinaryOperator::Divide, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_div(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil pembagian melampaui rentang angka 64-bit.".to_string())),
+            (BinaryOperator::Greater, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a > b)),
+            (BinaryOperator::Less, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a < b)),
+            (BinaryOperator::GreaterEqual, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a >= b)),
+            (BinaryOperator::LessEqual, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a <= b)),
+            (BinaryOperator::Equal, a, b) => Ok(RuntimeValue::Logical(a == b)),
+            (BinaryOperator::NotEqual, a, b) => Ok(RuntimeValue::Logical(a != b)),
+            (operator, a, b) => Err(error(format!("Nilai untuk operator {:?} tidak cocok: {} dan {}.", operator, runtime_type_name(&a), runtime_type_name(&b)))),
+        }
+    }
+}
+
+fn runtime_type_name(value: &RuntimeValue) -> &'static str {
+    match value {
+        RuntimeValue::Number(_) => "angka",
+        RuntimeValue::Text(_) => "teks",
+        RuntimeValue::Logical(_) => "logika",
+    }
 }
 
 struct SemanticAnalyzer {
@@ -900,7 +1036,7 @@ impl SemanticAnalyzer {
 
     fn infer_expression(&self, expression: &Expression) -> Result<ValueType, Diagnostic> {
         match expression {
-            Expression::Integer(_) => Ok(ValueType::Number),
+            Expression::Integer { .. } => Ok(ValueType::Number),
             Expression::Text(_) => Ok(ValueType::Text),
             Expression::Logical(_) => Ok(ValueType::Logical),
             Expression::Variable { name, location } => self.lookup(name).cloned().ok_or_else(|| {
@@ -969,10 +1105,12 @@ fn print_usage() {
     println!();
     println!("Penggunaan:");
     println!("  kontekstual check <berkas.konteks>");
+    println!("  kontekstual run <berkas.konteks>");
     println!("  kontekstual --help");
     println!();
-    println!("Perintah 'check' memeriksa sintaks, deklarasi variabel, dan tipe nilai.");
-    println!("Eksekusi program dan kompilasi native belum tersedia.");
+    println!("Perintah 'check' memeriksa sintaks dan tipe program tanpa menjalankannya.");
+    println!("Perintah 'run' menjalankan program melalui interpreter awal.");
+    println!("Kompilasi executable native belum tersedia.");
 }
 
 fn main() {
@@ -986,11 +1124,12 @@ fn main() {
         return;
     }
 
-    if arguments.len() != 2 || arguments[0] != "check" {
+    if arguments.len() != 2 || !["check", "run"].contains(&arguments[0].as_str()) {
         eprintln!("Perintah tidak dikenal atau argumennya tidak lengkap.");
         print_usage();
         std::process::exit(2);
     }
+    let command = arguments[0].as_str();
 
     let path = Path::new(&arguments[1]);
     if path.extension().and_then(|extension| extension.to_str()) != Some("konteks") {
@@ -1006,17 +1145,24 @@ fn main() {
         }
     };
 
-    match check_source(&source) {
-        Ok(program) => {
+    let result = if command == "check" {
+        check_source(&source).map(|program| {
             println!(
                 "Pemeriksaan berhasil: {} instruksi; sintaks dan tipe nilai valid.",
                 program.instruction_count()
             );
-        }
-        Err(diagnostic) => {
-            eprintln!("{}", diagnostic);
-            std::process::exit(1);
-        }
+        })
+    } else {
+        execute_source(&source).map(|lines| {
+            for line in lines {
+                println!("{}", line);
+            }
+        })
+    };
+
+    if let Err(diagnostic) = result {
+        eprintln!("{}", diagnostic);
+        std::process::exit(1);
     }
 }
 
@@ -1256,6 +1402,85 @@ Jika umur lebih dari 17, maka:
         Tampilkan nilai umur."#,
         )
         .expect("blok bersarang boleh membaca variabel dari scope luar");
+    }
+
+    #[test]
+    fn interpreter_prints_text_and_values() {
+        let output = execute_source(
+            r#"Tetapkan umur sebagai angka dengan nilai 20.
+Tampilkan teks "Halo dunia!".
+Tampilkan nilai umur.
+Tetapkan aktif sebagai logika dengan nilai benar.
+Tampilkan nilai aktif."#,
+        ).expect("program valid seharusnya berjalan");
+        assert_eq!(output, vec!["Halo dunia!", "20", "benar"]);
+    }
+
+    #[test]
+    fn interpreter_evaluates_arithmetic_precedence_and_parentheses() {
+        let output = execute_source(
+            "Tetapkan hasil sebagai angka dengan nilai (10 ditambah 5) dikali 2. Tampilkan nilai hasil. Tetapkan lainnya sebagai angka dengan nilai 10 ditambah 5 dikali 2. Tampilkan nilai lainnya.",
+        ).expect("aritmetika valid seharusnya berjalan");
+        assert_eq!(output, vec!["30", "20"]);
+    }
+
+    #[test]
+    fn interpreter_runs_only_the_true_conditional_branch() {
+        let output = execute_source(
+            r#"Tetapkan umur sebagai angka dengan nilai 20.
+Jika umur lebih dari 17, maka:
+    Tampilkan teks "Dewasa".
+    Jika umur kurang dari 60, maka:
+        Tampilkan teks "Masih usia produktif".
+Jika umur kurang dari 18, maka:
+    Tampilkan teks "Tidak seharusnya muncul".
+Tampilkan teks "Selesai"."#,
+        ).expect("kondisi valid seharusnya berjalan");
+        assert_eq!(output, vec!["Dewasa", "Masih usia produktif", "Selesai"]);
+    }
+
+    #[test]
+    fn interpreter_discards_variables_declared_inside_a_block() {
+        let source = r#"Jika 1 lebih dari 0, maka:
+    Tetapkan rahasia sebagai angka dengan nilai 42.
+Tampilkan nilai rahasia."#;
+        let error = execute_source(source).expect_err("variabel lokal tidak boleh keluar dari blok");
+        assert!(error.message.contains("belum ditetapkan"));
+    }
+
+    #[test]
+    fn interpreter_supports_text_and_logical_equality() {
+        let output = execute_source(
+            r#"Jika "apel" sama dengan "apel", maka:
+    Tampilkan teks "Teks sama".
+Jika benar tidak sama dengan salah, maka:
+    Tampilkan teks "Logika berbeda"."#,
+        ).expect("perbandingan sama tipe seharusnya valid");
+        assert_eq!(output, vec!["Teks sama", "Logika berbeda"]);
+    }
+
+    #[test]
+    fn interpreter_reports_division_by_zero() {
+        let error = execute_source(
+            "Tetapkan hasil sebagai angka dengan nilai 10 dibagi (3 dikurangi 3). Tampilkan nilai hasil.",
+        ).expect_err("pembagian nol harus gagal");
+        assert!(error.message.contains("Pembagian dengan nol"));
+    }
+
+    #[test]
+    fn interpreter_reports_integer_overflow() {
+        let error = execute_source(
+            "Tetapkan hasil sebagai angka dengan nilai 9223372036854775807 ditambah 1.",
+        ).expect_err("overflow harus gagal");
+        assert!(error.message.contains("melampaui rentang angka 64-bit"));
+    }
+
+    #[test]
+    fn interpreter_rejects_integer_literals_outside_i64_range() {
+        let error = execute_source(
+            "Tetapkan terlalu_besar sebagai angka dengan nilai 999999999999999999999999999999999999.",
+        ).expect_err("literal di luar rentang harus gagal");
+        assert!(error.message.contains("di luar rentang bilangan bulat 64-bit"));
     }
 
     #[test]
