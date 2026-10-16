@@ -1,0 +1,10 @@
+[package]
+name = "kontekstual"
+version = "0.1.0"
+edition = "2021"
+description = "Pemeriksa sintaks awal untuk bahasa pemrograman berbahasa Indonesia Kontekstual"
+license = "MIT"
+
+[[bin]]
+name = "kontekstual"
+path = "src/main.rs"
