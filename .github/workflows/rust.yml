@@ -22,3 +22,9 @@ jobs:
         run: cargo test --all-targets
       - name: Validate the example source
         run: cargo run -- check examples/halo.konteks
+      - name: Run the example program
+        run: |
+          actual="$(cargo run --quiet -- run examples/halo.konteks)"
+          expected="$(printf 'Halo dunia!\nProgram selesai.')"
+          test "$actual" = "$expected"
+          printf '%s\n' "$actual"
