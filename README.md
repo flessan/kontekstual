@@ -1,56 +1,61 @@
 # Kontekstual
 
-**Kontekstual** is an experimental, Indonesian-language programming language designed to help beginners understand the intent and flow of a program before learning symbolic syntax.
+**Kontekstual** is an experimental programming language designed around clear, structured Indonesian sentences and paragraphs. Instead of removing punctuation, it gives familiar punctuation a defined role in the language.
 
-Its source files use the `.konteks` extension. Language structure is expressed with words instead of symbolic operators.
+Source files use the `.konteks` extension.
 
-> Status: specification and prototype planning. A working compiler is not available yet.
+> Status: language design and grammar are still drafts. A working compiler is not available yet.
 
 ## Design goals
 
-- Teach programming concepts through readable Indonesian instructions.
-- Use a consistent, structured grammar rather than unrestricted natural language.
-- Avoid symbolic operators in Kontekstual source code.
-- Give clear diagnostics in Indonesian.
-- Eventually compile programs to native executables on supported desktop platforms.
+- Make programs readable like carefully written Indonesian instructions.
+- Use formal, predictable grammar—not unrestricted natural-language guessing.
+- Give punctuation familiar roles: periods end instructions, commas separate clauses, quotation marks delimit text, and parentheses group expressions.
+- Support one-line and multiline comments with `{- ... -}`.
+- Provide helpful diagnostics in Indonesian.
+- Eventually compile programs to native executables on supported platforms.
 
 ## Example
 
-This is an illustrative example for the proposed v0.1 syntax:
-
 ```text
-mulai
-tampilkan teks halo dunia
-akhir
+Mulai program.
+
+{- Contoh sederhana untuk menampilkan sapaan. -}
+Tampilkan teks "Halo dunia!".
+
+Akhiri program.
 ```
 
-A simple conditional program:
+A conditional example:
 
 ```text
-mulai
-tetapkan umur sebagai angka bernilai 20
-kalau umur lebih dari 17 maka
-    tampilkan teks kamu sudah dewasa
-selesai
-akhir
+Mulai program.
+
+Tetapkan umur sebagai angka dengan nilai 20.
+
+Jika umur lebih dari 17, maka:
+    Tampilkan teks "Kamu sudah dewasa!".
+Selesai jika.
+
+Akhiri program.
 ```
 
-The language specification is authoritative. Examples may be revised while the v0.1 compiler is implemented.
+Statements end with periods, so multiple instructions can appear in one paragraph or on separate lines. Line breaks and indentation help people read the code, but do not replace the language grammar.
 
 ## Repository guide
 
-- [SPECIFICATION.md](SPECIFICATION.md) — language design and v0.1 rules
-- [docs/grammar.md](docs/grammar.md) — formal grammar
+- [SPECIFICATION.md](SPECIFICATION.md) — language design and draft rules
+- [docs/grammar.md](docs/grammar.md) — formal grammar draft
 - [ROADMAP.md](ROADMAP.md) — implementation milestones
 - [examples/halo.konteks](examples/halo.konteks) — first example program
 
 ## Current scope
 
-Version 0.1 focuses on a small, teachable core: program boundaries, values, output, variables, arithmetic, comparisons, and conditional execution. Loops, user-defined functions, modules, and a stable native backend are planned for later milestones.
+The planned first version covers program boundaries, text output, integer variables, arithmetic expressions, comparisons, and conditional execution. The grammar is being revised before compiler implementation. Loops, user-defined functions, modules, and a stable native backend are planned for later milestones.
 
 ## Contributing
 
-Please discuss significant syntax or semantic changes before implementing them. Keep the grammar consistent, diagnostics beginner-friendly, and examples valid under the published specification.
+Discuss significant syntax or semantic changes before implementing them. Keep the grammar consistent, examples aligned with the specification, and diagnostics beginner-friendly.
 
 ## License
 
