@@ -903,7 +903,11 @@ komentar panjang
     #[test]
     fn accepts_indentation_closed_conditional() {
         let program = parse_ok(
-            "Tetapkan umur sebagai angka dengan nilai 20.\\n\\nJika umur lebih dari 17, maka:\\n    Tampilkan teks \\\"Dewasa\\\".\\nTampilkan teks \\\"Selesai\\\".",
+            r#"Tetapkan umur sebagai angka dengan nilai 20.
+
+Jika umur lebih dari 17, maka:
+    Tampilkan teks "Dewasa".
+Tampilkan teks "Selesai"."#,
         );
         assert_eq!(program.instruction_count(), 4);
     }
@@ -911,7 +915,10 @@ komentar panjang
     #[test]
     fn accepts_nested_conditionals_closed_by_indentation() {
         let program = parse_ok(
-            "Jika umur lebih dari 17, maka:\\n    Jika umur kurang dari 60, maka:\\n        Tampilkan teks \\\"Usia produktif\\\".\\n    Tampilkan teks \\\"Di dalam kondisi luar\\\".",
+            r#"Jika umur lebih dari 17, maka:
+    Jika umur kurang dari 60, maka:
+        Tampilkan teks "Usia produktif".
+    Tampilkan teks "Di dalam kondisi luar"."#,
         );
         assert_eq!(program.instruction_count(), 4);
     }
