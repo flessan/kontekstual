@@ -1164,6 +1164,100 @@ Tampilkan teks "Halo"."#).unwrap_err();
         assert!(error.message.contains("Program masih kosong"));
     }
 
+    fn check_error(source: &str) -> Diagnostic {
+        check_source(source).expect_err("program seharusnya gagal pemeriksaan semantik")
+    }
+
+    #[test]
+    fn semantic_check_accepts_matching_declaration_and_expression_types() {
+        let program = check_source(
+            r#"Tetapkan umur sebagai angka dengan nilai 20.
+Tetapkan dewasa sebagai logika dengan nilai umur lebih dari 17.
+Tampilkan nilai umur."#,
+        )
+        .expect("deklarasi dan perbandingan dengan tipe cocok seharusnya valid");
+        assert_eq!(program.instruction_count(), 3);
+    }
+
+    #[test]
+    fn semantic_check_rejects_undeclared_variable_in_output() {
+        let error = check_error("Tampilkan nilai umur.");
+        assert!(error.message.contains("belum ditetapkan"));
+        assert!(error.message.contains("umur"));
+    }
+
+    #[test]
+    fn semantic_check_rejects_undeclared_variable_in_expression() {
+        let error = check_error(
+            "Tetapkan total sebagai angka dengan nilai harga ditambah 1.",
+        );
+        assert!(error.message.contains("belum ditetapkan"));
+        assert!(error.message.contains("harga"));
+    }
+
+    #[test]
+    fn semantic_check_rejects_duplicate_declarations_in_same_scope() {
+        let error = check_error(
+            "Tetapkan umur sebagai angka dengan nilai 17. Tetapkan umur sebagai angka dengan nilai 18.",
+        );
+        assert!(error.message.contains("sudah ditetapkan"));
+    }
+
+    #[test]
+    fn semantic_check_rejects_initial_value_type_mismatch() {
+        let error = check_error(
+            r#"Tetapkan umur sebagai angka dengan nilai "dua puluh"."#,
+        );
+        assert!(error.message.contains("meminta angka"));
+    }
+
+    #[test]
+    fn semantic_check_rejects_arithmetic_on_non_numbers() {
+        let error = check_error(
+            r#"Tetapkan jumlah sebagai angka dengan nilai "dua" ditambah 3."#,
+        );
+        assert!(error.message.contains("hanya menerima angka"));
+    }
+
+    #[test]
+    fn semantic_check_rejects_order_comparison_on_text() {
+        let error = check_error(
+            r#"Jika "apel" lebih dari 2, maka:
+    Tampilkan teks "tidak valid"."#,
+        );
+        assert!(error.message.contains("hanya menerima angka"));
+    }
+
+    #[test]
+    fn semantic_check_rejects_comparison_between_different_types() {
+        let error = check_error(
+            r#"Tetapkan hasil sebagai logika dengan nilai 1 sama dengan "1"."#,
+        );
+        assert!(error.message.contains("harus bertipe sama"));
+    }
+
+    #[test]
+    fn semantic_check_keeps_if_block_variables_local() {
+        let error = check_error(
+            r#"Jika 1 lebih dari 0, maka:
+    Tetapkan lokal sebagai angka dengan nilai 10.
+Tampilkan nilai lokal."#,
+        );
+        assert!(error.message.contains("belum ditetapkan"));
+        assert!(error.message.contains("lokal"));
+    }
+
+    #[test]
+    fn semantic_check_allows_parent_variables_inside_nested_blocks() {
+        check_source(
+            r#"Tetapkan umur sebagai angka dengan nilai 20.
+Jika umur lebih dari 17, maka:
+    Jika umur kurang dari 60, maka:
+        Tampilkan nilai umur."#,
+        )
+        .expect("blok bersarang boleh membaca variabel dari scope luar");
+    }
+
     #[test]
     fn accepts_final_period_as_end_of_program() {
         let program = parse_ok(
