@@ -885,7 +885,7 @@ mod tests {
     #[test]
     fn accepts_single_line_and_multiline_comments() {
         let program = parse_ok(
-            " {- komentar singkat -} Tampilkan teks \"Halo\". {-
+            "{- komentar singkat -} Tampilkan teks \"Halo\". {-
 komentar panjang
 -}",
         );
