@@ -2,7 +2,7 @@
 
 **Kontekstual** is an experimental programming language designed around clear, structured Indonesian sentences and paragraphs. Instead of removing punctuation, it gives familiar punctuation a defined role in the language.
 
-Source files use the `.konteks` extension.
+Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program—no artificial start/end wrapper is needed.
 
 > Status: a Rust syntax-checker prototype is available. Execution, semantic type-checking, and native compilation are not implemented yet.
 
@@ -18,29 +18,21 @@ Source files use the `.konteks` extension.
 ## Example
 
 ```text
-Mulai program.
-
 {- Contoh sederhana untuk menampilkan sapaan. -}
 Tampilkan teks "Halo dunia!".
-
-Akhiri program.
 ```
 
 A conditional example:
 
 ```text
-Mulai program.
-
 Tetapkan umur sebagai angka dengan nilai 20.
 
 Jika umur lebih dari 17, maka:
     Tampilkan teks "Kamu sudah dewasa!".
 Selesai jika.
-
-Akhiri program.
 ```
 
-Statements end with periods, so multiple instructions can appear in one paragraph or on separate lines. Line breaks and indentation help people read the code, but do not replace the language grammar.
+Every instruction ends with a period, so instructions can appear in one paragraph or on separate lines. A block such as a conditional has its own closing sentence, like `Selesai jika.`. Once the final instruction ends, the file simply stops. Line breaks and indentation help people read the code, but do not change its meaning.
 
 ## Try the syntax checker
 
