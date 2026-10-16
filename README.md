@@ -35,6 +35,17 @@ Tampilkan teks "Lanjut di luar kondisi.".
 
 Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. The block closes automatically when indentation returns to the previous level—or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
+## Browser playground (StackBlitz)
+
+Open the repository in StackBlitz and run the web playground without Rust or Cargo:
+
+- StackBlitz: https://stackblitz.com/~/github.com/flessan/kontekstual
+- Start command: `npm run dev` (StackBlitz may start it automatically)
+- Run compatibility tests: `npm test`
+- Create a production build: `npm run build`
+
+The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based `Jika` blocks, and comments. It is a compatibility implementation—not the Rust compiler itself—and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. CI runs the shared behavior examples against the browser runtime and builds the web app.
+
 ## Check and run a program
 
 Install stable Rust, then run these commands from the repository root:
