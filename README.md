@@ -4,7 +4,7 @@
 
 Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program—no artificial start/end wrapper is needed.
 
-> Status: a Rust syntax-checker prototype is available. Execution, semantic type-checking, and native compilation are not implemented yet.
+> Status: a Rust checker prototype validates syntax, variable declarations and scope, and expression types. It does not execute programs or generate native executables yet.
 
 ## Design goals
 
@@ -44,7 +44,7 @@ cargo test --all-targets
 cargo run -- check examples/halo.konteks
 ```
 
-The `check` command reports whether the file follows the current draft grammar. It does not run the program or produce an executable.
+The `check` command validates syntax plus static semantic rules: variables must be declared before use, names cannot be declared twice in the same block, and expression types must fit the declared type. It does not run the program or produce an executable.
 
 ## Repository guide
 
@@ -55,7 +55,7 @@ The `check` command reports whether the file follows the current draft grammar. 
 
 ## Current scope
 
-The parser prototype recognizes period-terminated instructions, text output, declarations, value output, arithmetic expressions, comparisons, and conditional blocks. It checks syntax only; it does not execute programs or yet verify declared names and value types. Loops, user-defined functions, modules, and a native backend remain future work.
+The prototype recognizes period-terminated instructions, text output, declarations, value output, arithmetic expressions, comparisons, and indentation-based conditional blocks. Its static semantic checker validates variable visibility, duplicate declarations, initializer types, arithmetic operand types, and comparison operand types. Runtime evaluation, loops, user-defined functions, modules, and a native backend remain future work.
 
 ## Contributing
 
