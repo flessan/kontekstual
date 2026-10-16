@@ -416,10 +416,10 @@ impl Parser {
             TokenKind::Word(name) => {
                 let lower = name.to_lowercase();
                 let reserved = [
-                    "mulai", "program", "akhiri", "tetapkan", "sebagai", "angka", "teks",
-                    "logika", "benar", "salah", "dengan", "nilai", "tampilkan", "jika",
-                    "maka", "selesai", "ditambah", "dikurangi", "dikali", "dibagi", "lebih",
-                    "dari", "kurang", "sama", "tidak", "atau",
+                    "tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah",
+                    "dengan", "nilai", "tampilkan", "jika", "maka", "selesai",
+                    "ditambah", "dikurangi", "dikali", "dibagi", "lebih", "dari",
+                    "kurang", "sama", "tidak", "atau",
                 ];
                 if reserved.contains(&lower.as_str()) {
                     return Err(Diagnostic::new(
@@ -435,19 +435,9 @@ impl Parser {
     }
 
     fn parse_program(&mut self) -> Result<Program, Diagnostic> {
-        self.expect_phrase(
-            "mulai program",
-            "Program harus diawali dengan 'Mulai program.'.",
-        )?;
-        self.expect_period()?;
-
         let mut statements = Vec::new();
-        while !self.phrase_at("akhiri program") {
-            if matches!(&self.current().kind, TokenKind::Eof) {
-                return Err(self.error_here(
-                    "Program belum diakhiri. Tambahkan 'Akhiri program.'.",
-                ));
-            }
+
+        while !matches!(&self.current().kind, TokenKind::Eof) {
             if self.phrase_at("selesai jika") {
                 return Err(self.error_here(
                     "Penanda 'Selesai jika.' tidak memiliki blok kondisi yang terbuka.",
@@ -456,18 +446,13 @@ impl Parser {
             statements.push(self.parse_statement()?);
         }
 
-        self.expect_phrase(
-            "akhiri program",
-            "Program harus diakhiri dengan 'Akhiri program.'.",
-        )?;
-        self.expect_period()?;
-
-        if !matches!(&self.current().kind, TokenKind::Eof) {
+        if statements.is_empty() {
             return Err(self.error_here(
-                "Tidak boleh ada instruksi setelah 'Akhiri program.'.",
+                "Program masih kosong. Tambahkan setidaknya satu instruksi yang diakhiri titik.",
             ));
         }
 
+        // Akhir berkas menandai akhir program. Setiap instruksi tetap wajib diakhiri titik.
         Ok(Program { statements })
     }
 
@@ -557,9 +542,7 @@ impl Parser {
 
         let mut body = Vec::new();
         while !self.phrase_at("selesai jika") {
-            if matches!(&self.current().kind, TokenKind::Eof)
-                || self.phrase_at("akhiri program")
-            {
+            if matches!(&self.current().kind, TokenKind::Eof) {
                 return Err(self.error_here(
                     "Blok 'Jika' belum ditutup. Tambahkan 'Selesai jika.'.",
                 ));
@@ -770,17 +753,15 @@ mod tests {
     }
 
     #[test]
-    fn accepts_minimal_program() {
-        let program = parse_ok(
-            r#"Mulai program. Tampilkan teks "Halo dunia!". Akhiri program."#,
-        );
+    fn accepts_minimal_program_without_outer_wrappers() {
+        let program = parse_ok(r#"Tampilkan teks "Halo dunia!"."#);
         assert_eq!(program.instruction_count(), 1);
     }
 
     #[test]
     fn accepts_paragraph_layout_and_case_insensitive_keywords() {
         let program = parse_ok(
-            "MULAI PROGRAM. Tetapkan umur sebagai angka dengan nilai 20. tampilkan nilai umur. AKHIRI PROGRAM.",
+            "Tetapkan umur sebagai angka dengan nilai 20. tampilkan nilai umur.",
         );
         assert_eq!(program.instruction_count(), 2);
     }
@@ -788,7 +769,9 @@ mod tests {
     #[test]
     fn accepts_single_line_and_multiline_comments() {
         let program = parse_ok(
-            "Mulai program. {- komentar singkat -} Tampilkan teks \"Halo\". {-\nkomentar panjang\n-} Akhiri program.",
+            " {- komentar singkat -} Tampilkan teks \"Halo\". {-
+komentar panjang
+-}",
         );
         assert_eq!(program.instruction_count(), 1);
     }
@@ -796,7 +779,7 @@ mod tests {
     #[test]
     fn comment_markers_inside_strings_are_plain_text() {
         let program = parse_ok(
-            r#"Mulai program. Tampilkan teks "Tanda {- ini -} bagian teks". Akhiri program."#,
+            r#"Tampilkan teks "Tanda {- ini -} bagian teks"."#,
         );
         assert_eq!(program.instruction_count(), 1);
     }
@@ -804,7 +787,7 @@ mod tests {
     #[test]
     fn accepts_conditional_and_word_based_comparison() {
         let program = parse_ok(
-            r#"Mulai program. Tetapkan umur sebagai angka dengan nilai 20. Jika umur lebih dari 17, maka: Tampilkan teks "Dewasa". Selesai jika. Akhiri program."#,
+            r#"Tetapkan umur sebagai angka dengan nilai 20. Jika umur lebih dari 17, maka: Tampilkan teks "Dewasa". Selesai jika."#,
         );
         assert_eq!(program.instruction_count(), 3);
     }
@@ -812,7 +795,7 @@ mod tests {
     #[test]
     fn accepts_parenthesized_arithmetic() {
         let program = parse_ok(
-            "Mulai program. Tetapkan total sebagai angka dengan nilai (10 ditambah 5) dikali 2. Akhiri program.",
+            "Tetapkan total sebagai angka dengan nilai (10 ditambah 5) dikali 2.",
         );
         assert_eq!(program.instruction_count(), 1);
     }
@@ -820,7 +803,7 @@ mod tests {
     #[test]
     fn rejects_symbolic_comparison_operator() {
         let error = parse_source(
-            "Mulai program. Jika umur > 17, maka: Tampilkan teks \"Dewasa\". Selesai jika. Akhiri program.",
+            r#"Jika umur > 17, maka: Tampilkan teks "Dewasa". Selesai jika."#,
         )
         .expect_err("operator simbolik seharusnya ditolak");
         assert!(error.message.contains("Karakter"));
@@ -828,37 +811,48 @@ mod tests {
 
     #[test]
     fn rejects_unclosed_comment() {
-        let error = parse_source("Mulai program. {- komentar belum selesai").unwrap_err();
+        let error = parse_source("{- komentar belum selesai").unwrap_err();
         assert!(error.message.contains("Komentar belum ditutup"));
     }
 
     #[test]
     fn rejects_unclosed_string() {
-        let error = parse_source("Mulai program. Tampilkan teks \"Halo. Akhiri program.").unwrap_err();
+        let error = parse_source(r#"Tampilkan teks "Halo."#).unwrap_err();
         assert!(error.message.contains("Tanda kutip teks belum ditutup"));
     }
 
     #[test]
     fn rejects_instruction_without_period() {
-        let error = parse_source(
-            r#"Mulai program. Tampilkan teks "Halo" Akhiri program."#,
-        )
-        .unwrap_err();
+        let error = parse_source(r#"Tampilkan teks "Halo""#).unwrap_err();
         assert!(error.message.contains("tanda titik"));
     }
 
     #[test]
     fn rejects_unclosed_conditional() {
         let error = parse_source(
-            r#"Mulai program. Jika umur lebih dari 17, maka: Tampilkan teks "Dewasa". Akhiri program."#,
+            r#"Jika umur lebih dari 17, maka: Tampilkan teks "Dewasa"."#,
         )
         .unwrap_err();
         assert!(error.message.contains("Blok 'Jika' belum ditutup"));
     }
 
     #[test]
-    fn rejects_missing_program_start() {
-        let error = parse_source(r#"Tampilkan teks "Halo". Akhiri program."#).unwrap_err();
-        assert!(error.message.contains("Mulai program"));
+    fn rejects_lonely_conditional_terminator() {
+        let error = parse_source("Selesai jika.").unwrap_err();
+        assert!(error.message.contains("tidak memiliki blok kondisi"));
+    }
+
+    #[test]
+    fn rejects_empty_program() {
+        let error = parse_source("   {- hanya komentar -}  ").unwrap_err();
+        assert!(error.message.contains("Program masih kosong"));
+    }
+
+    #[test]
+    fn accepts_final_period_as_end_of_program() {
+        let program = parse_ok(
+            "Tampilkan teks \"Selesai.\". {- Berkas selesai setelah instruksi ini. -}",
+        );
+        assert_eq!(program.instruction_count(), 1);
     }
 }
