@@ -21,9 +21,7 @@ Keywords and reserved phrases are case-insensitive. Identifiers are case-sensiti
 ## 2. EBNF
 
 ```ebnf
-program           = whitespace, "mulai program", ".", whitespace,
-                    { statement, whitespace },
-                    "akhiri program", ".", whitespace, EOF ;
+program           = whitespace, statement, { whitespace, statement, whitespace }, EOF ;
 
 statement         = declaration
                   | text_output
@@ -77,18 +75,16 @@ The grammar sketch describes intended recognition, not a working parser. In an a
 
 ## 3. Reading the grammar
 
-A minimal program:
+A minimal program consists of one complete instruction. The period ends the instruction; end-of-file ends the program:
 
 ```text
-Mulai program.
 Tampilkan teks "Halo dunia!".
-Akhiri program.
 ```
 
 A paragraph-style program is also valid because periods, not line breaks, separate statements:
 
 ```text
-Mulai program. Tetapkan umur sebagai angka dengan nilai 20. Jika umur lebih dari 17, maka: Tampilkan teks "Kamu sudah dewasa!". Selesai jika. Akhiri program.
+Tetapkan umur sebagai angka dengan nilai 20. Jika umur lebih dari 17, maka: Tampilkan teks "Kamu sudah dewasa!". Selesai jika.
 ```
 
 A multiline comment is valid:
@@ -107,17 +103,14 @@ The program-start phrase is required:
 
 ```text
 Tampilkan teks "Halo dunia!".
-Akhiri program.
 ```
 
 This condition uses invalid symbolic comparison syntax; comparisons are expressed with words:
 
 ```text
-Mulai program.
 Jika umur > 17, maka:
     Tampilkan teks "Halo".
 Selesai jika.
-Akhiri program.
 ```
 
 The compiler should report the unexpected `>` and suggest `lebih dari`.
@@ -126,7 +119,7 @@ An unterminated string or comment is also invalid. The lexer should identify the
 
 ## 5. Known limitations and decisions still required
 
-1. The grammar is a design draft and has not been implemented or tested by a real parser.
+1. The grammar is a design draft and implemented only in an early syntax-checker prototype.
 2. Arithmetic and comparison syntax are planned; they are not currently working compiler features.
 3. The initial declaration grammar supports expression values syntactically, but semantic checks must enforce the declared type.
 4. Conditional bodies and nested conditionals need dedicated parser tests to verify matching block terminators.
