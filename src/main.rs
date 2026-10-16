@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env;
 use std::fmt;
 use std::fs;
@@ -335,12 +336,16 @@ enum Expression {
     Integer(String),
     Text(String),
     Logical(bool),
-    Variable(String),
+    Variable {
+        name: String,
+        location: Location,
+    },
     Group(Box<Expression>),
     Binary {
         operator: BinaryOperator,
         left: Box<Expression>,
         right: Box<Expression>,
+        location: Location,
     },
 }
 
@@ -350,12 +355,17 @@ enum Statement {
         name: String,
         value_type: ValueType,
         initial_value: Expression,
+        location: Location,
     },
     PrintText(String),
-    PrintValue(String),
+    PrintValue {
+        name: String,
+        location: Location,
+    },
     If {
         condition: Expression,
         body: Vec<Statement>,
+        location: Location,
     },
 }
 
@@ -565,6 +575,7 @@ impl Parser {
     }
 
     fn parse_declaration(&mut self) -> Result<Statement, Diagnostic> {
+        let location = self.current().location.clone();
         self.expect_phrase("tetapkan", "Diharapkan 'Tetapkan'.")?;
         let name = self.expect_identifier()?;
         self.expect_phrase("sebagai", "Tambahkan 'sebagai' setelah nama variabel.")?;
@@ -592,6 +603,7 @@ impl Parser {
             name,
             value_type,
             initial_value,
+            location,
         })
     }
 
@@ -614,13 +626,15 @@ impl Parser {
     }
 
     fn parse_value_output(&mut self) -> Result<Statement, Diagnostic> {
+        let location = self.current().location.clone();
         self.expect_phrase("tampilkan nilai", "Diharapkan 'Tampilkan nilai'.")?;
         let name = self.expect_identifier()?;
         self.expect_period()?;
-        Ok(Statement::PrintValue(name))
+        Ok(Statement::PrintValue { name, location })
     }
 
     fn parse_conditional(&mut self) -> Result<Statement, Diagnostic> {
+        let location = self.current().location.clone();
         self.expect_phrase("jika", "Diharapkan 'Jika'.")?;
         let condition = self.parse_expression()?;
         if !condition.is_comparison() {
@@ -669,7 +683,7 @@ impl Parser {
             self.position += 1;
         }
 
-        Ok(Statement::If { condition, body })
+        Ok(Statement::If { condition, body, location })
     }
 
     fn parse_expression(&mut self) -> Result<Expression, Diagnostic> {
@@ -685,12 +699,14 @@ impl Parser {
         ];
 
         for (phrase, operator) in comparisons {
+            let location = self.current().location.clone();
             if self.eat_phrase(phrase) {
                 let right = self.parse_additive()?;
                 return Ok(Expression::Binary {
                     operator,
                     left: Box::new(left),
                     right: Box::new(right),
+                    location,
                 });
             }
         }
@@ -701,6 +717,7 @@ impl Parser {
     fn parse_additive(&mut self) -> Result<Expression, Diagnostic> {
         let mut expression = self.parse_multiplicative()?;
         loop {
+            let location = self.current().location.clone();
             let operator = if self.eat_phrase("ditambah") {
                 Some(BinaryOperator::Add)
             } else if self.eat_phrase("dikurangi") {
@@ -717,6 +734,7 @@ impl Parser {
                 operator,
                 left: Box::new(expression),
                 right: Box::new(right),
+                location,
             };
         }
         Ok(expression)
@@ -725,6 +743,7 @@ impl Parser {
     fn parse_multiplicative(&mut self) -> Result<Expression, Diagnostic> {
         let mut expression = self.parse_primary()?;
         loop {
+            let location = self.current().location.clone();
             let operator = if self.eat_phrase("dikali") {
                 Some(BinaryOperator::Multiply)
             } else if self.eat_phrase("dibagi") {
@@ -741,6 +760,7 @@ impl Parser {
                 operator,
                 left: Box::new(expression),
                 right: Box::new(right),
+                location,
             };
         }
         Ok(expression)
@@ -766,8 +786,9 @@ impl Parser {
                 Ok(Expression::Logical(false))
             }
             TokenKind::Word(name) => {
+                let location = token.location;
                 self.position += 1;
-                Ok(Expression::Variable(name))
+                Ok(Expression::Variable { name, location })
             }
             TokenKind::LeftParen => {
                 self.expect_left_paren()?;
@@ -804,15 +825,154 @@ fn parse_source(source: &str) -> Result<Program, Diagnostic> {
     Parser::new(lex(source)?).parse_program()
 }
 
+fn check_source(source: &str) -> Result<Program, Diagnostic> {
+    let program = parse_source(source)?;
+    SemanticAnalyzer::new().check_program(&program)?;
+    Ok(program)
+}
+
+struct SemanticAnalyzer {
+    scopes: Vec<HashMap<String, ValueType>>,
+}
+
+impl SemanticAnalyzer {
+    fn new() -> Self {
+        Self { scopes: vec![HashMap::new()] }
+    }
+
+    fn check_program(&mut self, program: &Program) -> Result<(), Diagnostic> {
+        self.check_statements(&program.statements)
+    }
+
+    fn check_statements(&mut self, statements: &[Statement]) -> Result<(), Diagnostic> {
+        for statement in statements {
+            match statement {
+                Statement::Declare { name, value_type, initial_value, location } => {
+                    let actual_type = self.infer_expression(initial_value)?;
+                    if actual_type != *value_type {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!(
+                                "Nilai awal variabel '{}' bertipe {}, tetapi deklarasinya meminta {}.",
+                                name, type_name(&actual_type), type_name(value_type)
+                            ),
+                        ));
+                    }
+                    let current_scope = self.scopes.last_mut().expect("scope global selalu ada");
+                    if current_scope.contains_key(name) {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Variabel '{}' sudah ditetapkan pada blok ini.", name),
+                        ));
+                    }
+                    current_scope.insert(name.clone(), value_type.clone());
+                }
+                Statement::PrintText(_) => {}
+                Statement::PrintValue { name, location } => {
+                    if self.lookup(name).is_none() {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name),
+                        ));
+                    }
+                }
+                Statement::If { condition, body, location } => {
+                    let condition_type = self.infer_expression(condition)?;
+                    if condition_type != ValueType::Logical {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Kondisi 'Jika' harus menghasilkan logika, bukan {}.", type_name(&condition_type)),
+                        ));
+                    }
+                    self.scopes.push(HashMap::new());
+                    let result = self.check_statements(body);
+                    self.scopes.pop();
+                    result?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn lookup(&self, name: &str) -> Option<&ValueType> {
+        self.scopes.iter().rev().find_map(|scope| scope.get(name))
+    }
+
+    fn infer_expression(&self, expression: &Expression) -> Result<ValueType, Diagnostic> {
+        match expression {
+            Expression::Integer(_) => Ok(ValueType::Number),
+            Expression::Text(_) => Ok(ValueType::Text),
+            Expression::Logical(_) => Ok(ValueType::Logical),
+            Expression::Variable { name, location } => self.lookup(name).cloned().ok_or_else(|| {
+                Diagnostic::new(
+                    location.clone(),
+                    format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name),
+                )
+            }),
+            Expression::Group(inner) => self.infer_expression(inner),
+            Expression::Binary { operator, left, right, location } => {
+                let left_type = self.infer_expression(left)?;
+                let right_type = self.infer_expression(right)?;
+                match operator {
+                    BinaryOperator::Add | BinaryOperator::Subtract | BinaryOperator::Multiply | BinaryOperator::Divide => {
+                        if left_type != ValueType::Number || right_type != ValueType::Number {
+                            return Err(Diagnostic::new(
+                                location.clone(),
+                                format!(
+                                    "Operator aritmetika hanya menerima angka; ditemukan {} dan {}.",
+                                    type_name(&left_type), type_name(&right_type)
+                                ),
+                            ));
+                        }
+                        Ok(ValueType::Number)
+                    }
+                    BinaryOperator::Greater | BinaryOperator::Less | BinaryOperator::GreaterEqual | BinaryOperator::LessEqual => {
+                        if left_type != ValueType::Number || right_type != ValueType::Number {
+                            return Err(Diagnostic::new(
+                                location.clone(),
+                                format!(
+                                    "Perbandingan urutan hanya menerima angka; ditemukan {} dan {}.",
+                                    type_name(&left_type), type_name(&right_type)
+                                ),
+                            ));
+                        }
+                        Ok(ValueType::Logical)
+                    }
+                    BinaryOperator::Equal | BinaryOperator::NotEqual => {
+                        if left_type != right_type {
+                            return Err(Diagnostic::new(
+                                location.clone(),
+                                format!(
+                                    "Kedua nilai dalam perbandingan harus bertipe sama; ditemukan {} dan {}.",
+                                    type_name(&left_type), type_name(&right_type)
+                                ),
+                            ));
+                        }
+                        Ok(ValueType::Logical)
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn type_name(value_type: &ValueType) -> &'static str {
+    match value_type {
+        ValueType::Number => "angka",
+        ValueType::Text => "teks",
+        ValueType::Logical => "logika",
+    }
+}
+
 fn print_usage() {
-    println!("Kontekstual — pemeriksa sintaks awal");
+    println!("Kontekstual — pemeriksa program awal");
     println!();
     println!("Penggunaan:");
     println!("  kontekstual check <berkas.konteks>");
     println!("  kontekstual --help");
     println!();
-    println!("Perintah 'check' hanya memeriksa struktur sintaks. Eksekusi dan");
-    println!("kompilasi native belum tersedia pada prototipe ini.");
+    println!("Perintah 'check' memeriksa sintaks, deklarasi variabel, dan tipe nilai.");
+    println!("Eksekusi program dan kompilasi native belum tersedia.");
 }
 
 fn main() {
@@ -846,10 +1006,10 @@ fn main() {
         }
     };
 
-    match parse_source(&source) {
+    match check_source(&source) {
         Ok(program) => {
             println!(
-                "Sintaks valid: {} instruksi dikenali.",
+                "Pemeriksaan berhasil: {} instruksi; sintaks dan tipe nilai valid.",
                 program.instruction_count()
             );
         }
