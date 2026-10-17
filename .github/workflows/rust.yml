@@ -28,6 +28,14 @@ jobs:
           expected="$(printf 'Halo dunia!\nProgram selesai.')"
           test "$actual" = "$expected"
           printf '%s\n' "$actual"
+      - name: Validate the variables and logic example
+        run: cargo run -- check examples/variabel-dan-logika.konteks
+      - name: Run the variables and logic example
+        run: |
+          actual="$(cargo run --quiet -- run examples/variabel-dan-logika.konteks)"
+          expected="$(printf 'Halo, Thio Saputra!\nSkor saat ini:\n21')"
+          test "$actual" = "$expected"
+          printf '%s\n' "$actual"
 
   playground:
     name: Browser playground compatibility
