@@ -962,6 +962,21 @@ impl Interpreter {
                     scope.insert(name.clone(), value);
                 }
                 Statement::PrintText(value) => self.output.push(value.clone()),
+                Statement::PrintExpression(expression) => self.output.push(self.evaluate(expression)?.display()),
+                Statement::Assign { name, value, location } => {
+                    let new_value = self.evaluate(value)?;
+                    let mut assigned = false;
+                    for scope in self.scopes.iter_mut().rev() {
+                        if scope.contains_key(name) {
+                            scope.insert(name.clone(), new_value.clone());
+                            assigned = true;
+                            break;
+                        }
+                    }
+                    if !assigned {
+                        return Err(Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum bisa diubah.", name)));
+                    }
+                }
                 Statement::PrintValue { name, location } => {
                     let value = self.lookup(name).cloned().ok_or_else(|| {
                         Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name))
@@ -1007,6 +1022,16 @@ impl Interpreter {
                 Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name))
             }),
             Expression::Group(inner) => self.evaluate(inner),
+            Expression::Unary { operator, expression, location } => {
+                let value = self.evaluate(expression)?;
+                match (operator, value) {
+                    (UnaryOperator::Not, RuntimeValue::Logical(v)) => Ok(RuntimeValue::Logical(!v)),
+                    (UnaryOperator::Negate, RuntimeValue::Number(v)) => v.checked_neg().map(RuntimeValue::Number)
+                        .ok_or_else(|| Diagnostic::new(location.clone(), "Hasil negasi melampaui rentang angka 64-bit.")),
+                    (UnaryOperator::Not, other) => Err(Diagnostic::new(location.clone(), format!("Operator 'tidak' membutuhkan logika, bukan {}.", runtime_type_name(&other)))),
+                    (UnaryOperator::Negate, other) => Err(Diagnostic::new(location.clone(), format!("Operator '-' membutuhkan angka, bukan {}.", runtime_type_name(&other)))),
+                }
+            }
             Expression::Binary { operator, left, right, location } => {
                 let left = self.evaluate(left)?;
                 let right = self.evaluate(right)?;
@@ -1025,14 +1050,19 @@ impl Interpreter {
         let error = |message: String| Diagnostic::new(location.clone(), message);
         match (operator, left, right) {
             (BinaryOperator::Add, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_add(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil penjumlahan melampaui rentang angka 64-bit.".to_string())),
+            (BinaryOperator::Add, RuntimeValue::Text(a), RuntimeValue::Text(b)) => Ok(RuntimeValue::Text(format!("{}{}", a, b))),
             (BinaryOperator::Subtract, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_sub(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil pengurangan melampaui rentang angka 64-bit.".to_string())),
             (BinaryOperator::Multiply, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_mul(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil perkalian melampaui rentang angka 64-bit.".to_string())),
             (BinaryOperator::Divide, RuntimeValue::Number(_), RuntimeValue::Number(0)) => Err(error("Pembagian dengan nol tidak diperbolehkan.".to_string())),
             (BinaryOperator::Divide, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_div(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil pembagian melampaui rentang angka 64-bit.".to_string())),
+            (BinaryOperator::Modulo, RuntimeValue::Number(_), RuntimeValue::Number(0)) => Err(error("Sisa bagi dengan nol tidak diperbolehkan.".to_string())),
+            (BinaryOperator::Modulo, RuntimeValue::Number(a), RuntimeValue::Number(b)) => a.checked_rem(b).map(RuntimeValue::Number).ok_or_else(|| error("Hasil sisa bagi melampaui rentang angka 64-bit.".to_string())),
             (BinaryOperator::Greater, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a > b)),
             (BinaryOperator::Less, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a < b)),
             (BinaryOperator::GreaterEqual, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a >= b)),
             (BinaryOperator::LessEqual, RuntimeValue::Number(a), RuntimeValue::Number(b)) => Ok(RuntimeValue::Logical(a <= b)),
+            (BinaryOperator::And, RuntimeValue::Logical(a), RuntimeValue::Logical(b)) => Ok(RuntimeValue::Logical(a && b)),
+            (BinaryOperator::Or, RuntimeValue::Logical(a), RuntimeValue::Logical(b)) => Ok(RuntimeValue::Logical(a || b)),
             (BinaryOperator::Equal, a, b) => Ok(RuntimeValue::Logical(a == b)),
             (BinaryOperator::NotEqual, a, b) => Ok(RuntimeValue::Logical(a != b)),
             (operator, a, b) => Err(error(format!("Nilai untuk operator {:?} tidak cocok: {} dan {}.", operator, runtime_type_name(&a), runtime_type_name(&b)))),
@@ -1085,6 +1115,19 @@ impl SemanticAnalyzer {
                     current_scope.insert(name.clone(), value_type.clone());
                 }
                 Statement::PrintText(_) => {}
+                Statement::PrintExpression(expression) => { self.infer_expression(expression)?; }
+                Statement::Assign { name, value, location } => {
+                    let expected_type = self.lookup(name).cloned().ok_or_else(|| Diagnostic::new(
+                        location.clone(), format!("Variabel '{}' belum ditetapkan sebelum bisa diubah.", name)
+                    ))?;
+                    let actual_type = self.infer_expression(value)?;
+                    if expected_type != actual_type {
+                        return Err(Diagnostic::new(location.clone(), format!(
+                            "Variabel '{}' bertipe {}, jadi nilainya tidak bisa diubah menjadi {}.",
+                            name, type_name(&expected_type), type_name(&actual_type)
+                        )));
+                    }
+                }
                 Statement::PrintValue { name, location } => {
                     if self.lookup(name).is_none() {
                         return Err(Diagnostic::new(
@@ -1127,43 +1170,32 @@ impl SemanticAnalyzer {
                 )
             }),
             Expression::Group(inner) => self.infer_expression(inner),
-            Expression::Binary { operator, left, right, location } => {
-                let left_type = self.infer_expression(left)?;
-                let right_type = self.infer_expression(right)?;
+            Expression::Unary { operator, expression, location } => {
+                let inner = self.infer_expression(expression)?;
                 match operator {
-                    BinaryOperator::Add | BinaryOperator::Subtract | BinaryOperator::Multiply | BinaryOperator::Divide => {
+                    BinaryOperator::Add if left_type == right_type && matches!(left_type, ValueType::Number | ValueType::Text) => Ok(left_type),
+                    BinaryOperator::Add => Err(Diagnostic::new(location.clone(), "Operator '+' membutuhkan dua angka atau dua teks.")),
+                    BinaryOperator::Subtract | BinaryOperator::Multiply | BinaryOperator::Divide | BinaryOperator::Modulo => {
                         if left_type != ValueType::Number || right_type != ValueType::Number {
-                            return Err(Diagnostic::new(
-                                location.clone(),
-                                format!(
-                                    "Operator aritmetika hanya menerima angka; ditemukan {} dan {}.",
-                                    type_name(&left_type), type_name(&right_type)
-                                ),
-                            ));
+                            return Err(Diagnostic::new(location.clone(), "Operator matematika '-', '*', '/', '%' hanya menerima angka."));
                         }
                         Ok(ValueType::Number)
                     }
                     BinaryOperator::Greater | BinaryOperator::Less | BinaryOperator::GreaterEqual | BinaryOperator::LessEqual => {
                         if left_type != ValueType::Number || right_type != ValueType::Number {
-                            return Err(Diagnostic::new(
-                                location.clone(),
-                                format!(
-                                    "Perbandingan urutan hanya menerima angka; ditemukan {} dan {}.",
-                                    type_name(&left_type), type_name(&right_type)
-                                ),
-                            ));
+                            return Err(Diagnostic::new(location.clone(), "Perbandingan urutan hanya menerima angka."));
                         }
                         Ok(ValueType::Logical)
                     }
                     BinaryOperator::Equal | BinaryOperator::NotEqual => {
                         if left_type != right_type {
-                            return Err(Diagnostic::new(
-                                location.clone(),
-                                format!(
-                                    "Kedua nilai dalam perbandingan harus bertipe sama; ditemukan {} dan {}.",
-                                    type_name(&left_type), type_name(&right_type)
-                                ),
-                            ));
+                            return Err(Diagnostic::new(location.clone(), "Kedua nilai dalam perbandingan harus bertipe sama."));
+                        }
+                        Ok(ValueType::Logical)
+                    }
+                    BinaryOperator::And | BinaryOperator::Or => {
+                        if left_type != ValueType::Logical || right_type != ValueType::Logical {
+                            return Err(Diagnostic::new(location.clone(), "Operator logika 'dan/atau' hanya menerima nilai logika."));
                         }
                         Ok(ValueType::Logical)
                     }
