@@ -112,68 +112,72 @@ Positive integer literals are written using decimal digits, for example `20`. Ne
 
 ## 8. Variables
 
-A variable declaration follows this form:
+Variables may be declared with an explicit type or by inferring the type from their first value:
 
 ```text
 Tetapkan umur sebagai angka dengan nilai 20.
-Tampilkan nilai umur.
+Tetapkan nama = "Thio".
+umur = umur + 1.
+nama = nama + " Saputra".
+Tampilkan nama.
 ```
-
-The example declares the variable `umur` and initializes it to `20`.
 
 Rules:
 
-- A variable must be declared before it is read.
+- A variable must be declared before it is read or reassigned.
 - A variable name cannot be a reserved keyword or phrase.
 - A name may be declared only once within the same scope.
-- The initial draft initializes a variable once; reassignment will require a separately defined instruction.
-- The initializer must match the declared type.
-- A conditional creates a local scope: it can read variables from outer scopes, but variables declared inside it are not available after the block closes.
+- `Tetapkan nama = ekspresi.` infers the initial type from the expression.
+- Reassignment uses `nama = ekspresi.` and must preserve the variable's type.
+- The longer `Tetapkan nama sebagai tipe dengan nilai ekspresi.` declaration remains supported.
+- A conditional creates a local scope: it can read and reassign variables from outer scopes, but variables declared inside it are not available after the block closes.
 - Parentheses may group an expression used as a value.
 
 ## 9. Output
 
-Use `Tampilkan teks` followed by a quoted string to display literal text:
+Use `Tampilkan` followed by an expression to display a value:
 
 ```text
-Tampilkan teks "Halo, dunia!".
+Tetapkan nama = "Thio".
+Tampilkan "Halo, " + nama + "!".
+Tampilkan 10 + 5 * 2.
 ```
 
-Use `Tampilkan nilai` followed by a declared identifier to display its value:
+The earlier forms `Tampilkan teks "Halo, dunia!".` and `Tampilkan nilai nama.` remain supported for compatibility. Each output instruction writes one line to standard output. Output is UTF-8.
 
-```text
-Tetapkan umur sebagai angka dengan nilai 20.
-Tampilkan nilai umur.
-```
+## 10. Arithmetic, text, comparison, and logic
 
-Each output instruction writes one line to standard output. Output is UTF-8.
+Kontekstual supports a small set of familiar symbols where they make programs easier to read. Indonesian operator phrases remain supported for compatibility.
 
-## 10. Arithmetic and comparisons
-
-Arithmetic operations use Indonesian phrases rather than symbolic arithmetic operators:
-
-| Meaning | Phrase |
+| Purpose | Supported form |
 | --- | --- |
-| Addition | `ditambah` |
-| Subtraction | `dikurangi` |
-| Multiplication | `dikali` |
-| Division | `dibagi` |
-| Greater than | `lebih dari` |
-| Less than | `kurang dari` |
-| Equal to | `sama dengan` |
-| Not equal to | `tidak sama dengan` |
-| Greater than or equal to | `lebih dari atau sama dengan` |
-| Less than or equal to | `kurang dari atau sama dengan` |
+| Add numbers / join text | `+` or `ditambah` |
+| Subtract | `-` or `dikurangi` |
+| Multiply | `*` or `dikali` |
+| Integer division | `/` or `dibagi` |
+| Remainder | `%` |
+| Greater / less | `>`, `<`, or Indonesian phrases |
+| Greater/less or equal | `>=`, `<=` |
+| Equal / different | `==`, `!=`, or Indonesian phrases |
+| Logical AND / OR | `dan`, `atau` |
+| Logical NOT | `tidak` or `!` |
+| Negative number | unary `-` |
 
 Example:
 
 ```text
-Tetapkan hasil sebagai angka dengan nilai (10 ditambah 5) dikali 2.
+Tetapkan nama = "Thio".
+Tetapkan skor = 10 + 5 * 2.
+nama = nama + "!".
+
+Jika skor >= 18 dan tidak salah, maka:
+    Tampilkan "Halo, " + nama + "!".
+    Tampilkan skor.
 ```
 
-Parentheses group expressions. Multiplication and division have higher precedence than addition and subtraction. Comparisons have lower precedence than arithmetic. Operators of equal precedence are left-associative. The interpreter uses signed 64-bit integers, truncating integer division, and reports division by zero and arithmetic overflow as errors.
+The `+` operator adds two numbers or concatenates two text values. Mixed types such as `"Skor: " + 10` are rejected; convert-and-format support may be designed separately. A variable's type is fixed at declaration. Expressions follow conventional precedence: unary operators, multiplication/division/remainder, addition/subtraction, comparisons, logical AND, then logical OR. Parentheses override precedence.
 
-The parser recognizes these expressions, the static checker validates operand types, and the interpreter evaluates them. Arithmetic operations require numeric operands; order comparisons require numeric operands; equality comparisons require both operands to have the same type.
+The interpreter uses signed 64-bit integers, truncating integer division, and reports division by zero, type errors, and arithmetic overflow. Order comparisons require numeric operands; equality comparisons require both operands to have the same type.
 
 ## 11. Conditional execution
 
@@ -262,9 +266,8 @@ Before declaring v0.1 stable, the project must decide:
 2. Host implementation language and native code-generation strategy.
 3. Integer width and overflow behavior.
 4. Exact Unicode identifier rules.
-5. Variable reassignment syntax.
-6. Whether and how to add an alternate conditional branch.
-7. String escape behavior beyond quote and backslash.
-8. User input, loops, functions, and procedures for later versions.
+5. Whether and how to add an alternate conditional branch.
+6. String escape behavior beyond quote, backslash, newline, and tab.
+7. User input, loops, functions, and procedures for later versions.
 
 Syntax changes, examples, grammar, and tests must be updated together.
