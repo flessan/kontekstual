@@ -44,3 +44,8 @@ test("sintaks lama tetap kompatibel",()=>{
   const r=runKontekstual('Tetapkan nama sebagai teks dengan nilai "Thio".\nTampilkan nilai nama.\nTampilkan teks "Tetap kompatibel".');
   assert.deepEqual(r.output,["Thio","Tetap kompatibel"]);
 });
+
+test("escape newline dan tab di dalam string",()=>{
+  const r=runKontekstual('Tampilkan "Baris\\nKedua\\tbertab".');
+  assert.deepEqual(r.output,["Baris\nKedua\tbertab"]);
+});
