@@ -6,7 +6,7 @@ This is the grammar draft for Kontekstual's structured Indonesian instructions. 
 
 - `IDENTIFIER`: a name beginning with a letter and followed by letters or digits
 - `INTEGER`: one or more decimal digits
-- `STRING`: a double-quoted, single-line text literal
+- `STRING`: a double-quoted, single-line text literal; supports escapes `\\\"`, `\\\\`, `\\n`, and `\\t`
 - `PERIOD`: `.`, which terminates an instruction
 - `COMMA`: `,`, used before `maka` in a condition
 - `COLON`: `:`, which introduces a conditional block
