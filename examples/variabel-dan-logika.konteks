@@ -1,0 +1,16 @@
+{- Contoh variabel, teks, aritmetika, dan logika di Kontekstual. -}
+
+Tetapkan nama = "Thio".
+Tetapkan umur = 20.
+Tetapkan skor = 10 + 5 * 2.
+
+nama = nama + " Saputra".
+skor = skor + 1.
+
+Jika umur >= 18 dan skor > 0, maka:
+    Tampilkan "Halo, " + nama + "!".
+    Tampilkan "Skor saat ini:".
+    Tampilkan skor.
+
+Jika umur < 18 atau skor == 0, maka:
+    Tampilkan "Periksa lagi data program.".
