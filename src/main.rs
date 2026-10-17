@@ -376,6 +376,7 @@ enum Statement {
         initial_value: Expression,
         location: Location,
     },
+    DeclareInferred { name: String, initial_value: Expression, location: Location },
     PrintText(String),
     PrintValue {
         name: String,
@@ -603,7 +604,12 @@ impl Parser {
         let location = self.current().location.clone();
         self.expect_phrase("tetapkan", "Diharapkan 'Tetapkan'.")?;
         let name = self.expect_identifier()?;
-        self.expect_phrase("sebagai", "Tambahkan 'sebagai' setelah nama variabel.")?;
+        if self.eat_operator("=") {
+            let initial_value = self.parse_expression()?;
+            self.expect_period()?;
+            return Ok(Statement::DeclareInferred { name, initial_value, location });
+        }
+        self.expect_phrase("sebagai", "Tambahkan 'sebagai' setelah nama variabel, atau gunakan '=' untuk tipe otomatis.")?;
 
         let value_type = if self.eat_phrase("angka") {
             ValueType::Number
@@ -961,6 +967,14 @@ impl Interpreter {
                     }
                     scope.insert(name.clone(), value);
                 }
+                Statement::DeclareInferred { name, initial_value, location } => {
+                    let value = self.evaluate(initial_value)?;
+                    let scope = self.scopes.last_mut().expect("scope global selalu ada");
+                    if scope.contains_key(name) {
+                        return Err(Diagnostic::new(location.clone(), format!("Variabel '{}' sudah ditetapkan pada blok ini.", name)));
+                    }
+                    scope.insert(name.clone(), value);
+                }
                 Statement::PrintText(value) => self.output.push(value.clone()),
                 Statement::PrintExpression(expression) => self.output.push(self.evaluate(expression)?.display()),
                 Statement::Assign { name, value, location } => {
@@ -1114,6 +1128,14 @@ impl SemanticAnalyzer {
                     }
                     current_scope.insert(name.clone(), value_type.clone());
                 }
+                Statement::DeclareInferred { name, initial_value, location } => {
+                    let inferred_type = self.infer_expression(initial_value)?;
+                    let current_scope = self.scopes.last_mut().expect("scope global selalu ada");
+                    if current_scope.contains_key(name) {
+                        return Err(Diagnostic::new(location.clone(), format!("Variabel '{}' sudah ditetapkan pada blok ini.", name)));
+                    }
+                    current_scope.insert(name.clone(), inferred_type);
+                }
                 Statement::PrintText(_) => {}
                 Statement::PrintExpression(expression) => { self.infer_expression(expression)?; }
                 Statement::Assign { name, value, location } => {
@@ -1164,16 +1186,24 @@ impl SemanticAnalyzer {
             Expression::Text(_) => Ok(ValueType::Text),
             Expression::Logical(_) => Ok(ValueType::Logical),
             Expression::Variable { name, location } => self.lookup(name).cloned().ok_or_else(|| {
-                Diagnostic::new(
-                    location.clone(),
-                    format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name),
-                )
+                Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name))
             }),
             Expression::Group(inner) => self.infer_expression(inner),
             Expression::Unary { operator, expression, location } => {
                 let inner = self.infer_expression(expression)?;
                 match operator {
-                    BinaryOperator::Add if left_type == right_type && matches!(left_type, ValueType::Number | ValueType::Text) => Ok(left_type),
+                    UnaryOperator::Not if inner == ValueType::Logical => Ok(ValueType::Logical),
+                    UnaryOperator::Negate if inner == ValueType::Number => Ok(ValueType::Number),
+                    UnaryOperator::Not => Err(Diagnostic::new(location.clone(), "Operator 'tidak' hanya menerima nilai logika.")),
+                    UnaryOperator::Negate => Err(Diagnostic::new(location.clone(), "Operator '-' hanya menerima angka.")),
+                }
+            }
+            Expression::Binary { operator, left, right, location } => {
+                let left_type = self.infer_expression(left)?;
+                let right_type = self.infer_expression(right)?;
+                match operator {
+                    BinaryOperator::Add if left_type == right_type &&
+                        (left_type == ValueType::Number || left_type == ValueType::Text) => Ok(left_type),
                     BinaryOperator::Add => Err(Diagnostic::new(location.clone(), "Operator '+' membutuhkan dua angka atau dua teks.")),
                     BinaryOperator::Subtract | BinaryOperator::Multiply | BinaryOperator::Divide | BinaryOperator::Modulo => {
                         if left_type != ValueType::Number || right_type != ValueType::Number {
