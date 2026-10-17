@@ -13,3 +13,34 @@ test("deklarasi ganda dalam scope sama ditolak",()=>assert.throws(()=>runKonteks
 
 test("kondisi bersarang di dalam cabang salah tidak dievaluasi",()=>{const r=runKontekstual('Jika 1 lebih dari 2, maka:\n    Jika variabelhilang lebih dari 0, maka:\n        Tampilkan teks "Tidak muncul".\nTampilkan teks "Tetap jalan".');assert.deepEqual(r.output,["Tetap jalan"]);});
 test("indentasi tidak konsisten ditolak",()=>assert.throws(()=>runKontekstual('Jika benar sama dengan benar, maka:\n    Tampilkan teks "A".\n  Tampilkan teks "B".'),/Indentasi blok tidak konsisten/));
+
+test("deklarasi singkat menginferensikan tipe dan variabel dapat diubah",()=>{
+  const r=runKontekstual('Tetapkan umur = 17.\numur = umur + 1.\nTampilkan umur.');
+  assert.deepEqual(r.output,["18"]);
+});
+test("operator plus menggabungkan teks dan mempertahankan tanda baca",()=>{
+  const r=runKontekstual('Tetapkan nama = "Thio".\nTampilkan "Halo, " + nama + "!".');
+  assert.deepEqual(r.output,["Halo, Thio!"]);
+});
+test("operator aritmetika dan urutan prioritas simbolik",()=>{
+  const r=runKontekstual('Tampilkan 10 + 5 * 2.\nTampilkan (10 + 5) * 2.\nTampilkan 17 % 5.\nTampilkan -3 + 5.');
+  assert.deepEqual(r.output,["20","30","2","2"]);
+});
+test("operator perbandingan dan logika bahasa Indonesia",()=>{
+  const r=runKontekstual('Tetapkan umur = 20.\nJika umur >= 18 dan tidak salah, maka:\n    Tampilkan "Boleh".\nJika umur < 18 atau umur == 0, maka:\n    Tampilkan "Tidak muncul".');
+  assert.deepEqual(r.output,["Boleh"]);
+});
+test("operator simbolik dan perbandingan string",()=>{
+  const r=runKontekstual('Jika "apel" == "apel", maka:\n    Tampilkan "Sama".\nJika "apel" != "jeruk", maka:\n    Tampilkan "Berbeda".');
+  assert.deepEqual(r.output,["Sama","Berbeda"]);
+});
+test("variabel tidak boleh berubah menjadi tipe berbeda",()=>{
+  assert.throws(()=>runKontekstual('Tetapkan umur = 20.\numur = "dua puluh".'),/tidak dapat diubah/);
+});
+test("operator logika menolak operand yang bukan logika",()=>{
+  assert.throws(()=>runKontekstual('Tampilkan 1 dan benar.'),/hanya menerima nilai logika/);
+});
+test("sintaks lama tetap kompatibel",()=>{
+  const r=runKontekstual('Tetapkan nama sebagai teks dengan nilai "Thio".\nTampilkan nilai nama.\nTampilkan teks "Tetap kompatibel".');
+  assert.deepEqual(r.output,["Thio","Tetap kompatibel"]);
+});
