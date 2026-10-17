@@ -84,7 +84,7 @@ Text output uses quotation marks:
 Tampilkan teks "Halo, dunia! Selamat datang.".
 ```
 
-In a quoted string, a double quote and backslash are escaped as `\"` and `\\`, respectively. The first draft supports a text literal on one physical line; multiline text literals are deferred. The punctuation ending the instruction belongs outside the closing quote.
+In a quoted string, a double quote, backslash, newline, and tab can be written as `\"`, `\\`, `\n`, and `\t`. These escapes represent characters inside one physical source line; multiline source literals are deferred. The punctuation ending the instruction belongs outside the closing quote.
 
 ## 6. Program structure
 
@@ -248,7 +248,7 @@ The compiler must not silently guess the author's intent.
 
 The initial reserved set includes phrases and words such as:
 
-`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `atau`.
+`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `dan`, `atau`, `tidak`, `bukan`.
 
 The old `Selesai jika.` form is not part of the syntax. The checker gives it a migration message directing authors to remove it and let indentation close the block.
 
