@@ -28,53 +28,43 @@ program           = { NEWLINE }, statement,
                     { NEWLINE }, EOF ;
 
 statement         = declaration
-                  | text_output
-                  | value_output
+                  | assignment
+                  | output
                   | conditional ;
 
-declaration       = "tetapkan", identifier, "sebagai", type,
-                    "dengan nilai", expression, "." ;
-
+declaration       = "tetapkan", identifier,
+                    ( "=", expression
+                    | "sebagai", type, "dengan nilai", expression ), "." ;
+assignment        = identifier, "=", expression, "." ;
 type              = "angka" | "teks" | "logika" ;
 
-text_output       = "tampilkan teks", STRING, "." ;
-value_output      = "tampilkan nilai", identifier, "." ;
+output            = "tampilkan", expression, "."
+                  | "tampilkan teks", STRING, "."
+                  | "tampilkan nilai", identifier, "." ;
 
 conditional       = "jika", expression, ",", "maka", ":",
                     NEWLINE, { NEWLINE }, INDENT,
                     statement, { { NEWLINE }, statement },
                     { NEWLINE }, DEDENT ;
 
-expression        = comparison_expression ;
-
-comparison_expression
-                  = additive_expression,
-                    [ comparison_operator, additive_expression ] ;
-
+expression        = logical_or ;
+logical_or        = logical_and, { ("atau" | "||"), logical_and } ;
+logical_and       = comparison, { ("dan" | "&&"), comparison } ;
+comparison        = additive, [ comparison_operator, additive ] ;
 comparison_operator
-                  = "lebih dari"
-                  | "kurang dari"
-                  | "sama dengan"
-                  | "tidak sama dengan"
+                  = ">" | "<" | ">=" | "<=" | "==" | "!="
+                  | "lebih dari" | "kurang dari"
+                  | "sama dengan" | "tidak sama dengan"
                   | "lebih dari atau sama dengan"
                   | "kurang dari atau sama dengan" ;
-
-additive_expression
-                  = multiplicative_expression,
-                    { ("ditambah" | "dikurangi"),
-                      multiplicative_expression } ;
-
-multiplicative_expression
-                  = primary,
-                    { ("dikali" | "dibagi"), primary } ;
-
-primary           = INTEGER
-                  | identifier
-                  | STRING
-                  | "benar"
-                  | "salah"
+additive          = multiplicative,
+                    { ("+" | "-" | "ditambah" | "dikurangi"),
+                      multiplicative } ;
+multiplicative    = unary,
+                    { ("*" | "/" | "%" | "dikali" | "dibagi"), unary } ;
+unary             = [ "!" | "-" | "tidak" | "bukan" ], primary ;
+primary           = INTEGER | identifier | STRING | "benar" | "salah"
                   | "(", expression, ")" ;
-
 identifier        = IDENTIFIER ;
 ```
 
@@ -126,14 +116,12 @@ A file containing only comments is invalid because the program has no instructio
 {- Program ini belum memiliki instruksi. -}
 ```
 
-Use word-based comparisons rather than symbols:
+Both symbolic and word-based comparisons are supported:
 
 ```text
-Jika umur > 17, maka:
-    Tampilkan teks "Halo".
+Jika umur >= 17, maka:
+    Tampilkan "Halo".
 ```
-
-The lexer should report the unsupported `>` character and suggest `lebih dari`.
 
 A conditional body must be indented and cannot be empty:
 
@@ -147,5 +135,5 @@ Tampilkan teks "Halo".
 1. This grammar is a draft implemented by an early syntax-checker prototype, not a complete compiler.
 2. The checker validates syntactic structure only; it does not execute programs or verify variable declarations and types.
 3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, and conditional blocks, but parsing a construct does not imply runtime behavior exists.
-4. The initial draft does not support nested comments, multiline string literals, reassignment, or an alternate conditional branch.
+4. The initial draft does not support nested comments, multiline string literals, or an alternate conditional branch.
 5. Identifier Unicode details and a source formatter still need a formal decision.
