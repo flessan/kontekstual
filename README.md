@@ -71,6 +71,7 @@ The interpreter uses signed 64-bit integers, reports division by zero and arithm
 - [docs/grammar.md](docs/grammar.md) — formal grammar draft
 - [ROADMAP.md](ROADMAP.md) — implementation milestones
 - [examples/halo.konteks](examples/halo.konteks) — first example program
+- [examples/variabel-dan-logika.konteks](examples/variabel-dan-logika.konteks) — variables, string concatenation, arithmetic, and logic
 
 ## Current scope
 
