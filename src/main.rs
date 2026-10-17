@@ -139,10 +139,12 @@ fn lex(source: &str) -> Result<Vec<Token>, Diagnostic> {
                         match advance(&chars, &mut index, &mut line, &mut column) {
                             Some('"') => value.push('"'),
                             Some('\\') => value.push('\\'),
+                            Some('n') => value.push('\n'),
+                            Some('t') => value.push('\t'),
                             Some(other) => {
                                 return Err(Diagnostic::new(
                                     escape_location,
-                                    format!("Urutan pelolosan setelah garis miring terbalik belum didukung: '{}'. Gunakan hanya pelolosan tanda kutip atau garis miring terbalik.", other),
+                                    format!("Urutan pelolosan setelah garis miring terbalik belum didukung: '{}'. Gunakan escape tanda kutip, garis miring terbalik, \\n, atau \\t.", other),
                                 ));
                             }
                             None => {
@@ -1667,5 +1669,11 @@ Jika umur >= 18 dan tidak salah, maka:
         let error = check_source(r#"Tetapkan umur = 20. umur = "dua puluh"."#)
             .expect_err("tipe variabel harus tetap");
         assert!(error.message.contains("tidak bisa diubah"));
+    }
+    #[test]
+    fn interpreter_supports_newline_and_tab_string_escapes() {
+        let output = execute_source(r#"Tampilkan "Baris\nKedua\tbertab"."#)
+            .expect("escape baris baru dan tab seharusnya didukung");
+        assert_eq!(output, vec!["Baris\nKedua\tbertab"]);
     }
 }
