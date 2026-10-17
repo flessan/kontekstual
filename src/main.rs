@@ -45,6 +45,7 @@ enum TokenKind {
     Colon,
     LeftParen,
     RightParen,
+    Operator(String),
     Newline,
     Indent,
     Dedent,
@@ -170,6 +171,27 @@ fn lex(source: &str) -> Result<Vec<Token>, Diagnostic> {
                 kind: TokenKind::Text(value),
                 location,
             });
+            continue;
+        }
+
+        if matches!(ch, '+' | '-' | '*' | '/' | '%' | '=' | '!' | '>' | '<' | '&' | '|') {
+            let mut operator = String::new();
+            operator.push(ch);
+            advance(&chars, &mut index, &mut line, &mut column);
+            if let Some(next) = chars.get(index).copied() {
+                let is_pair = matches!((ch, next),
+                    ('=', '=') | ('!', '=') | ('>', '=') | ('<', '=') |
+                    ('&', '&') | ('|', '|')
+                );
+                if is_pair {
+                    operator.push(next);
+                    advance(&chars, &mut index, &mut line, &mut column);
+                }
+            }
+            if operator == "&" || operator == "|" {
+                return Err(Diagnostic::new(location, format!("Operator '{}' belum lengkap. Gunakan pasangan simbol atau operator 'dan'/'atau'.", operator)));
+            }
+            tokens.push(Token { kind: TokenKind::Operator(operator), location });
             continue;
         }
 
@@ -319,17 +341,13 @@ enum ValueType {
 
 #[derive(Clone, Debug, PartialEq)]
 enum BinaryOperator {
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    Greater,
-    Less,
-    Equal,
-    NotEqual,
-    GreaterEqual,
-    LessEqual,
+    Add, Subtract, Multiply, Divide, Modulo,
+    Greater, Less, Equal, NotEqual, GreaterEqual, LessEqual,
+    And, Or,
 }
+
+#[derive(Clone, Debug, PartialEq)]
+enum UnaryOperator { Not, Negate }
 
 #[derive(Clone, Debug, PartialEq)]
 enum Expression {
@@ -341,6 +359,7 @@ enum Expression {
         location: Location,
     },
     Group(Box<Expression>),
+    Unary { operator: UnaryOperator, expression: Box<Expression>, location: Location },
     Binary {
         operator: BinaryOperator,
         left: Box<Expression>,
@@ -362,6 +381,8 @@ enum Statement {
         name: String,
         location: Location,
     },
+    PrintExpression(Expression),
+    Assign { name: String, value: Expression, location: Location },
     If {
         condition: Expression,
         body: Vec<Statement>,
