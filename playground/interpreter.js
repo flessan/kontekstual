@@ -51,7 +51,7 @@ function tokenizeExpression(source, line) {
           if (i >= source.length) break;
           const escaped = source[i++];
           const map = { '"': '"', "\\": "\\", n: "\n", t: "\t" };
-          if (!(escaped in map)) throw new KontekstualError("Escape teks tidak dikenal. Gunakan \\" , \\\\, \\n, atau \\t.", line);
+          if (!(escaped in map)) throw new KontekstualError("Escape teks tidak dikenal. Escape yang didukung: tanda kutip, garis miring terbalik, dan penanda baris baru/tab.", line);
           value += map[escaped];
         } else value += c;
       }
