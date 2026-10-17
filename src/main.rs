@@ -586,6 +586,10 @@ impl Parser {
             self.parse_text_output()
         } else if self.phrase_at("tampilkan nilai") {
             self.parse_value_output()
+        } else if self.phrase_at("tampilkan") {
+            self.parse_expression_output()
+        } else if self.is_assignment_start() {
+            self.parse_assignment()
         } else if self.phrase_at("jika") {
             self.parse_conditional()
         } else {
@@ -628,6 +632,30 @@ impl Parser {
         })
     }
 
+    fn is_assignment_start(&self) -> bool {
+        matches!(self.current().kind, TokenKind::Word(_))
+            && matches!(self.tokens.get(self.position + 1).map(|t| &t.kind), Some(TokenKind::Operator(op)) if op == "=")
+    }
+
+    fn parse_assignment(&mut self) -> Result<Statement, Diagnostic> {
+        let token = self.current().clone();
+        let name = match token.kind {
+            TokenKind::Word(name) => name,
+            _ => return Err(self.error_here("Diharapkan nama variabel sebelum '='.")),
+        };
+        self.position += 2;
+        let value = self.parse_expression()?;
+        self.expect_period()?;
+        Ok(Statement::Assign { name, value, location: token.location })
+    }
+
+    fn parse_expression_output(&mut self) -> Result<Statement, Diagnostic> {
+        self.expect_phrase("tampilkan", "Diharapkan 'Tampilkan'.")?;
+        let expression = self.parse_expression()?;
+        self.expect_period()?;
+        Ok(Statement::PrintExpression(expression))
+    }
+
     fn parse_text_output(&mut self) -> Result<Statement, Diagnostic> {
         self.expect_phrase("tampilkan teks", "Diharapkan 'Tampilkan teks'.")?;
         let token = self.current().clone();
@@ -658,11 +686,6 @@ impl Parser {
         let location = self.current().location.clone();
         self.expect_phrase("jika", "Diharapkan 'Jika'.")?;
         let condition = self.parse_expression()?;
-        if !condition.is_comparison() {
-            return Err(self.error_here(
-                "Kondisi harus menggunakan perbandingan, misalnya 'umur lebih dari 17'.",
-            ));
-        }
         self.expect_comma()?;
         self.expect_phrase("maka", "Tambahkan kata 'maka' setelah koma.")?;
         self.expect_colon()?;
@@ -708,8 +731,53 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> Result<Expression, Diagnostic> {
-        let left = self.parse_additive()?;
+        self.parse_or()
+    }
 
+    fn parse_or(&mut self) -> Result<Expression, Diagnostic> {
+        let mut expression = self.parse_and()?;
+        loop {
+            let location = self.current().location.clone();
+            let operator = if self.eat_phrase("atau") || self.eat_operator("||") { Some(BinaryOperator::Or) } else { None };
+            let Some(operator) = operator else { break };
+            let right = self.parse_and()?;
+            expression = Expression::Binary { operator, left: Box::new(expression), right: Box::new(right), location };
+        }
+        Ok(expression)
+    }
+
+    fn parse_and(&mut self) -> Result<Expression, Diagnostic> {
+        let mut expression = self.parse_comparison()?;
+        loop {
+            let location = self.current().location.clone();
+            let operator = if self.eat_phrase("dan") || self.eat_operator("&&") { Some(BinaryOperator::And) } else { None };
+            let Some(operator) = operator else { break };
+            let right = self.parse_comparison()?;
+            expression = Expression::Binary { operator, left: Box::new(expression), right: Box::new(right), location };
+        }
+        Ok(expression)
+    }
+
+    fn parse_comparison(&mut self) -> Result<Expression, Diagnostic> {
+        let left = self.parse_additive()?;
+        let location = self.current().location.clone();
+        let symbolic = match &self.current().kind {
+            TokenKind::Operator(op) => match op.as_str() {
+                "==" => Some(BinaryOperator::Equal),
+                "!=" => Some(BinaryOperator::NotEqual),
+                ">" => Some(BinaryOperator::Greater),
+                "<" => Some(BinaryOperator::Less),
+                ">=" => Some(BinaryOperator::GreaterEqual),
+                "<=" => Some(BinaryOperator::LessEqual),
+                _ => None,
+            },
+            _ => None,
+        };
+        if let Some(operator) = symbolic {
+            self.position += 1;
+            let right = self.parse_additive()?;
+            return Ok(Expression::Binary { operator, left: Box::new(left), right: Box::new(right), location });
+        }
         let comparisons = [
             ("lebih dari atau sama dengan", BinaryOperator::GreaterEqual),
             ("kurang dari atau sama dengan", BinaryOperator::LessEqual),
@@ -718,20 +786,12 @@ impl Parser {
             ("kurang dari", BinaryOperator::Less),
             ("sama dengan", BinaryOperator::Equal),
         ];
-
         for (phrase, operator) in comparisons {
-            let location = self.current().location.clone();
             if self.eat_phrase(phrase) {
                 let right = self.parse_additive()?;
-                return Ok(Expression::Binary {
-                    operator,
-                    left: Box::new(left),
-                    right: Box::new(right),
-                    location,
-                });
+                return Ok(Expression::Binary { operator, left: Box::new(left), right: Box::new(right), location });
             }
         }
-
         Ok(left)
     }
 
@@ -739,52 +799,52 @@ impl Parser {
         let mut expression = self.parse_multiplicative()?;
         loop {
             let location = self.current().location.clone();
-            let operator = if self.eat_phrase("ditambah") {
+            let operator = if self.eat_phrase("ditambah") || self.eat_operator("+") {
                 Some(BinaryOperator::Add)
-            } else if self.eat_phrase("dikurangi") {
+            } else if self.eat_phrase("dikurangi") || self.eat_operator("-") {
                 Some(BinaryOperator::Subtract)
-            } else {
-                None
-            };
-
-            let Some(operator) = operator else {
-                break;
-            };
+            } else { None };
+            let Some(operator) = operator else { break };
             let right = self.parse_multiplicative()?;
-            expression = Expression::Binary {
-                operator,
-                left: Box::new(expression),
-                right: Box::new(right),
-                location,
-            };
+            expression = Expression::Binary { operator, left: Box::new(expression), right: Box::new(right), location };
         }
         Ok(expression)
     }
 
     fn parse_multiplicative(&mut self) -> Result<Expression, Diagnostic> {
-        let mut expression = self.parse_primary()?;
+        let mut expression = self.parse_unary()?;
         loop {
             let location = self.current().location.clone();
-            let operator = if self.eat_phrase("dikali") {
+            let operator = if self.eat_phrase("dikali") || self.eat_operator("*") {
                 Some(BinaryOperator::Multiply)
-            } else if self.eat_phrase("dibagi") {
+            } else if self.eat_phrase("dibagi") || self.eat_operator("/") {
                 Some(BinaryOperator::Divide)
-            } else {
-                None
-            };
-
-            let Some(operator) = operator else {
-                break;
-            };
-            let right = self.parse_primary()?;
-            expression = Expression::Binary {
-                operator,
-                left: Box::new(expression),
-                right: Box::new(right),
-                location,
-            };
+            } else if self.eat_operator("%") {
+                Some(BinaryOperator::Modulo)
+            } else { None };
+            let Some(operator) = operator else { break };
+            let right = self.parse_unary()?;
+            expression = Expression::Binary { operator, left: Box::new(expression), right: Box::new(right), location };
         }
         Ok(expression)
+    }
+
+    fn parse_unary(&mut self) -> Result<Expression, Diagnostic> {
+        let location = self.current().location.clone();
+        if self.eat_phrase("tidak") || self.eat_phrase("bukan") || self.eat_operator("!") {
+            return Ok(Expression::Unary { operator: UnaryOperator::Not, expression: Box::new(self.parse_unary()?), location });
+        }
+        if self.eat_operator("-") {
+            return Ok(Expression::Unary { operator: UnaryOperator::Negate, expression: Box::new(self.parse_unary()?), location });
+        }
+        self.parse_primary()
+    }
+
+    fn eat_operator(&mut self, expected: &str) -> bool {
+        if matches!(&self.current().kind, TokenKind::Operator(op) if op == expected) {
+            self.position += 1;
+            true
+        } else { false }
     }
 
     fn parse_primary(&mut self) -> Result<Expression, Diagnostic> {
