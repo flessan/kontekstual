@@ -1204,7 +1204,7 @@ impl SemanticAnalyzer {
                 match operator {
                     BinaryOperator::Add if left_type == right_type &&
                         (left_type == ValueType::Number || left_type == ValueType::Text) => Ok(left_type),
-                    BinaryOperator::Add => Err(Diagnostic::new(location.clone(), "Operator '+' hanya menerima dua angka atau dua teks.")),
+                    BinaryOperator::Add => Err(Diagnostic::new(location.clone(), "Operator '+' hanya menerima angka atau menggabungkan dua teks.")),
                     BinaryOperator::Subtract | BinaryOperator::Multiply | BinaryOperator::Divide | BinaryOperator::Modulo => {
                         if left_type != ValueType::Number || right_type != ValueType::Number {
                             return Err(Diagnostic::new(location.clone(), "Operator matematika '-', '*', '/', '%' hanya menerima angka."));
