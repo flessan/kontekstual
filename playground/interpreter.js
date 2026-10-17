@@ -248,7 +248,7 @@ function evaluate(tree, scopes, line) {
   if (op === "+" && typeof left === "string" && typeof right === "string") return left + right;
   if (["+", "-", "*", "/", "%"].includes(op)) {
     if (typeof left !== "number" || typeof right !== "number") throw new KontekstualError("Operator matematika membutuhkan dua angka; '+' juga bisa menggabungkan dua teks.", line);
-    if ((op === "/" || op === "%") && right === 0) throw new KontekstualError("Pembagian atau sisa bagi dengan nol tidak diperbolehkan.", line);
+    if ((op === "/" || op === "%") && right === 0) throw new KontekstualError("Pembagian dengan nol atau sisa bagi dengan nol tidak diperbolehkan.", line);
     let result = op === "+" ? left + right : op === "-" ? left - right : op === "*" ? left * right : op === "/" ? Math.trunc(left / right) : left % right;
     if (!Number.isSafeInteger(result)) throw new KontekstualError("Hasil melampaui rentang angka aman JavaScript.", line);
     return result;
