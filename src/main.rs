@@ -1406,12 +1406,12 @@ Tampilkan teks "Halo"."#).unwrap_err();
     }
 
     #[test]
-    fn rejects_symbolic_comparison_operator() {
-        let error = parse_source(
-            r#"Jika umur > 17, maka: Tampilkan teks "Dewasa". Selesai jika."#,
-        )
-        .expect_err("operator simbolik seharusnya ditolak");
-        assert!(error.message.contains("Karakter"));
+    fn accepts_symbolic_comparison_operator() {
+        let program = parse_ok(
+            r#"Jika umur > 17, maka:
+    Tampilkan teks "Dewasa"."#,
+        );
+        assert_eq!(program.instruction_count(), 2);
     }
 
     #[test]
@@ -1632,5 +1632,40 @@ Jika benar tidak sama dengan salah, maka:
             "Tampilkan teks \"Selesai.\". {- Berkas selesai setelah instruksi ini. -}",
         );
         assert_eq!(program.instruction_count(), 1);
+    }
+
+    #[test]
+    fn interpreter_supports_inferred_variables_reassignment_and_text_concatenation() {
+        let output = execute_source(
+            r#"Tetapkan nama = "Thio".
+nama = nama + "!".
+Tampilkan "Halo, " + nama + "."."#,
+        ).expect("variabel mutable dan konkatenasi teks seharusnya berjalan");
+        assert_eq!(output, vec!["Halo, Thio!."]);
+    }
+
+    #[test]
+    fn interpreter_supports_symbolic_arithmetic_and_modulo() {
+        let output = execute_source(
+            "Tetapkan hasil = (10 + 5) * 2. Tampilkan hasil. Tampilkan 17 % 5.",
+        ).expect("operator simbolik aritmetika seharusnya berjalan");
+        assert_eq!(output, vec!["30", "2"]);
+    }
+
+    #[test]
+    fn interpreter_supports_logical_operators_and_boolean_conditions() {
+        let output = execute_source(
+            r#"Tetapkan umur = 20.
+Jika umur >= 18 dan tidak salah, maka:
+    Tampilkan "Dewasa"."#,
+        ).expect("operator logika seharusnya berjalan");
+        assert_eq!(output, vec!["Dewasa"]);
+    }
+
+    #[test]
+    fn semantic_checker_rejects_reassignment_to_another_type() {
+        let error = check_source(r#"Tetapkan umur = 20. umur = "dua puluh"."#)
+            .expect_err("tipe variabel harus tetap");
+        assert!(error.message.contains("tidak bisa diubah"));
     }
 }
