@@ -74,7 +74,7 @@ The interpreter uses signed 64-bit integers, reports division by zero and arithm
 
 ## Current scope
 
-The prototype recognizes period-terminated instructions, text output, declarations, value output, arithmetic expressions, comparisons, and indentation-based conditional blocks. Its interpreter executes that subset after static semantic checking. Loops, variable reassignment, user-defined functions, modules, user input, and native executable generation remain future work.
+The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, and indentation-based conditional blocks. Loops, an alternate conditional branch, user-defined functions, modules, user input, and native executable generation remain future work.
 
 ## Contributing
 
