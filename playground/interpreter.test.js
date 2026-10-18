@@ -49,3 +49,8 @@ test("escape newline dan tab di dalam string",()=>{
   const r=runKontekstual('Tampilkan "Baris\\nKedua\\tbertab".');
   assert.deepEqual(r.output,["Baris\nKedua\tbertab"]);
 });
+
+test("frasa variabel bahasa Indonesia didukung",()=>{
+  const r=runKontekstual('Tetapkan umur bernilai 17.\nTetapkan nama dengan nilai "Thio".\nUbah umur menjadi umur + 3.\nTampilkan nama.\nTampilkan umur.');
+  assert.deepEqual(r.output,["Thio","20"]);
+});
