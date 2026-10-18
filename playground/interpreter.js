@@ -177,7 +177,7 @@ function parseProgram(source) {
         if (
           elseHeader < lines.length &&
           lines[elseHeader].indent === item.indent &&
-          /^Jika\\s+tidak,\\s*maka\\s*:\\s*$/iu.test(lines[elseHeader].text)
+          /^Jika\s+tidak,\s*maka\s*:\s*$/iu.test(lines[elseHeader].text)
         ) {
           cursor = elseHeader + 1;
           let elseFirst = cursor;
