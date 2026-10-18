@@ -34,8 +34,11 @@ statement         = declaration
 
 declaration       = "tetapkan", identifier,
                     ( "=", expression
+                    | "bernilai", expression
+                    | "dengan nilai", expression
                     | "sebagai", type, "dengan nilai", expression ), "." ;
-assignment        = identifier, "=", expression, "." ;
+assignment        = identifier, "=", expression, "."
+                  | "ubah", identifier, "menjadi", expression, "." ;
 type              = "angka" | "teks" | "logika" ;
 
 output            = "tampilkan", expression, "."
