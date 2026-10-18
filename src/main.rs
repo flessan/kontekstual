@@ -1785,4 +1785,53 @@ Ubah umur menjadi "dua puluh"."#,
 
 
 
+
+    #[test]
+    fn interpreter_runs_the_else_branch_when_condition_is_false() {
+        let output = execute_source(
+            r#"Tetapkan umur bernilai 16.
+Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Sudah dewasa".
+Jika tidak, maka:
+    Tampilkan "Belum dewasa"."#,
+        ).expect("cabang Jika tidak seharusnya berjalan saat kondisi salah");
+        assert_eq!(output, vec!["Belum dewasa"]);
+    }
+
+    #[test]
+    fn interpreter_skips_the_else_branch_when_condition_is_true() {
+        let output = execute_source(
+            r#"Tetapkan umur bernilai 20.
+Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Sudah dewasa".
+Jika tidak, maka:
+    Tampilkan "Belum dewasa"."#,
+        ).expect("cabang alternatif tidak seharusnya dijalankan saat kondisi benar");
+        assert_eq!(output, vec!["Sudah dewasa"]);
+    }
+
+    #[test]
+    fn interpreter_supports_nested_if_else_branches() {
+        let output = execute_source(
+            r#"Tetapkan umur bernilai 16.
+Jika benar, maka:
+    Jika umur lebih dari atau sama dengan 18, maka:
+        Tampilkan "Dewasa".
+    Jika tidak, maka:
+        Tampilkan "Remaja".
+Jika tidak, maka:
+    Tampilkan "Tidak aktif"."#,
+        ).expect("cabang Jika tidak bersarang seharusnya valid");
+        assert_eq!(output, vec!["Remaja"]);
+    }
+
+    #[test]
+    fn parser_rejects_empty_else_branch() {
+        let error = parse_source(
+            "Jika benar, maka:\n    Tampilkan \"Ya\".\nJika tidak, maka:",
+        ).expect_err("blok alternatif kosong harus ditolak");
+        assert!(error.message.contains("Blok 'Jika tidak' membutuhkan"));
+    }
+
+
 }
