@@ -133,6 +133,8 @@ Rules:
 - A conditional creates a local scope: it can read and reassign variables from outer scopes, but variables declared inside it are not available after the block closes.
 - Parentheses may group an expression used as a value.
 
+The inferred declaration forms `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.` are also supported. Use `Ubah nama menjadi ekspresi.` to reassign an existing variable while preserving its type.
+
 ## 9. Output
 
 Use `Tampilkan` followed by an expression to display a value:
