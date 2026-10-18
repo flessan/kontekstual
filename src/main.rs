@@ -389,6 +389,7 @@ enum Statement {
     If {
         condition: Expression,
         body: Vec<Statement>,
+        else_body: Option<Vec<Statement>>,
         location: Location,
     },
 }
@@ -402,7 +403,10 @@ impl Program {
     fn instruction_count(&self) -> usize {
         fn count(statement: &Statement) -> usize {
             match statement {
-                Statement::If { body, .. } => 1 + body.iter().map(count).sum::<usize>(),
+                Statement::If { body, else_body, .. } => {
+                    1 + body.iter().map(count).sum::<usize>()
+                        + else_body.as_ref().map(|items| items.iter().map(count).sum::<usize>()).unwrap_or(0)
+                },
                 _ => 1,
             }
         }
@@ -752,7 +756,54 @@ impl Parser {
             self.position += 1;
         }
 
-        Ok(Statement::If { condition, body, location })
+        let else_body = if self.phrase_at("jika tidak") {
+            self.expect_phrase("jika tidak", "Diharapkan 'Jika tidak'.")?;
+            self.expect_comma()?;
+            self.expect_phrase("maka", "Tambahkan kata 'maka' setelah koma.")?;
+            self.expect_colon()?;
+
+            if !matches!(&self.current().kind, TokenKind::Newline) {
+                return Err(self.error_here(
+                    "Mulai isi blok 'Jika tidak' pada baris baru, lalu gunakan indentasi.",
+                ));
+            }
+            self.skip_newlines();
+            if !matches!(&self.current().kind, TokenKind::Indent) {
+                return Err(self.error_here(
+                    "Blok 'Jika tidak' membutuhkan setidaknya satu instruksi yang menjorok ke dalam.",
+                ));
+            }
+            self.position += 1;
+
+            let mut else_body = Vec::new();
+            self.skip_newlines();
+            while !matches!(&self.current().kind, TokenKind::Dedent | TokenKind::Eof) {
+                if matches!(&self.current().kind, TokenKind::Indent) {
+                    return Err(self.error_here(
+                        "Indentasi tambahan harus diawali oleh blok baru, misalnya 'Jika'.",
+                    ));
+                }
+                if self.phrase_at("selesai jika") {
+                    return Err(self.error_here(
+                        "'Selesai jika' tidak diperlukan. Hapus baris itu; indentasi menutup blok secara otomatis.",
+                    ));
+                }
+                else_body.push(self.parse_statement()?);
+                self.skip_newlines();
+            }
+
+            if else_body.is_empty() {
+                return Err(self.error_here("Blok 'Jika tidak' tidak boleh kosong."));
+            }
+            if matches!(&self.current().kind, TokenKind::Dedent) {
+                self.position += 1;
+            }
+            Some(else_body)
+        } else {
+            None
+        };
+
+        Ok(Statement::If { condition, body, else_body, location })
     }
 
     fn parse_expression(&mut self) -> Result<Expression, Diagnostic> {
@@ -1016,7 +1067,7 @@ impl Interpreter {
                     })?;
                     self.output.push(value.display());
                 }
-                Statement::If { condition, body, location } => {
+                Statement::If { condition, body, else_body, location } => {
                     match self.evaluate(condition)? {
                         RuntimeValue::Logical(true) => {
                             self.scopes.push(HashMap::new());
@@ -1024,7 +1075,14 @@ impl Interpreter {
                             self.scopes.pop();
                             result?;
                         }
-                        RuntimeValue::Logical(false) => {}
+                        RuntimeValue::Logical(false) => {
+                            if let Some(else_statements) = else_body {
+                                self.scopes.push(HashMap::new());
+                                let result = self.execute_statements(else_statements);
+                                self.scopes.pop();
+                                result?;
+                            }
+                        }
                         other => return Err(Diagnostic::new(
                             location.clone(),
                             format!("Kondisi 'Jika' harus menghasilkan logika, bukan {}.", runtime_type_name(&other)),
@@ -1177,7 +1235,7 @@ impl SemanticAnalyzer {
                         ));
                     }
                 }
-                Statement::If { condition, body, location } => {
+                Statement::If { condition, body, else_body, location } => {
                     let condition_type = self.infer_expression(condition)?;
                     if condition_type != ValueType::Logical {
                         return Err(Diagnostic::new(
@@ -1189,6 +1247,12 @@ impl SemanticAnalyzer {
                     let result = self.check_statements(body);
                     self.scopes.pop();
                     result?;
+                    if let Some(else_statements) = else_body {
+                        self.scopes.push(HashMap::new());
+                        let result = self.check_statements(else_statements);
+                        self.scopes.pop();
+                        result?;
+                    }
                 }
             }
         }
