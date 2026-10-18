@@ -33,7 +33,7 @@ jobs:
       - name: Run the variables and logic example
         run: |
           actual="$(cargo run --quiet -- run examples/variabel-dan-logika.konteks)"
-          expected="$(printf 'Halo, Thio Saputra!\nSkor saat ini:\n21')"
+          expected="$(printf 'Halo, Thio!\n20\nbenar')"
           test "$actual" = "$expected"
           printf '%s\n' "$actual"
 
