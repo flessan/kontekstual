@@ -1,15 +1,19 @@
+<div align="center">
+<img width="789" alt="image" src="https://github.com/user-attachments/assets/cc9841f0-a630-4e59-aeec-513e92b21f25" />
+</div>
+
 # Kontekstual
 
 **Kontekstual** is an experimental programming language designed around clear, structured Indonesian sentences and paragraphs. Instead of removing punctuation, it gives familiar punctuation a defined role in the language.
 
-Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program—no artificial start/end wrapper is needed.
+Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program, no artificial start/end wrapper is needed.
 
 > Status: an early Rust interpreter can run text output, variables, arithmetic, comparisons, and indentation-based conditional blocks. Static semantic checking rejects unknown variables and incompatible types. Native executable generation is not implemented yet.
 
 ## Design goals
 
 - Make programs readable like carefully written Indonesian instructions.
-- Use formal, predictable grammar—not unrestricted natural-language guessing.
+- Use formal, predictable grammar not unrestricted natural-language guessing.
 - Give punctuation familiar roles: periods end instructions, commas separate clauses, quotation marks delimit text, and parentheses group expressions.
 - Support one-line and multiline comments with `{- ... -}`.
 - Provide helpful diagnostics in Indonesian.
@@ -35,7 +39,7 @@ Jika umur lebih dari atau sama dengan 18, maka:
 Tampilkan "Lanjut di luar kondisi.".
 ```
 
-Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. The block closes automatically when indentation returns to the previous level—or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
+Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. The block closes automatically when indentation returns to the previous level or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
 ## Browser playground (StackBlitz)
 
@@ -46,7 +50,7 @@ Open the repository in StackBlitz and run the web playground without Rust or Car
 - Run compatibility tests: `npm test`
 - Create a production build: `npm run build`
 
-The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based `Jika` blocks, and comments. It is a compatibility implementation—not the Rust compiler itself—and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. CI runs the shared behavior examples against the browser runtime and builds the web app.
+The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based `Jika` blocks, and comments. It is a compatibility implementation not the Rust compiler itself and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. CI runs the shared behavior examples against the browser runtime and builds the web app.
 
 ## Check and run a program
 
@@ -69,11 +73,11 @@ The interpreter uses signed 64-bit integers, reports division by zero and arithm
 
 ## Repository guide
 
-- [SPECIFICATION.md](SPECIFICATION.md) — language design and draft rules
-- [docs/grammar.md](docs/grammar.md) — formal grammar draft
-- [ROADMAP.md](ROADMAP.md) — implementation milestones
-- [examples/halo.konteks](examples/halo.konteks) — first example program
-- [examples/variabel-dan-logika.konteks](examples/variabel-dan-logika.konteks) — variables, string concatenation, arithmetic, and logic
+- [SPECIFICATION.md](SPECIFICATION.md) - language design and draft rules
+- [docs/grammar.md](docs/grammar.md) - formal grammar draft
+- [ROADMAP.md](ROADMAP.md) - implementation milestones
+- [examples/halo.konteks](examples/halo.konteks) - first example program
+- [examples/variabel-dan-logika.konteks](examples/variabel-dan-logika.konteks) - variables, string concatenation, arithmetic, and logic
 
 ## Current scope
 
