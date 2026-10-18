@@ -526,7 +526,7 @@ impl Parser {
                 let lower = name.to_lowercase();
                 let reserved = [
                     "tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah",
-                    "dengan", "nilai", "tampilkan", "jika", "maka", "selesai",
+                    "bernilai", "dengan", "nilai", "ubah", "menjadi", "tampilkan", "jika", "maka", "selesai",
                     "ditambah", "dikurangi", "dikali", "dibagi", "lebih", "dari",
                     "kurang", "sama", "tidak", "atau",
                 ];
@@ -591,6 +591,8 @@ impl Parser {
             self.parse_value_output()
         } else if self.phrase_at("tampilkan") {
             self.parse_expression_output()
+        } else if self.phrase_at("ubah") {
+            self.parse_mutation()
         } else if self.is_assignment_start() {
             self.parse_assignment()
         } else if self.phrase_at("jika") {
@@ -611,7 +613,12 @@ impl Parser {
             self.expect_period()?;
             return Ok(Statement::DeclareInferred { name, initial_value, location });
         }
-        self.expect_phrase("sebagai", "Tambahkan 'sebagai' setelah nama variabel, atau gunakan '=' untuk tipe otomatis.")?;
+        if self.eat_phrase("bernilai") || self.eat_phrase("dengan nilai") {
+            let initial_value = self.parse_expression()?;
+            self.expect_period()?;
+            return Ok(Statement::DeclareInferred { name, initial_value, location });
+        }
+        self.expect_phrase("sebagai", "Gunakan 'bernilai', 'dengan nilai', atau 'sebagai' diikuti tipe variabel.")?;
 
         let value_type = if self.eat_phrase("angka") {
             ValueType::Number
@@ -643,6 +650,16 @@ impl Parser {
     fn is_assignment_start(&self) -> bool {
         matches!(self.current().kind, TokenKind::Word(_))
             && matches!(self.tokens.get(self.position + 1).map(|t| &t.kind), Some(TokenKind::Operator(op)) if op == "=")
+    }
+
+    fn parse_mutation(&mut self) -> Result<Statement, Diagnostic> {
+        let location = self.current().location.clone();
+        self.expect_phrase("ubah", "Diharapkan 'Ubah'.")?;
+        let name = self.expect_identifier()?;
+        self.expect_phrase("menjadi", "Tambahkan kata 'menjadi' setelah nama variabel.")?;
+        let value = self.parse_expression()?;
+        self.expect_period()?;
+        Ok(Statement::Assign { name, value, location })
     }
 
     fn parse_assignment(&mut self) -> Result<Statement, Diagnostic> {
