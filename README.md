@@ -25,12 +25,14 @@ Tampilkan teks "Halo dunia!".
 A conditional example:
 
 ```text
-Tetapkan umur sebagai angka dengan nilai 20.
+Tetapkan umur bernilai 17.
+Tetapkan nama dengan nilai "Thio".
+Ubah umur menjadi umur + 3.
 
-Jika umur lebih dari 17, maka:
-    Tampilkan teks "Kamu sudah dewasa!".
+Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Halo, " + nama + "!".
 
-Tampilkan teks "Lanjut di luar kondisi.".
+Tampilkan "Lanjut di luar kondisi.".
 ```
 
 Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. The block closes automatically when indentation returns to the previous level—or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
@@ -75,7 +77,7 @@ The interpreter uses signed 64-bit integers, reports division by zero and arithm
 
 ## Current scope
 
-The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, and indentation-based conditional blocks. Loops, an alternate conditional branch, user-defined functions, modules, user input, and native executable generation remain future work.
+The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, and indentation-based conditional blocks. Inferred declarations accept both `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.` as well as the older `nama = ekspresi.` form. Loops, an alternate conditional branch, user-defined functions, modules, user input, and native executable generation remain future work.
 
 ## Contributing
 
