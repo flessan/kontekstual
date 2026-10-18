@@ -139,4 +139,5 @@ Tampilkan teks "Halo".
 2. The checker validates syntactic structure only; it does not execute programs or verify variable declarations and types.
 3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, and conditional blocks, but parsing a construct does not imply runtime behavior exists.
 4. The initial draft does not support nested comments, multiline string literals, or an alternate conditional branch.
+5. Variable initialization also accepts `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.`.
 5. Identifier Unicode details and a source formatter still need a formal decision.
