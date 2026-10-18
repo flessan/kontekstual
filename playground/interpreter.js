@@ -138,7 +138,7 @@ function expression(source, line) {
 const valueType = value => typeof value === "number" ? "angka" : typeof value === "string" ? "teks" : "logika";
 const display = value => typeof value === "boolean" ? (value ? "benar" : "salah") : String(value);
 const validName = /^[\p{L}_][\p{L}\p{N}_]*$/u;
-const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah", "tampilkan", "nilai", "jika", "maka", "dan", "atau", "tidak", "bukan"]);
+const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah", "bernilai", "ubah", "menjadi", "tampilkan", "nilai", "jika", "maka", "dan", "atau", "tidak", "bukan"]);
 
 function parseProgram(source) {
   const stripped = stripComments(source);
@@ -199,11 +199,24 @@ function parseProgram(source) {
         statements.push({ kind: "declare", name, type, value: expression(declaration[3], line), line });
         continue;
       }
+      const naturalDeclaration = text.match(/^Tetapkan\s+([\p{L}_][\p{L}\p{N}_]*)\s+(?:bernilai\s+|dengan\s+nilai\s+)(.+)\.$/iu);
+      if (naturalDeclaration) {
+        const name = naturalDeclaration[1];
+        if (reservedNames.has(name.toLocaleLowerCase("id"))) throw new KontekstualError("Nama tersebut merupakan kata khusus.", line);
+        statements.push({ kind: "declare", name, type: null, value: expression(naturalDeclaration[2], line), line });
+        continue;
+      }
       const inferred = text.match(/^Tetapkan\s+([\p{L}_][\p{L}\p{N}_]*)\s*=\s*(.+)\.$/iu);
       if (inferred) {
         const name = inferred[1];
         if (reservedNames.has(name.toLocaleLowerCase("id"))) throw new KontekstualError("Nama tersebut merupakan kata khusus.", line);
         statements.push({ kind: "declare", name, type: null, value: expression(inferred[2], line), line });
+        continue;
+      }
+      const mutation = text.match(/^Ubah\s+([\p{L}_][\p{L}\p{N}_]*)\s+menjadi\s+(.+)\.$/iu);
+      if (mutation) {
+        if (reservedNames.has(mutation[1].toLocaleLowerCase("id"))) throw new KontekstualError("Nama tersebut merupakan kata khusus.", line);
+        statements.push({ kind: "assign", name: mutation[1], value: expression(mutation[2], line), line });
         continue;
       }
       const assignment = text.match(/^([\p{L}_][\p{L}\p{N}_]*)\s*=\s*(.+)\.$/u);
