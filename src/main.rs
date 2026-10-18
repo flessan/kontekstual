@@ -1828,7 +1828,7 @@ Jika tidak, maka:
     #[test]
     fn parser_rejects_empty_else_branch() {
         let error = parse_source(
-            "Jika benar, maka:\n    Tampilkan \"Ya\".\nJika tidak, maka:",
+            "Jika benar, maka:\n    Tampilkan \"Ya\".\nJika tidak, maka:\nTampilkan \"Sesudah\".",
         ).expect_err("blok alternatif kosong harus ditolak");
         assert!(error.message.contains("Blok 'Jika tidak' membutuhkan"));
     }
