@@ -45,8 +45,9 @@ output            = "tampilkan", expression, "."
                   | "tampilkan teks", STRING, "."
                   | "tampilkan nilai", identifier, "." ;
 
-conditional       = "jika", expression, ",", "maka", ":",
-                    NEWLINE, { NEWLINE }, INDENT,
+conditional       = "jika", expression, ",", "maka", ":", conditional_block,
+                    [ "jika", "tidak", ",", "maka", ":", conditional_block ] ;
+conditional_block = NEWLINE, { NEWLINE }, INDENT,
                     statement, { { NEWLINE }, statement },
                     { NEWLINE }, DEDENT ;
 
@@ -84,13 +85,13 @@ Tampilkan teks "Halo dunia!".
 A block is ended by moving back to the previous indentation level:
 
 ```text
-Tetapkan umur sebagai angka dengan nilai 20.
+Tetapkan umur bernilai 16.
 
-Jika umur lebih dari 17, maka:
-    Tampilkan teks "Kamu sudah dewasa!".
-    Jika umur kurang dari 60, maka:
-        Tampilkan teks "Usia produktif".
-Tampilkan teks "Baris ini berada di luar kondisi".
+Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Kamu sudah dewasa!".
+Jika tidak, maka:
+    Tampilkan "Kamu belum dewasa".
+Tampilkan "Baris ini berada di luar kondisi".
 ```
 
 The inner block closes before the final indented instruction; the outer block closes before the last top-level instruction. If the file ends while a block is open, end-of-file closes that block.
@@ -136,8 +137,9 @@ Tampilkan teks "Halo".
 ## 5. Known limitations
 
 1. This grammar is a draft implemented by an early syntax-checker prototype, not a complete compiler.
-2. The checker validates syntactic structure only; it does not execute programs or verify variable declarations and types.
+2. The grammar document describes the syntax; the Rust prototype also performs static type/name checks and executes its supported subset through an interpreter.
 3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, and conditional blocks, but parsing a construct does not imply runtime behavior exists.
-4. The initial draft does not support nested comments, multiline string literals, or an alternate conditional branch.
+4. The initial draft does not support nested comments or multiline string literals.
 5. Variable initialization also accepts `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.`.
-5. Identifier Unicode details and a source formatter still need a formal decision.
+6. Identifier Unicode details and a source formatter still need a formal decision.
+7. `Jika tidak, maka:` must immediately follow its matching `Jika` block at the same indentation level, and its body must not be empty.
