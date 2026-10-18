@@ -1693,4 +1693,29 @@ Jika umur >= 18 dan tidak salah, maka:
             .expect("escape baris baru dan tab seharusnya didukung");
         assert_eq!(output, vec!["Baris\nKedua\tbertab"]);
     }
+
+    #[test]
+    fn interpreter_supports_three_indonesian_variable_phrases() {
+        let output = execute_source(
+            r#"Tetapkan umur bernilai 17.
+Tetapkan nama dengan nilai "Thio".
+Tetapkan aktif bernilai benar.
+Ubah umur menjadi umur + 3.
+Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Aku sudah dewasa~".
+    Tampilkan nama.
+Tampilkan aktif."#,
+        ).expect("ketiga bentuk penetapan dan perubahan nilai harus berjalan");
+        assert_eq!(output, vec!["Aku sudah dewasa~", "Thio", "benar"]);
+    }
+
+    #[test]
+    fn semantic_check_rejects_type_change_with_ubah_menjadi() {
+        let error = check_source(
+            r#"Tetapkan umur bernilai 20.
+Ubah umur menjadi "dua puluh"."#,
+        ).expect_err("Ubah tidak boleh mengganti tipe variabel");
+        assert!(error.message.contains("tidak bisa diubah menjadi"));
+    }
+
 }
