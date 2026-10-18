@@ -115,10 +115,10 @@ Positive integer literals are written using decimal digits, for example `20`. Ne
 Variables may be declared with an explicit type or by inferring the type from their first value:
 
 ```text
-Tetapkan umur sebagai angka dengan nilai 20.
-Tetapkan nama = "Thio".
-umur = umur + 1.
-nama = nama + " Saputra".
+Tetapkan umur bernilai 20.
+Tetapkan nama dengan nilai "Thio".
+Ubah umur menjadi umur + 1.
+Ubah nama menjadi nama + " Saputra".
 Tampilkan nama.
 ```
 
