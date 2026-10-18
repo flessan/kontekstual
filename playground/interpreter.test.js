@@ -54,3 +54,19 @@ test("frasa variabel bahasa Indonesia didukung",()=>{
   const r=runKontekstual('Tetapkan umur bernilai 17.\nTetapkan nama dengan nilai "Thio".\nUbah umur menjadi umur + 3.\nTampilkan nama.\nTampilkan umur.');
   assert.deepEqual(r.output,["Thio","20"]);
 });
+
+test("Jika tidak menjalankan cabang alternatif ketika kondisi salah",()=>{
+  const r=runKontekstual('Tetapkan umur bernilai 16.\nJika umur lebih dari atau sama dengan 18, maka:\n    Tampilkan "Sudah dewasa".\nJika tidak, maka:\n    Tampilkan "Belum dewasa".');
+  assert.deepEqual(r.output,["Belum dewasa"]);
+});
+test("Jika tidak tidak dijalankan ketika kondisi benar",()=>{
+  const r=runKontekstual('Tetapkan umur bernilai 20.\nJika umur lebih dari atau sama dengan 18, maka:\n    Tampilkan "Sudah dewasa".\nJika tidak, maka:\n    Tampilkan "Belum dewasa".');
+  assert.deepEqual(r.output,["Sudah dewasa"]);
+});
+test("Jika tidak bekerja dalam blok bersarang",()=>{
+  const r=runKontekstual('Tetapkan umur bernilai 16.\nJika benar, maka:\n    Jika umur lebih dari atau sama dengan 18, maka:\n        Tampilkan "Dewasa".\n    Jika tidak, maka:\n        Tampilkan "Remaja".\nJika tidak, maka:\n    Tampilkan "Tidak aktif".');
+  assert.deepEqual(r.output,["Remaja"]);
+});
+test("blok Jika tidak yang kosong ditolak",()=>{
+  assert.throws(()=>runKontekstual('Jika benar, maka:\n    Tampilkan "Ya".\nJika tidak, maka:\n'),/Blok Jika tidak membutuhkan/);
+});
