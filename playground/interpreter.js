@@ -170,7 +170,29 @@ function parseProgram(source) {
         while (cursor < next) cursor++;
         const body = block(childIndent);
         if (body.length === 0) throw new KontekstualError("Blok Jika tidak boleh kosong.", line);
-        statements.push({ kind: "if", condition, body, line });
+
+        let elseBody = null;
+        let elseHeader = cursor;
+        while (elseHeader < lines.length && !lines[elseHeader].text) elseHeader++;
+        if (
+          elseHeader < lines.length &&
+          lines[elseHeader].indent === item.indent &&
+          /^Jika\\s+tidak,\\s*maka\\s*:\\s*$/iu.test(lines[elseHeader].text)
+        ) {
+          cursor = elseHeader + 1;
+          let elseFirst = cursor;
+          while (elseFirst < lines.length && !lines[elseFirst].text) elseFirst++;
+          if (elseFirst >= lines.length || lines[elseFirst].indent <= item.indent) {
+            throw new KontekstualError("Blok Jika tidak membutuhkan setidaknya satu instruksi yang lebih menjorok ke dalam.", lines[elseHeader].line);
+          }
+          const elseIndent = lines[elseFirst].indent;
+          if (elseIndent !== item.indent + 4) throw new KontekstualError("Gunakan empat spasi untuk setiap tingkat indentasi.", lines[elseFirst].line);
+          while (cursor < elseFirst) cursor++;
+          elseBody = block(elseIndent);
+          if (elseBody.length === 0) throw new KontekstualError("Blok Jika tidak tidak boleh kosong.", lines[elseHeader].line);
+        }
+
+        statements.push({ kind: "if", condition, body, elseBody, line });
         continue;
       }
       if (/^Selesai\s+jika\s*\.$/iu.test(text)) {
@@ -311,10 +333,14 @@ function execute(statements, scopes, output) {
     } else if (statement.kind === "if") {
       const condition = evaluate(statement.condition, scopes, line);
       if (typeof condition !== "boolean") throw new KontekstualError("Kondisi Jika harus menghasilkan logika.", line);
-      if (condition) {
+      const selected = condition ? statement.body : statement.elseBody;
+      if (selected) {
         scopes.push(new Map());
-        execute(statement.body, scopes, output);
-        scopes.pop();
+        try {
+          execute(selected, scopes, output);
+        } finally {
+          scopes.pop();
+        }
       }
     }
   }
