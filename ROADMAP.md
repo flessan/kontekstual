@@ -44,7 +44,8 @@ This roadmap separates language design from implementation so the grammar can be
 - [x] Test precedence and parentheses through interpreter outputs
 - [x] Evaluate numeric, text, and logical equality comparisons
 - [x] Parse `Jika` / `maka:` blocks that close by indentation
-- [x] Add nested conditional parser and execution tests
+- [x] Support the alternate `Jika tidak, maka:` branch
+- [x] Add nested conditional parser and execution tests for both branches
 - [x] Define signed 64-bit integers, overflow, and division-by-zero diagnostics
 
 **Exit criteria:** the supported expression subset evaluates deterministically and rejects invalid numeric operations.
