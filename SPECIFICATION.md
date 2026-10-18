@@ -250,7 +250,7 @@ The compiler must not silently guess the author's intent.
 
 The initial reserved set includes phrases and words such as:
 
-`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `dengan nilai`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `dan`, `atau`, `tidak`, `bukan`.
+`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `bernilai`, `dengan nilai`, `ubah`, `menjadi`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `dan`, `atau`, `tidak`, `bukan`.
 
 The old `Selesai jika.` form is not part of the syntax. The checker gives it a migration message directing authors to remove it and let indentation close the block.
 
