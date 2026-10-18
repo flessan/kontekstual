@@ -9,5 +9,7 @@ Ubah umur menjadi umur + 3.
 Jika umur lebih dari atau sama dengan 18, maka:
     Tampilkan "Halo, " + nama + "!".
     Tampilkan umur.
+Jika tidak, maka:
+    Tampilkan "Kamu belum dewasa, " + nama + "!".
 
 Tampilkan aktif.
