@@ -183,19 +183,18 @@ The interpreter uses signed 64-bit integers, truncating integer division, and re
 
 ## 11. Conditional execution
 
-A conditional block starts with `Jika`, uses a comma before `maka`, and a colon to introduce its body. Its body starts on the next line and is indented. The block closes when indentation returns to its parent's level.
+A conditional block starts with `Jika`, uses a comma before `maka`, and a colon to introduce its body. Its body starts on the next line and is indented. An optional `Jika tidak, maka:` at the same indentation level selects an alternative body when the condition is false.
 
 ```text
-Tetapkan umur sebagai angka dengan nilai 20.
+Tetapkan umur bernilai 20.
 
-Jika umur lebih dari 17, maka:
-    Tampilkan teks "Kamu sudah dewasa!".
-    Jika umur kurang dari 60, maka:
-        Tampilkan teks "Usia produktif".
-Tampilkan teks "Instruksi di luar kondisi".
+Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Kamu sudah dewasa!".
+Jika tidak, maka:
+    Tampilkan "Kamu belum dewasa.".
 ```
 
-The nested condition closes when indentation returns to the outer block's level; the outer block closes when indentation returns to the top level. End-of-file also closes any open indentation blocks. An alternate branch equivalent to `else` is not included in draft v0.1.
+Only the selected branch runs. Both branches have their own local scope, and each branch must contain at least one instruction. An unmatched `Jika tidak, maka:` is a syntax error. Nested conditional blocks may each have their own alternative branch. Indentation closes each block automatically, and end-of-file closes any remaining block.
 
 ## 12. Draft lexical and parsing rules
 
