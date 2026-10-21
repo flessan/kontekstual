@@ -73,7 +73,7 @@ Comments are treated as whitespace by the lexer. They may appear between tokens,
 | --- | --- |
 | `.` | Ends a complete instruction. |
 | `,` | Separates parts of a clause; for example, before `maka` in a condition. |
-| `:` | Introduces the body of a block such as a conditional. |
+| `:` | Introduces the body of a block such as a conditional or loop. |
 | `"..." ` | Delimits a text literal, including spaces and ordinary punctuation. |
 | `(...)` | Groups an expression so its evaluation order is explicit. |
 | `{- ... -}` | Delimits a comment. |
@@ -280,7 +280,7 @@ Before declaring v0.1 stable, the project must decide:
 2. Host implementation language and native code-generation strategy.
 3. Integer width and overflow behavior.
 4. Exact Unicode identifier rules.
-5. Whether and how to add an alternate conditional branch.
+5. Whether to add chained alternatives such as `Jika ... atau jika ...`.
 6. String escape behavior beyond quote, backslash, newline, and tab.
 7. User input, loop-control statements, functions, and procedures for later versions.
 
