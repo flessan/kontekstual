@@ -392,6 +392,11 @@ enum Statement {
         else_body: Option<Vec<Statement>>,
         location: Location,
     },
+    While {
+        condition: Expression,
+        body: Vec<Statement>,
+        location: Location,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -407,6 +412,7 @@ impl Program {
                     1 + body.iter().map(count).sum::<usize>()
                         + else_body.as_ref().map(|items| items.iter().map(count).sum::<usize>()).unwrap_or(0)
                 },
+                Statement::While { body, .. } => 1 + body.iter().map(count).sum::<usize>(),
                 _ => 1,
             }
         }
@@ -531,6 +537,7 @@ impl Parser {
                 let reserved = [
                     "tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah",
                     "bernilai", "dengan", "nilai", "ubah", "menjadi", "tampilkan", "jika", "maka", "selesai",
+                    "selama", "lakukan",
                     "ditambah", "dikurangi", "dikali", "dibagi", "lebih", "dari",
                     "kurang", "sama", "tidak", "atau",
                 ];
@@ -560,7 +567,7 @@ impl Parser {
         while !matches!(&self.current().kind, TokenKind::Eof) {
             match &self.current().kind {
                 TokenKind::Indent => return Err(self.error_here(
-                    "Indentasi tidak terduga. Gunakan indentasi hanya di dalam blok 'Jika'.",
+                    "Indentasi tidak terduga. Gunakan indentasi hanya di dalam blok 'Jika' atau 'Selama'.",
                 )),
                 TokenKind::Dedent => return Err(self.error_here(
                     "Indentasi menutup blok yang tidak sedang terbuka.",
@@ -601,9 +608,11 @@ impl Parser {
             self.parse_assignment()
         } else if self.phrase_at("jika") {
             self.parse_conditional()
+        } else if self.phrase_at("selama") {
+            self.parse_while()
         } else {
             Err(self.error_here(
-                "Instruksi tidak dikenal. Gunakan 'Tetapkan', 'Tampilkan teks', 'Tampilkan nilai', atau 'Jika'.",
+                "Instruksi tidak dikenal. Gunakan 'Tetapkan', 'Tampilkan', 'Jika', atau 'Selama'.",
             ))
         }
     }
@@ -804,6 +813,54 @@ impl Parser {
         };
 
         Ok(Statement::If { condition, body, else_body, location })
+    }
+
+    fn parse_while(&mut self) -> Result<Statement, Diagnostic> {
+        let location = self.current().location.clone();
+        self.expect_phrase("selama", "Diharapkan 'Selama'.")?;
+        let condition = self.parse_expression()?;
+        self.expect_comma()?;
+        self.expect_phrase("lakukan", "Tambahkan kata 'lakukan' setelah koma.")?;
+        self.expect_colon()?;
+
+        if !matches!(&self.current().kind, TokenKind::Newline) {
+            return Err(self.error_here(
+                "Mulai isi blok 'Selama' pada baris baru, lalu gunakan indentasi.",
+            ));
+        }
+        self.skip_newlines();
+        if !matches!(&self.current().kind, TokenKind::Indent) {
+            return Err(self.error_here(
+                "Blok 'Selama' membutuhkan setidaknya satu instruksi yang menjorok ke dalam.",
+            ));
+        }
+        self.position += 1;
+
+        let mut body = Vec::new();
+        self.skip_newlines();
+        while !matches!(&self.current().kind, TokenKind::Dedent | TokenKind::Eof) {
+            if matches!(&self.current().kind, TokenKind::Indent) {
+                return Err(self.error_here(
+                    "Indentasi tambahan harus diawali oleh blok baru, misalnya 'Jika' atau 'Selama'.",
+                ));
+            }
+            if self.phrase_at("selesai jika") {
+                return Err(self.error_here(
+                    "'Selesai jika' tidak diperlukan. Hapus baris itu; indentasi menutup blok secara otomatis.",
+                ));
+            }
+            body.push(self.parse_statement()?);
+            self.skip_newlines();
+        }
+
+        if body.is_empty() {
+            return Err(self.error_here("Blok 'Selama' tidak boleh kosong."));
+        }
+        if matches!(&self.current().kind, TokenKind::Dedent) {
+            self.position += 1;
+        }
+
+        Ok(Statement::While { condition, body, location })
     }
 
     fn parse_expression(&mut self) -> Result<Expression, Diagnostic> {
@@ -1011,14 +1068,17 @@ impl RuntimeValue {
     }
 }
 
+const MAX_LOOP_ITERATIONS: usize = 100_000;
+
 struct Interpreter {
     scopes: Vec<HashMap<String, RuntimeValue>>,
     output: Vec<String>,
+    loop_iterations: usize,
 }
 
 impl Interpreter {
     fn new() -> Self {
-        Self { scopes: vec![HashMap::new()], output: Vec::new() }
+        Self { scopes: vec![HashMap::new()], output: Vec::new(), loop_iterations: 0 }
     }
 
     fn execute_program(mut self, program: &Program) -> Result<Vec<String>, Diagnostic> {
@@ -1087,6 +1147,30 @@ impl Interpreter {
                             location.clone(),
                             format!("Kondisi 'Jika' harus menghasilkan logika, bukan {}.", runtime_type_name(&other)),
                         )),
+                    }
+                }
+                Statement::While { condition, body, location } => {
+                    loop {
+                        match self.evaluate(condition)? {
+                            RuntimeValue::Logical(true) => {
+                                if self.loop_iterations >= MAX_LOOP_ITERATIONS {
+                                    return Err(Diagnostic::new(
+                                        location.clone(),
+                                        format!("Perulangan melewati batas {} putaran. Pastikan kondisi 'Selama' akhirnya menjadi salah.", MAX_LOOP_ITERATIONS),
+                                    ));
+                                }
+                                self.loop_iterations += 1;
+                                self.scopes.push(HashMap::new());
+                                let result = self.execute_statements(body);
+                                self.scopes.pop();
+                                result?;
+                            }
+                            RuntimeValue::Logical(false) => break,
+                            other => return Err(Diagnostic::new(
+                                location.clone(),
+                                format!("Kondisi 'Selama' harus menghasilkan logika, bukan {}.", runtime_type_name(&other)),
+                            )),
+                        }
                     }
                 }
             }
@@ -1253,6 +1337,19 @@ impl SemanticAnalyzer {
                         self.scopes.pop();
                         result?;
                     }
+                }
+                Statement::While { condition, body, location } => {
+                    let condition_type = self.infer_expression(condition)?;
+                    if condition_type != ValueType::Logical {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Kondisi 'Selama' harus menghasilkan logika, bukan {}.", type_name(&condition_type)),
+                        ));
+                    }
+                    self.scopes.push(HashMap::new());
+                    let result = self.check_statements(body);
+                    self.scopes.pop();
+                    result?;
                 }
             }
         }
@@ -1831,6 +1928,49 @@ Jika tidak, maka:
             "Jika benar, maka:\n    Tampilkan \"Ya\".\nJika tidak, maka:\nTampilkan \"Sesudah\".",
         ).expect_err("blok alternatif kosong harus ditolak");
         assert!(error.message.contains("Blok 'Jika tidak' membutuhkan"));
+    }
+
+
+
+    #[test]
+    fn interpreter_runs_while_loop_and_updates_outer_variable() {
+        let output = execute_source(
+            r#"Tetapkan hitungan bernilai 1.
+Selama hitungan kurang dari atau sama dengan 5, lakukan:
+    Tampilkan hitungan.
+    Ubah hitungan menjadi hitungan + 1.
+Tampilkan "Selesai"."#,
+        ).expect("perulangan yang kondisinya akhirnya salah harus selesai");
+        assert_eq!(output, vec!["1", "2", "3", "4", "5", "Selesai"]);
+    }
+
+    #[test]
+    fn interpreter_skips_while_body_when_condition_is_false() {
+        let output = execute_source(
+            r#"Selama salah, lakukan:
+    Tampilkan "Tidak muncul".
+Tampilkan "Selesai"."#,
+        ).expect("kondisi salah seharusnya melewati isi perulangan");
+        assert_eq!(output, vec!["Selesai"]);
+    }
+
+    #[test]
+    fn semantic_checker_requires_logical_while_condition() {
+        let error = check_source(
+            r#"Selama 1, lakukan:
+    Tampilkan 1."#,
+        ).expect_err("kondisi perulangan harus menghasilkan logika");
+        assert!(error.message.contains("Kondisi 'Selama' harus menghasilkan logika"));
+    }
+
+    #[test]
+    fn interpreter_stops_non_terminating_while_loop() {
+        let error = execute_source(
+            r#"Tetapkan hitungan bernilai 0.
+Selama benar, lakukan:
+    Ubah hitungan menjadi hitungan + 1."#,
+        ).expect_err("perulangan tanpa akhir harus dihentikan oleh batas runtime");
+        assert!(error.message.contains("batas 100000 putaran"));
     }
 
 
