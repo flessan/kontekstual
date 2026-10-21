@@ -70,3 +70,18 @@ test("Jika tidak bekerja dalam blok bersarang",()=>{
 test("blok Jika tidak yang kosong ditolak",()=>{
   assert.throws(()=>runKontekstual('Jika benar, maka:\n    Tampilkan "Ya".\nJika tidak, maka:\n'),/Blok Jika tidak membutuhkan/);
 });
+
+test("Selama menjalankan instruksi berulang dan memperbarui variabel luar",()=>{
+  const r=runKontekstual('Tetapkan hitungan bernilai 1.\\nSelama hitungan kurang dari atau sama dengan 5, lakukan:\\n    Tampilkan hitungan.\\n    Ubah hitungan menjadi hitungan + 1.\\nTampilkan "Selesai".');
+  assert.deepEqual(r.output,["1","2","3","4","5","Selesai"]);
+});
+test("Selama melewati isi blok saat kondisi sejak awal salah",()=>{
+  const r=runKontekstual('Selama salah, lakukan:\\n    Tampilkan "Tidak muncul".\\nTampilkan "Selesai".');
+  assert.deepEqual(r.output,["Selesai"]);
+});
+test("kondisi Selama harus menghasilkan nilai logika",()=>{
+  assert.throws(()=>runKontekstual('Selama 1, lakukan:\\n    Tampilkan 1.'),/Kondisi Selama harus menghasilkan logika/);
+});
+test("Selama menghentikan perulangan yang tidak pernah selesai",()=>{
+  assert.throws(()=>runKontekstual('Tetapkan hitungan bernilai 0.\\nSelama benar, lakukan:\\n    Ubah hitungan menjadi hitungan + 1.'),/batas 100000 putaran/);
+});
