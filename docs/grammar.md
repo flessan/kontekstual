@@ -9,7 +9,7 @@ This is the grammar draft for Kontekstual's structured Indonesian instructions. 
 - `STRING`: a double-quoted, single-line text literal; supports escapes `\\\"`, `\\\\`, `\\n`, and `\\t`
 - `PERIOD`: `.`, which terminates an instruction
 - `COMMA`: `,`, used before `maka` in a condition
-- `COLON`: `:`, which introduces a conditional block
+- `COLON`: `:`, which introduces a conditional or loop block
 - `LPAREN`, `RPAREN`: parentheses used to group expressions
 - `COMMENT`: text delimited by `{-` and `-}`, treated as whitespace
 - `NEWLINE`: a boundary between source lines containing tokens
@@ -30,7 +30,8 @@ program           = { NEWLINE }, statement,
 statement         = declaration
                   | assignment
                   | output
-                  | conditional ;
+                  | conditional
+                  | while_loop ;
 
 declaration       = "tetapkan", identifier,
                     ( "=", expression
@@ -45,9 +46,10 @@ output            = "tampilkan", expression, "."
                   | "tampilkan teks", STRING, "."
                   | "tampilkan nilai", identifier, "." ;
 
-conditional       = "jika", expression, ",", "maka", ":", conditional_block,
-                    [ "jika", "tidak", ",", "maka", ":", conditional_block ] ;
-conditional_block = NEWLINE, { NEWLINE }, INDENT,
+conditional       = "jika", expression, ",", "maka", ":", block,
+                    [ "jika", "tidak", ",", "maka", ":", block ] ;
+while_loop        = "selama", expression, ",", "lakukan", ":", block ;
+block             = NEWLINE, { NEWLINE }, INDENT,
                     statement, { { NEWLINE }, statement },
                     { NEWLINE }, DEDENT ;
 
@@ -72,7 +74,7 @@ primary           = INTEGER | identifier | STRING | "benar" | "salah"
 identifier        = IDENTIFIER ;
 ```
 
-A conditional body must contain at least one statement. The `DEDENT` token closes the block; the source author does not write a closing keyword or period for the block itself. Each statement inside it still ends with a period. End-of-file closes remaining indentation levels. Spaces count as one column each, while a tab advances to the next multiple of four columns. Four spaces per nesting level are recommended.
+A conditional or loop body must contain at least one statement. The `DEDENT` token closes the block; the source author does not write a closing keyword or period for the block itself. Each statement inside it still ends with a period. End-of-file closes remaining indentation levels. Spaces count as one column each, while a tab advances to the next multiple of four columns. Four spaces per nesting level are recommended.
 
 ## 3. Reading the grammar
 
@@ -138,8 +140,9 @@ Tampilkan teks "Halo".
 
 1. This grammar is a draft implemented by an early syntax-checker prototype, not a complete compiler.
 2. The grammar document describes the syntax; the Rust prototype also performs static type/name checks and executes its supported subset through an interpreter.
-3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, and conditional blocks, but parsing a construct does not imply runtime behavior exists.
+3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, conditional blocks, and Selama loops, but parsing a construct does not imply runtime behavior exists.
 4. The initial draft does not support nested comments or multiline string literals.
 5. Variable initialization also accepts `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.`.
 6. Identifier Unicode details and a source formatter still need a formal decision.
 7. `Jika tidak, maka:` must immediately follow its matching `Jika` block at the same indentation level, and its body must not be empty.
+8. `Selama kondisi, lakukan:` checks a logical condition before each iteration; its body must not be empty.
