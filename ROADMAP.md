@@ -46,6 +46,8 @@ This roadmap separates language design from implementation so the grammar can be
 - [x] Parse `Jika` / `maka:` blocks that close by indentation
 - [x] Support the alternate `Jika tidak, maka:` branch
 - [x] Add nested conditional parser and execution tests for both branches
+- [x] Add `Selama ... , lakukan:` loops with static condition checking and runtime execution
+- [x] Cap loop iterations to stop accidental non-terminating programs
 - [x] Define signed 64-bit integers, overflow, and division-by-zero diagnostics
 
 **Exit criteria:** the supported expression subset evaluates deterministically and rejects invalid numeric operations.
@@ -83,7 +85,7 @@ This roadmap separates language design from implementation so the grammar can be
 
 ## Deferred beyond draft v0.1
 
-- Loops
+- Loop-control statements such as `hentikan` and `lanjutkan`
 - User-defined functions
 - Lists and collections
 - Standard library
