@@ -138,7 +138,7 @@ function expression(source, line) {
 const valueType = value => typeof value === "number" ? "angka" : typeof value === "string" ? "teks" : "logika";
 const display = value => typeof value === "boolean" ? (value ? "benar" : "salah") : String(value);
 const validName = /^[\p{L}_][\p{L}\p{N}_]*$/u;
-const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah", "bernilai", "ubah", "menjadi", "tampilkan", "nilai", "jika", "maka", "dan", "atau", "tidak", "bukan"]);
+const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah", "bernilai", "ubah", "menjadi", "tampilkan", "nilai", "jika", "maka", "selama", "lakukan", "dan", "atau", "tidak", "bukan"]);
 
 function parseProgram(source) {
   const stripped = stripComments(source);
@@ -157,6 +157,22 @@ function parseProgram(source) {
       if (item.indent > expectedIndent) throw new KontekstualError("Indentasi blok tidak konsisten.", item.line);
       const text = item.text, line = item.line;
       cursor++;
+      const whileMatch = text.match(/^Selama\s+(.+),\s*lakukan\s*:\s*$/iu);
+      if (whileMatch) {
+        const condition = expression(whileMatch[1], line);
+        let next = cursor;
+        while (next < lines.length && !lines[next].text) next++;
+        if (next >= lines.length || lines[next].indent <= item.indent) {
+          throw new KontekstualError("Blok Selama membutuhkan setidaknya satu instruksi yang lebih menjorok ke dalam.", line);
+        }
+        const childIndent = lines[next].indent;
+        if (childIndent !== item.indent + 4) throw new KontekstualError("Gunakan empat spasi untuk setiap tingkat indentasi.", lines[next].line);
+        while (cursor < next) cursor++;
+        const body = block(childIndent);
+        if (body.length === 0) throw new KontekstualError("Blok Selama tidak boleh kosong.", line);
+        statements.push({ kind: "while", condition, body, line });
+        continue;
+      }
       const ifMatch = text.match(/^Jika\s+(.+),\s*maka\s*:\s*$/iu);
       if (ifMatch) {
         const condition = expression(ifMatch[1], line);
@@ -316,7 +332,9 @@ function assignExisting(scopes, name, value, line) {
   throw new KontekstualError("Variabel '" + name + "' belum ditetapkan sebelum bisa diubah.", line);
 }
 
-function execute(statements, scopes, output) {
+const MAX_LOOP_ITERATIONS = 100_000;
+
+function execute(statements, scopes, output, state) {
   for (const statement of statements) {
     const line = statement.line;
     if (statement.kind === "declare") {
@@ -337,7 +355,23 @@ function execute(statements, scopes, output) {
       if (selected) {
         scopes.push(new Map());
         try {
-          execute(selected, scopes, output);
+          execute(selected, scopes, output, state);
+        } finally {
+          scopes.pop();
+        }
+      }
+    } else if (statement.kind === "while") {
+      while (true) {
+        const condition = evaluate(statement.condition, scopes, line);
+        if (typeof condition !== "boolean") throw new KontekstualError("Kondisi Selama harus menghasilkan logika.", line);
+        if (!condition) break;
+        if (state.loopIterations >= MAX_LOOP_ITERATIONS) {
+          throw new KontekstualError("Perulangan melewati batas " + MAX_LOOP_ITERATIONS + " putaran. Pastikan kondisi Selama akhirnya menjadi salah.", line);
+        }
+        state.loopIterations++;
+        scopes.push(new Map());
+        try {
+          execute(statement.body, scopes, output, state);
         } finally {
           scopes.pop();
         }
@@ -349,6 +383,6 @@ function execute(statements, scopes, output) {
 export function runKontekstual(source) {
   const ast = parseProgram(source);
   const output = [];
-  execute(ast, [new Map()], output);
+  execute(ast, [new Map()], output, { loopIterations: 0 });
   return { output, text: output.join("\n") };
 }
