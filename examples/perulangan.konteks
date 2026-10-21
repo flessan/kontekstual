@@ -1,0 +1,9 @@
+{- Contoh perulangan Selama -}
+
+Tetapkan hitungan bernilai 1.
+
+Selama hitungan kurang dari atau sama dengan 5, lakukan:
+    Tampilkan hitungan.
+    Ubah hitungan menjadi hitungan + 1.
+
+Tampilkan "Perulangan selesai.".
