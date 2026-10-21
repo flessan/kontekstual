@@ -94,7 +94,7 @@ Every instruction ends with a period. A source file is one program: after the la
 Tampilkan teks "Halo dunia!".
 ```
 
-One source file contains one program. A non-empty program must contain at least one instruction, and every instruction must end with a period. A conditional block closes automatically when indentation returns to the indentation level where that block began, or when the file ends. No extra closing sentence is required.
+One source file contains one program. A non-empty program must contain at least one instruction, and every instruction must end with a period. A conditional or loop block closes automatically when indentation returns to the indentation level where that block began, or when the file ends. No extra closing sentence is required.
 
 Keywords and reserved phrases are case-insensitive, so capitalization at the beginning of a sentence is allowed. Identifiers are case-sensitive in this draft; lowercase names are recommended.
 
@@ -106,7 +106,7 @@ The planned basic types are:
 - `teks` — text values
 - `logika` — Boolean values, written as `benar` or `salah`
 
-The current prototype statically checks declared types, variable visibility, arithmetic operand types, and comparison operand types. Its early interpreter evaluates supported expressions and executes output and conditional instructions. A feature is not considered implemented until it is backed by tests.
+The current prototype statically checks declared types, variable visibility, arithmetic operand types, and comparison operand types. Its early interpreter evaluates supported expressions and executes output, conditional, and Selama loop instructions. A feature is not considered implemented until it is backed by tests.
 
 Positive integer literals are written using decimal digits, for example `20`. Negative numbers and decimal fractions are deferred until their exact syntax and numeric behavior are defined.
 
@@ -130,7 +130,7 @@ Rules:
 - `Tetapkan nama = ekspresi.` infers the initial type from the expression.
 - Reassignment uses `nama = ekspresi.` and must preserve the variable's type.
 - The longer `Tetapkan nama sebagai tipe dengan nilai ekspresi.` declaration remains supported.
-- A conditional creates a local scope: it can read and reassign variables from outer scopes, but variables declared inside it are not available after the block closes.
+- A conditional or loop creates a local scope: it can read and reassign variables from outer scopes, but variables declared inside the block are not available after the block closes.
 - Parentheses may group an expression used as a value.
 
 The inferred declaration forms `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.` are also supported. Use `Ubah nama menjadi ekspresi.` to reassign an existing variable while preserving its type.
@@ -181,7 +181,7 @@ The `+` operator adds two numbers or concatenates two text values. Mixed types s
 
 The interpreter uses signed 64-bit integers, truncating integer division, and reports division by zero, type errors, and arithmetic overflow. Order comparisons require numeric operands; equality comparisons require both operands to have the same type.
 
-## 11. Conditional execution
+## 11. Conditional and loop execution
 
 A conditional block starts with `Jika`, uses a comma before `maka`, and a colon to introduce its body. Its body starts on the next line and is indented. An optional `Jika tidak, maka:` at the same indentation level selects an alternative body when the condition is false.
 
@@ -196,6 +196,19 @@ Jika tidak, maka:
 
 Only the selected branch runs. Both branches have their own local scope, and each branch must contain at least one instruction. An unmatched `Jika tidak, maka:` is a syntax error. Nested conditional blocks may each have their own alternative branch. Indentation closes each block automatically, and end-of-file closes any remaining block.
 
+### Perulangan `Selama`
+
+A repetition block begins with `Selama`, a logical expression, a comma, `lakukan`, and a colon. Its indented body runs again while the condition remains `benar`. The condition is checked before each iteration; a false condition skips the body or ends the loop.
+
+```text
+Tetapkan hitungan bernilai 1.
+Selama hitungan kurang dari atau sama dengan 5, lakukan:
+    Tampilkan hitungan.
+    Ubah hitungan menjadi hitungan + 1.
+```
+
+The loop body has a local scope for each iteration. It can read and reassign variables from outer scopes, but declarations created inside the body do not escape that iteration. Every loop body must contain at least one instruction. The prototype stops execution after 100,000 total loop iterations to protect against accidental non-terminating programs; exceeding this limit produces a diagnostic.
+
 ## 12. Draft lexical and parsing rules
 
 - The lexer recognizes quoted strings before treating punctuation as syntax.
@@ -203,7 +216,7 @@ Only the selected branch runs. Both branches have their own local scope, and eac
 - Periods outside strings and comments terminate statements.
 - Newlines are emitted as layout tokens when source lines change. Blank and comment-only lines do not create blocks.
 - Indentation introduces and closes blocks. Each nested block must use a consistent indentation level; unmatched indentation is an error.
-- A conditional body must begin on the line after its colon and contain at least one indented instruction.
+- A conditional or loop body must begin on the line after its colon and contain at least one indented instruction.
 - Leading spaces count as one column each; a tab advances to the next multiple of four columns. Four spaces per nesting level are recommended, and indentation must return to a level already used.
 - Reserved keywords and multiword phrases are recognized case-insensitively.
 - Identifiers must start with a letter and may contain letters and digits afterward. Support for the full Unicode letter range must be specified and tested before release.
@@ -249,7 +262,7 @@ The compiler must not silently guess the author's intent.
 
 The initial reserved set includes phrases and words such as:
 
-`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `bernilai`, `dengan nilai`, `ubah`, `menjadi`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `dan`, `atau`, `tidak`, `bukan`.
+`tetapkan`, `sebagai`, `angka`, `teks`, `logika`, `benar`, `salah`, `bernilai`, `dengan nilai`, `ubah`, `menjadi`, `tampilkan teks`, `tampilkan nilai`, `jika`, `maka`, `selama`, `lakukan`, `ditambah`, `dikurangi`, `dikali`, `dibagi`, `lebih dari`, `kurang dari`, `sama dengan`, `tidak sama dengan`, `dan`, `atau`, `tidak`, `bukan`.
 
 The old `Selesai jika.` form is not part of the syntax. The checker gives it a migration message directing authors to remove it and let indentation close the block.
 
@@ -269,6 +282,6 @@ Before declaring v0.1 stable, the project must decide:
 4. Exact Unicode identifier rules.
 5. Whether and how to add an alternate conditional branch.
 6. String escape behavior beyond quote, backslash, newline, and tab.
-7. User input, loops, functions, and procedures for later versions.
+7. User input, loop-control statements, functions, and procedures for later versions.
 
 Syntax changes, examples, grammar, and tests must be updated together.
