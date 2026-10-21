@@ -36,6 +36,14 @@ jobs:
           expected="$(printf 'Halo, Thio!\n20\nbenar')"
           test "$actual" = "$expected"
           printf '%s\n' "$actual"
+      - name: Validate the while loop example
+        run: cargo run -- check examples/perulangan.konteks
+      - name: Run the while loop example
+        run: |
+          actual="$(cargo run --quiet -- run examples/perulangan.konteks)"
+          expected="$(printf '1\n2\n3\n4\n5\nPerulangan selesai.')"
+          test "$actual" = "$expected"
+          printf '%s\n' "$actual"
 
   playground:
     name: Browser playground compatibility
