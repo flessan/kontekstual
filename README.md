@@ -8,7 +8,7 @@
 
 Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program, no artificial start/end wrapper is needed.
 
-> Status: an early Rust interpreter can run text output, variables, arithmetic, comparisons, and indentation-based conditional blocks. Static semantic checking rejects unknown variables and incompatible types. Native executable generation is not implemented yet.
+> Status: an early Rust interpreter can run text output, variables, arithmetic, comparisons, indentation-based conditional blocks, and Selama loops. Static semantic checking rejects unknown variables and incompatible types. Native executable generation is not implemented yet.
 
 ## Design goals
 
@@ -43,6 +43,17 @@ Tampilkan "Lanjut di luar kondisi.".
 
 Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. An optional `Jika tidak, maka:` at the same indentation provides the alternative branch. The block closes automatically when indentation returns to the previous level or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
+A repetition example:
+
+```text
+Tetapkan hitungan bernilai 1.
+Selama hitungan kurang dari atau sama dengan 5, lakukan:
+    Tampilkan hitungan.
+    Ubah hitungan menjadi hitungan + 1.
+```
+
+Selama checks its logical condition before every iteration. Each iteration gets a local scope, while assignments can update variables declared outside the loop. For runtime safety, the interpreter permits at most 100,000 loop iterations per program execution.
+
 ## Browser playground (StackBlitz)
 
 Open the repository in StackBlitz and run the web playground without Rust or Cargo:
@@ -52,7 +63,7 @@ Open the repository in StackBlitz and run the web playground without Rust or Car
 - Run compatibility tests: `npm test`
 - Create a production build: `npm run build`
 
-The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based `Jika` blocks, and comments. It is a compatibility implementation not the Rust compiler itself and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. CI runs the shared behavior examples against the browser runtime and builds the web app.
+The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based `Jika` and `Selama` blocks, and comments. It is a compatibility implementation not the Rust compiler itself and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the shared behavior examples against the browser runtime and builds the web app.
 
 ## Check and run a program
 
@@ -80,10 +91,11 @@ The interpreter uses signed 64-bit integers, reports division by zero and arithm
 - [ROADMAP.md](ROADMAP.md) - implementation milestones
 - [examples/halo.konteks](examples/halo.konteks) - first example program
 - [examples/variabel-dan-logika.konteks](examples/variabel-dan-logika.konteks) - variables, string concatenation, arithmetic, and logic
+- [examples/perulangan.konteks](examples/perulangan.konteks) - repeat instructions with `Selama ... , lakukan:`
 
 ## Current scope
 
-The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, and indentation-based conditional blocks. Inferred declarations accept both `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.` as well as the older `nama = ekspresi.` form. Loops, user-defined functions, modules, user input, and native executable generation remain future work.
+The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, indentation-based conditional blocks, and Selama loops. Inferred declarations accept both `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.` as well as the older `nama = ekspresi.` form. User-defined functions, modules, user input, loop-control instructions, and native executable generation remain future work.
 
 ## Contributing
 
