@@ -3,10 +3,8 @@ const ELSE_HEADER = /^Jika\s+tidak,\s*maka\s*:\s*$/iu;
 
 /**
  * Normalize whitespace and block indentation in a Kontekstual program.
- *
- * Since Kontekstual closes blocks through indentation, existing indentation is
- * used to infer where a block ends. This keeps formatting predictable without
- * pretending to parse or rewrite the program's semantics.
+ * Existing indentation is used to infer the end of a block because the language
+ * deliberately uses indentation instead of explicit closing keywords.
  */
 export function formatKontekstual(source) {
   const normalized = String(source ?? "").replace(/\r\n?/g, "\n");
@@ -26,14 +24,20 @@ export function formatKontekstual(source) {
 
     previousWasBlank = false;
     const rawIndent = rawLine.match(/^[\t ]*/)?.[0].replace(/\t/g, "    ").length ?? 0;
-    const isElse = ELSE_HEADER.test(text);
 
-    if (isElse) {
-      while (blocks.length && blocks.at(-1).indent > rawIndent) blocks.pop();
-      const matchingIf = blocks.at(-1);
-      if (matchingIf?.kind === "if" && matchingIf.indent === rawIndent && !matchingIf.hasElse) {
-        matchingIf.hasElse = true;
-        formatted.push("    ".repeat(Math.max(0, blocks.length - 1)) + text);
+    if (ELSE_HEADER.test(text)) {
+      let matchingIfIndex = -1;
+      for (let index = blocks.length - 1; index >= 0; index--) {
+        if (blocks[index].kind === "if" && !blocks[index].hasElse) {
+          matchingIfIndex = index;
+          break;
+        }
+      }
+
+      if (matchingIfIndex >= 0) {
+        blocks.splice(matchingIfIndex + 1);
+        blocks[matchingIfIndex].hasElse = true;
+        formatted.push("    ".repeat(matchingIfIndex) + text);
         continue;
       }
     }
