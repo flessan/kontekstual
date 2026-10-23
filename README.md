@@ -21,14 +21,14 @@ Source files use the \`.konteks\` extension. Every instruction ends with a perio
 
 ## Example
 
-\`\`\`text
+```text
 {- Contoh sederhana untuk menampilkan sapaan. -}
 Tampilkan teks "Halo dunia!".
-\`\`\`
+```
 
 A conditional example:
 
-\`\`\`text
+```text
 Tetapkan umur bernilai 17.
 Tetapkan nama dengan nilai "Thio".
 Ubah umur menjadi umur + 3.
@@ -39,18 +39,18 @@ Jika tidak, maka:
     Tampilkan "Kamu belum dewasa, " + nama + "!".
 
 Tampilkan "Lanjut di luar kondisi.".
-\`\`\`
+```
 
 Every instruction ends with a period. A conditional begins with \`Jika ..., maka:\`; its body starts on the next line and is indented. An optional \`Jika tidak, maka:\` at the same indentation provides the alternative branch. The block closes automatically when indentation returns to the previous level or when the file ends. No \`Selesai jika.\` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
 A repetition example:
 
-\`\`\`text
+```text
 Tetapkan hitungan bernilai 1.
 Selama hitungan kurang dari atau sama dengan 5, lakukan:
     Tampilkan hitungan.
     Ubah hitungan menjadi hitungan + 1.
-\`\`\`
+```
 
 Selama checks its logical condition before every iteration. Each iteration gets a local scope, while assignments can update variables declared outside the loop. For runtime safety, the interpreter permits at most 100,000 loop iterations per program execution.
 
@@ -77,18 +77,18 @@ Dependabot checks npm packages and GitHub Actions weekly. Minor and patch update
 
 Install stable Rust, then run these commands from the repository root:
 
-\`\`\`sh
+```sh
 cargo test --all-targets
 cargo run -- check examples/halo.konteks
 cargo run -- run examples/halo.konteks
-\`\`\`
+```
 
 The \`check\` command validates syntax and static semantic rules without executing the program. The \`run\` command executes the supported subset through the interpreter. Its output for the included example is:
 
-\`\`\`text
+```text
 Halo dunia!
 Program selesai.
-\`\`\`
+```
 
 The interpreter uses signed 64-bit integers, reports division by zero and arithmetic overflow, and prints logical values as \`benar\` or \`salah\`.
 
