@@ -6,7 +6,7 @@
 
 **Kontekstual** is an experimental programming language designed around clear, structured Indonesian sentences and paragraphs. Instead of removing punctuation, it gives familiar punctuation a defined role in the language.
 
-Source files use the `.konteks` extension. Every instruction ends with a period (`.`), and the end of the file marks the end of the program, no artificial start/end wrapper is needed.
+Source files use the \`.konteks\` extension. Every instruction ends with a period (\`.\`), and the end of the file marks the end of the program, no artificial start/end wrapper is needed.
 
 > Status: an early Rust interpreter can run text output, variables, arithmetic, comparisons, indentation-based conditional blocks, and Selama loops. Static semantic checking rejects unknown variables and incompatible types. Native executable generation is not implemented yet.
 
@@ -15,20 +15,20 @@ Source files use the `.konteks` extension. Every instruction ends with a period 
 - Make programs readable like carefully written Indonesian instructions.
 - Use formal, predictable grammar not unrestricted natural-language guessing.
 - Give punctuation familiar roles: periods end instructions, commas separate clauses, quotation marks delimit text, and parentheses group expressions.
-- Support one-line and multiline comments with `{- ... -}`.
+- Support one-line and multiline comments with \`{- ... -}\`.
 - Provide helpful diagnostics in Indonesian.
 - Eventually compile programs to native executables on supported platforms.
 
 ## Example
 
-```text
+\`\`\`text
 {- Contoh sederhana untuk menampilkan sapaan. -}
 Tampilkan teks "Halo dunia!".
-```
+\`\`\`
 
 A conditional example:
 
-```text
+\`\`\`text
 Tetapkan umur bernilai 17.
 Tetapkan nama dengan nilai "Thio".
 Ubah umur menjadi umur + 3.
@@ -39,50 +39,58 @@ Jika tidak, maka:
     Tampilkan "Kamu belum dewasa, " + nama + "!".
 
 Tampilkan "Lanjut di luar kondisi.".
-```
+\`\`\`
 
-Every instruction ends with a period. A conditional begins with `Jika ..., maka:`; its body starts on the next line and is indented. An optional `Jika tidak, maka:` at the same indentation provides the alternative branch. The block closes automatically when indentation returns to the previous level or when the file ends. No `Selesai jika.` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
+Every instruction ends with a period. A conditional begins with \`Jika ..., maka:\`; its body starts on the next line and is indented. An optional \`Jika tidak, maka:\` at the same indentation provides the alternative branch. The block closes automatically when indentation returns to the previous level or when the file ends. No \`Selesai jika.\` line is needed. Line breaks and indentation are therefore meaningful syntax for blocks, while ordinary instructions can still share a paragraph.
 
 A repetition example:
 
-```text
+\`\`\`text
 Tetapkan hitungan bernilai 1.
 Selama hitungan kurang dari atau sama dengan 5, lakukan:
     Tampilkan hitungan.
     Ubah hitungan menjadi hitungan + 1.
-```
+\`\`\`
 
 Selama checks its logical condition before every iteration. Each iteration gets a local scope, while assignments can update variables declared outside the loop. For runtime safety, the interpreter permits at most 100,000 loop iterations per program execution.
 
-## Browser playground (StackBlitz)
+## Browser playground
 
 Open the repository in StackBlitz and run the web playground without Rust or Cargo:
 
 - StackBlitz: https://stackblitz.com/~/github.com/flessan/kontekstual
-- Start command: `npm run dev` (StackBlitz may start it automatically)
-- Run compatibility tests: `npm test`
-- Create a production build: `npm run build`
+- Start command: \`npm run dev\`
+- Run compatibility tests: \`npm test\`
+- Create a production build: \`npm run build\`
 
-The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based `Jika` and `Selama` blocks, and comments. It is a compatibility implementation not the Rust compiler itself and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the shared behavior examples against the browser runtime and builds the web app.
+The playground includes a CodeMirror editor with Kontekstual syntax colors, line numbers, bracket matching, autocomplete, indentation assistance, adjustable text size, and automatic local saving. Use **Format** or \`Ctrl+Shift+F\` to normalize indentation, **Jalankan** or \`Ctrl+Enter\` to execute, \`Ctrl+F\` to search, and the copy button to copy the source. Output and runtime errors have separate panels.
+
+The formatter is language-specific rather than the standard Prettier package, because Kontekstual uses its own Indonesian syntax. Since blocks end through indentation and have no closing keyword, the formatter uses existing indentation to infer where blocks end; it can normalize indent levels and align \`Jika tidak\` branches, but it cannot safely infer every missing block boundary from completely unindented source.
+
+The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based \`Jika\` and \`Selama\` blocks, and comments. It is a compatibility implementation, not the Rust compiler itself, and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the browser tests and builds the web app.
+
+## Dependency updates
+
+Dependabot checks npm packages and GitHub Actions weekly. Minor and patch updates are grouped to reduce pull request noise; major updates are kept separate for review.
 
 ## Check and run a program
 
 Install stable Rust, then run these commands from the repository root:
 
-```sh
+\`\`\`sh
 cargo test --all-targets
 cargo run -- check examples/halo.konteks
 cargo run -- run examples/halo.konteks
-```
+\`\`\`
 
-The `check` command validates syntax and static semantic rules without executing the program. The `run` command executes the supported subset through the interpreter. Its output for the included example is:
+The \`check\` command validates syntax and static semantic rules without executing the program. The \`run\` command executes the supported subset through the interpreter. Its output for the included example is:
 
-```text
+\`\`\`text
 Halo dunia!
 Program selesai.
-```
+\`\`\`
 
-The interpreter uses signed 64-bit integers, reports division by zero and arithmetic overflow, and prints logical values as `benar` or `salah`.
+The interpreter uses signed 64-bit integers, reports division by zero and arithmetic overflow, and prints logical values as \`benar\` or \`salah\`.
 
 ## Repository guide
 
@@ -91,11 +99,11 @@ The interpreter uses signed 64-bit integers, reports division by zero and arithm
 - [ROADMAP.md](ROADMAP.md) - implementation milestones
 - [examples/halo.konteks](examples/halo.konteks) - first example program
 - [examples/variabel-dan-logika.konteks](examples/variabel-dan-logika.konteks) - variables, string concatenation, arithmetic, and logic
-- [examples/perulangan.konteks](examples/perulangan.konteks) - repeat instructions with `Selama ... , lakukan:`
+- [examples/perulangan.konteks](examples/perulangan.konteks) - repeat instructions with \`Selama ... , lakukan:\`
 
 ## Current scope
 
-The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, indentation-based conditional blocks, and Selama loops. Inferred declarations accept both `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.` as well as the older `nama = ekspresi.` form. User-defined functions, modules, user input, loop-control instructions, and native executable generation remain future work.
+The prototype recognizes period-terminated instructions, typed or inferred declarations, variable reassignment, quoted text output, arithmetic, text concatenation, comparisons, logical expressions, indentation-based conditional blocks, and Selama loops. Inferred declarations accept both \`Tetapkan nama bernilai ekspresi.\` and \`Tetapkan nama dengan nilai ekspresi.\`; reassignment accepts \`Ubah nama menjadi ekspresi.\` as well as the older \`nama = ekspresi.\` form. User-defined functions, modules, user input, loop-control instructions, and native executable generation remain future work.
 
 ## Contributing
 
