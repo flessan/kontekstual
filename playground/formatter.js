@@ -26,6 +26,7 @@ export function formatKontekstual(source) {
     const rawIndent = rawLine.match(/^[\t ]*/)?.[0].replace(/\t/g, "    ").length ?? 0;
 
     if (ELSE_HEADER.test(text)) {
+      while (blocks.length && blocks.at(-1).indent > rawIndent) blocks.pop();
       let matchingIfIndex = -1;
       for (let index = blocks.length - 1; index >= 0; index--) {
         if (blocks[index].kind === "if" && !blocks[index].hasElse) {
