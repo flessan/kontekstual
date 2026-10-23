@@ -1,8 +1,22 @@
 {
   "name": "kontekstual-playground",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "scripts": {"dev":"vite --host 0.0.0.0","build":"vite build","test":"node --test playground/interpreter.test.js"},
-  "devDependencies": {"vite":"^6.1.0"}
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "test": "node --test playground/*.test.js"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/search": "^6.5.10",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.5"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0"
+  }
 }
