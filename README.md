@@ -59,9 +59,10 @@ Selama checks its logical condition before every iteration. Each iteration gets 
 Open the repository in StackBlitz and run the web playground without Rust or Cargo:
 
 - StackBlitz: https://stackblitz.com/~/github.com/flessan/kontekstual
-- Start command: \`npm run dev\`
-- Run compatibility tests: \`npm test\`
-- Create a production build: \`npm run build\`
+- Install dependencies: \`pnpm install\`
+- Start command: \`pnpm dev\`
+- Run compatibility tests: \`pnpm test\`
+- Create a production build: \`pnpm build\`
 
 The playground includes a CodeMirror editor with Kontekstual syntax colors, line numbers, bracket matching, autocomplete, indentation assistance, adjustable text size, and automatic local saving. Use **Format** or \`Ctrl+Shift+F\` to normalize indentation, **Jalankan** or \`Ctrl+Enter\` to execute, \`Ctrl+F\` to search, and the copy button to copy the source. Output and runtime errors have separate panels.
 
@@ -71,7 +72,7 @@ The browser playground uses a small JavaScript runtime for quick experiments. It
 
 ## Dependency updates
 
-Dependabot checks npm packages and GitHub Actions weekly. Minor and patch updates are grouped to reduce pull request noise; major updates are kept separate for review.
+The browser playground uses pnpm 10 with a committed lockfile for reproducible dependency installs. Dependabot checks JavaScript packages (including pnpm dependencies) and GitHub Actions weekly. Minor and patch updates are grouped to reduce pull request noise; major updates are kept separate for review.
 
 ## Check and run a program
 

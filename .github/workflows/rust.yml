@@ -55,9 +55,14 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 22
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+          run_install: false
       - name: Test browser interpreter
-        run: npm test
+        run: pnpm test
       - name: Install playground dependencies
-        run: npm install
+        run: pnpm install --no-frozen-lockfile
       - name: Build browser playground
-        run: npm run build
+        run: pnpm build
