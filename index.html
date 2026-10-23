@@ -1,16 +1,116 @@
 <!doctype html>
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f3f5f9" />
-    <meta name="description" content="Coba bahasa pemrograman Kontekstual langsung di browser dengan editor kode, syntax highlighting, formatter, dan output interaktif." />
-    <meta name="color-scheme" content="light" />
-    <title>Kontekstual Playground | Editor Bahasa Pemrograman Indonesia</title>
-    <link rel="stylesheet" href="/playground/ide.css" />
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/playground/ide.js"></script>
-  </body>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="theme-color" content="#f6f7f2">
+  <meta name="description" content="Kontekstual adalah bahasa pemrograman eksperimental dengan sintaks berbahasa Indonesia. Pelajari konsepnya, lihat dokumentasi, dan tulis program langsung di browser.">
+  <meta name="keywords" content="Kontekstual, bahasa pemrograman Indonesia, belajar coding, pemrograman bahasa Indonesia, interpreter Rust">
+  <link rel="canonical" href="https://dotkonteks.pages.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Kontekstual">
+  <meta property="og:title" content="Kontekstual | Bahasa pemrograman dengan sintaks Indonesia">
+  <meta property="og:description" content="Tulis program dengan kalimat terstruktur berbahasa Indonesia. Mulai dari contoh, dokumentasi, lalu eksperimen langsung di browser.">
+  <meta property="og:url" content="https://dotkonteks.pages.dev/">
+  <meta name="twitter:card" content="summary">
+  <title>Kontekstual | Bahasa pemrograman dengan sintaks Indonesia</title>
+  <script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}</script>
+  <link rel="stylesheet" href="/site.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Kontekstual","url":"https://dotkonteks.pages.dev/","inLanguage":"id-ID","description":"Bahasa pemrograman eksperimental dengan sintaks berbahasa Indonesia."}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Kontekstual","applicationCategory":"DeveloperApplication","operatingSystem":"Web, Linux, Windows, macOS","url":"https://dotkonteks.pages.dev/","description":"Eksperimen bahasa pemrograman dengan sintaks Indonesia, interpreter Rust, dan playground browser.","programmingLanguage":["Kontekstual","Rust","JavaScript"],"codeRepository":"https://github.com/flessan/kontekstual"}</script>
+  <script type="module" src="/site.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten</a>
+  <header data-site-header></header>
+  <main id="main">
+    <section class="hero wrap">
+      <div class="hero-copy" data-reveal>
+        <div class="eyebrow"><span class="eyebrow-dot"></span> EKSPERIMEN BAHASA PEMROGRAMAN</div>
+        <h1>Kode yang terasa<br><span class="headline-mark">dekat dengan bahasa kita.</span></h1>
+        <p class="hero-lede">Kontekstual mengeksplorasi cara menulis instruksi program dengan kalimat terstruktur berbahasa Indonesia. Bukan tebakan dari bahasa sehari-hari, melainkan sintaks yang punya aturan jelas.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/coba/">Coba di browser <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="/docs/">Jelajahi dokumentasi <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-note"><span class="note-pip"></span> Gratis · tanpa instalasi untuk mencoba · masih eksperimental</div>
+      </div>
+      <div class="hero-art" data-reveal data-delay="120">
+        <div class="code-window">
+          <div class="window-bar">
+            <div class="window-dots"><i></i><i></i><i></i></div>
+            <span>halo.konteks</span>
+            <span class="file-extension">.KONTEKS</span>
+          </div>
+          <div class="code-sample" aria-label="Contoh program Kontekstual">
+            <div><span class="ln">01</span><span class="comment">{- Program pertamaku -}</span></div>
+            <div><span class="ln">02</span><span class="keyword">Tetapkan</span> nama <span class="keyword">bernilai</span> <span class="string">"Dunia"</span>.</div>
+            <div><span class="ln">03</span></div>
+            <div><span class="ln">04</span><span class="keyword">Tampilkan</span> <span class="string">"Halo, "</span> + nama + <span class="string">"!"</span>.</div>
+          </div>
+          <div class="code-result">
+            <div class="result-heading"><span><i></i> OUTPUT</span><span>simulasi</span></div>
+            <pre>Halo, Dunia!</pre>
+          </div>
+          <div class="code-foot"><span>Instruksi berakhir dengan titik</span><span class="code-valid">● Struktur sederhana</span></div>
+        </div>
+        <div class="orbit-note orbit-note-top"><span class="orbit-symbol">Aa</span><span><b>Bahasa Indonesia</b><small>sintaks yang eksplisit</small></span></div>
+        <div class="orbit-note orbit-note-bottom"><span class="orbit-symbol orbit-symbol-green">.{ }</span><span><b>Blok terstruktur</b><small>indentasi punya makna</small></span></div>
+      </div>
+      <div class="hero-index" aria-hidden="true"><span>01</span> / MULAI DARI IDE</div>
+    </section>
+
+    <section class="principles-section">
+      <div class="wrap principles-grid">
+        <div class="section-intro" data-reveal>
+          <div class="eyebrow">KENAPA KONTEKSTUAL?</div>
+          <h2>Kalimatnya akrab.<br><span>Aturannya tetap tegas.</span></h2>
+          <p>Tujuannya bukan membuat komputer menebak maksud kita. Kontekstual memakai kata yang familiar dengan tata bahasa pemrograman yang bisa dipelajari dan diperiksa.</p>
+        </div>
+        <div class="principle-list">
+          <article class="principle-item" data-reveal><span class="principle-number">01</span><div><h3>Instruksi terbaca</h3><p><code>Tampilkan</code>, <code>Tetapkan</code>, dan <code>Ubah</code> memberi petunjuk yang jelas tentang apa yang dilakukan program.</p></div><span class="principle-arrow">↗</span></article>
+          <article class="principle-item" data-reveal><span class="principle-number">02</span><div><h3>Struktur punya makna</h3><p>Titik mengakhiri instruksi. Indentasi menunjukkan isi blok. Tidak perlu menebak di mana sebuah kondisi selesai.</p></div><span class="principle-arrow">↗</span></article>
+          <article class="principle-item" data-reveal><span class="principle-number">03</span><div><h3>Eksperimen yang transparan</h3><p>Dokumentasi menjelaskan bagian yang sudah berjalan, batas runtime browser, dan fitur yang masih direncanakan.</p></div><span class="principle-arrow">↗</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="start-section wrap">
+      <div class="section-heading" data-reveal><div><div class="eyebrow">PILIH LANGKAHMU</div><h2>Dari baris pertama<br>hingga aturan bahasa.</h2></div><p>Mulai dengan satu contoh kecil, pahami struktur program, atau baca spesifikasi lebih dalam.</p></div>
+      <div class="path-grid">
+        <a class="path-card path-card-featured" href="/coba/" data-reveal>
+          <div class="path-meta"><span class="path-icon">↗</span><span>INTERAKTIF</span></div>
+          <h3>Buka playground</h3><p>Tulis, format, dan jalankan kode Kontekstual di browser. Kode tersimpan otomatis di perangkatmu.</p>
+          <span class="path-link">Mulai mencoba <b>→</b></span>
+          <div class="path-code" aria-hidden="true">Tampilkan "Halo dunia!".<span>_</span></div>
+        </a>
+        <a class="path-card" href="/docs/tutorial/" data-reveal data-delay="80">
+          <div class="path-meta"><span class="path-icon">01</span><span>TUTORIAL</span></div>
+          <h3>Program pertamamu</h3><p>Kenali instruksi, variabel, nilai, serta cara membaca hasil program dari contoh yang sederhana.</p>
+          <span class="path-link">Ikuti tutorial <b>→</b></span>
+        </a>
+        <a class="path-card" href="/docs/" data-reveal data-delay="160">
+          <div class="path-meta"><span class="path-icon">⌘</span><span>DOKUMENTASI</span></div>
+          <h3>Pelajari bahasanya</h3><p>Jelajahi aturan sintaks, tipe data, operator, kondisi, perulangan, dan status implementasi.</p>
+          <span class="path-link">Baca dokumentasi <b>→</b></span>
+        </a>
+      </div>
+    </section>
+
+    <section class="ai-band">
+      <div class="wrap ai-band-inner" data-reveal>
+        <div class="ai-badge">AI / AGENT READY</div>
+        <div class="ai-band-copy"><h2>Bangun proyek dengan bantuan AI, berbekal aturan yang benar.</h2><p>Dokumen ringkas, spesifikasi lengkap, contoh program, dan batas implementasi tersedia dalam format yang mudah dibaca manusia maupun agen AI.</p></div>
+        <a class="button button-on-dark" href="/agent/">Buka AI docs <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="status-section wrap" data-reveal>
+      <div class="status-copy"><div class="eyebrow">STATUS PROYEK</div><h2>Masih tumbuh.<br>Dibangun terbuka.</h2><p>Kontekstual adalah eksperimen aktif. Interpreter Rust dan runtime browser mendukung subset sintaks saat ini, sedangkan compiler native dan sejumlah fitur bahasa masih menjadi pekerjaan mendatang.</p><a class="text-link" href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">Lihat kode sumber di GitHub ↗</a></div>
+      <div class="status-board"><div class="status-row"><span>Interpreter Rust</span><span class="status-pill status-pill-live">Tersedia</span></div><div class="status-row"><span>Playground browser</span><span class="status-pill status-pill-live">Tersedia</span></div><div class="status-row"><span>Dokumentasi sintaks</span><span class="status-pill">Dikembangkan</span></div><div class="status-row"><span>Compiler executable native</span><span class="status-pill status-pill-planned">Rencana</span></div><div class="status-foot">Status berdasarkan repositori dan implementasi yang tersedia.</div></div>
+    </section>
+  </main>
+  <footer data-site-footer></footer>
+</body>
 </html>

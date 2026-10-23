@@ -11,9 +11,15 @@ import { tags } from "@lezer/highlight";
 const starter = "{- Variabel, teks, angka, dan logika -}\n\nTetapkan umur bernilai 17.\nTetapkan nama dengan nilai \"Thio\".\nTetapkan aktif bernilai benar.\n\nUbah umur menjadi umur + 3.\n\nJika umur lebih dari atau sama dengan 18, maka:\n    Tampilkan \"Halo, \" + nama + \"!\".\n    Tampilkan umur.\nJika tidak, maka:\n    Tampilkan \"Kamu belum dewasa, \" + nama + \"!\".\n\nTampilkan aktif.\n\nTetapkan hitungan bernilai 1.\nSelama hitungan kurang dari atau sama dengan 5, lakukan:\n    Tampilkan \"Putaran \" + hitungan.\n    Ubah hitungan menjadi hitungan + 1.";
 
 const STORAGE_KEY = "kontekstual-playground:source";
+const examples = {
+  lengkap: starter,
+  sapaan: 'Tetapkan nama bernilai "Dunia".\nTampilkan "Halo, " + nama + "!".',
+  kondisi: 'Tetapkan umur bernilai 18.\n\nJika umur lebih dari atau sama dengan 17, maka:\n    Tampilkan "Kamu bisa melanjutkan!".\nJika tidak, maka:\n    Tampilkan "Coba lagi nanti.".',
+  perulangan: 'Tetapkan hitungan bernilai 1.\n\nSelama hitungan kurang dari atau sama dengan 5, lakukan:\n    Tampilkan "Putaran " + hitungan.\n    Ubah hitungan menjadi hitungan + 1.'
+};
 const BLOCK_HEADER = /^(?:Jika\s+.+,\s*maka|Selama\s+.+,\s*lakukan|Jika\s+tidak,\s*maka)\s*:\s*$/iu;
 
-document.querySelector("#app").innerHTML = '<header class="appbar"><a class="brand" href="/" aria-label="Kontekstual Playground"><span class="brand-mark">K.</span><span class="brand-copy"><strong>Kontekstual</strong><small>PLAYGROUND</small></span></a><div class="appbar-divider"></div><div class="project-title"><span class="file-symbol">K</span><span><strong>main.konteks</strong><small>Workspace lokal</small></span></div><div class="appbar-spacer"></div><span class="runtime-badge"><i></i> Browser runtime</span><a class="github-link" href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer" aria-label="Lihat repository di GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.13c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.7 1.15 1.7 1.15.99 1.7 2.61 1.21 3.25.92.1-.72.39-1.21.71-1.49-2.47-.28-5.07-1.24-5.07-5.5 0-1.21.43-2.2 1.15-2.98-.12-.28-.5-1.42.11-2.95 0 0 .94-.3 3.05 1.14A10.6 10.6 0 0 1 12 6.16c.95 0 1.9.13 2.79.38 2.12-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.67.12 2.95.71.78 1.14 1.77 1.14 2.98 0 4.27-2.6 5.21-5.08 5.49.4.35.76 1.02.76 2.06v3.11c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/></svg></a></header><main class="ide-shell"><section class="workspace-toolbar" aria-label="Kontrol editor"><div class="breadcrumb"><span>Playground</span><span class="breadcrumb-slash">/</span><strong>main.konteks</strong><span id="save-state" class="save-state">Siap</span></div><div class="toolbar-actions"><button id="format" class="tool-button" title="Format kode (Ctrl+Shift+F)"><span class="format-icon">≡</span><span>Format</span></button><button id="copy" class="tool-button" title="Salin kode ke clipboard"><span class="copy-icon">▢</span><span>Salin</span></button><button id="reset" class="tool-button" title="Kembalikan contoh awal">Reset</button><button id="run" class="run-button" title="Jalankan program (Ctrl+Enter)"><span class="play-icon">▶</span><span>Jalankan</span><kbd>Ctrl ↵</kbd></button></div></section><section class="ide-layout" aria-label="Editor dan hasil program"><section class="editor-card"><div class="editor-tabbar"><div class="file-tab"><span class="file-tab-icon">K</span><span>main.konteks</span><span class="tab-close">×</span></div><div class="editor-tab-actions"><span class="language-label">Kontekstual</span><button id="font-down" class="icon-button" aria-label="Perkecil teks editor" title="Perkecil teks">A−</button><button id="font-up" class="icon-button" aria-label="Perbesar teks editor" title="Perbesar teks">A+</button></div></div><div id="editor-mount" class="editor-mount" aria-label="Editor kode Kontekstual"></div><div class="editor-statusbar"><span id="cursor-position">Ln 1, Col 1</span><span id="line-count">1 baris</span><span>Spaces: 4</span><span>UTF-8</span><span class="status-lang">Kontekstual</span></div></section><section class="console-card"><div class="console-heading"><div class="console-tabs" role="tablist" aria-label="Panel hasil"><button class="console-tab is-active" id="output-tab" role="tab" aria-selected="true" aria-controls="output-view" data-panel="output-view"><span class="terminal-glyph">›_</span> Output</button><button class="console-tab" id="problems-tab" role="tab" aria-selected="false" aria-controls="problems-view" data-panel="problems-view"><span class="problem-glyph">!</span> Masalah <span id="problem-count" class="problem-count">0</span></button></div><button id="clear-output" class="icon-button clear-button" title="Bersihkan output">Bersihkan</button></div><div class="console-content"><div id="output-view" class="console-view" role="tabpanel" aria-labelledby="output-tab" aria-live="polite"><div id="output" class="output-lines"></div></div><div id="problems-view" class="console-view problems-view" role="tabpanel" aria-labelledby="problems-tab" hidden><div id="problems-content" class="problems-empty"><span class="problem-check">✓</span><strong>Tidak ada masalah</strong><p>Pesan kesalahan akan muncul di sini saat program dijalankan.</p></div></div></div><div class="console-footer"><span><i class="runtime-dot"></i> Dieksekusi secara lokal</span><span id="execution-time">Belum dijalankan</span></div></section></section><div class="shortcut-footer"><div class="shortcut-group"><span class="shortcut-label">SHORTCUT</span><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> Jalankan</span><span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> Format</span><span><kbd>Ctrl</kbd> + <kbd>F</kbd> Cari</span></div><span class="runtime-note">Runtime JavaScript · browser · eksperimen bahasa</span></div><section class="feature-strip" aria-label="Fitur playground"><article><span class="feature-icon icon-editor">⌘</span><div><strong>Editor yang nyaman</strong><p>Syntax highlighting, nomor baris, auto-indent, dan saran sintaks.</p></div></article><article><span class="feature-icon icon-format">{ }</span><div><strong>Format kode</strong><p>Rapikan indentasi blok dengan formatter khusus Kontekstual.</p></div></article><article><span class="feature-icon icon-run">▶</span><div><strong>Langsung dijalankan</strong><p>Hasil dan kesalahan runtime tersedia di panel sebelah.</p></div></article></section><footer class="page-footer"><span>Kontekstual · Bahasa pemrograman dengan sintaks Indonesia</span><a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">Sumber terbuka di GitHub ↗</a></footer></main>';
+document.querySelector("#app").innerHTML = '<header class="appbar"><a class="brand" href="/" aria-label="Kontekstual, halaman utama"><span class="brand-mark">K.</span><span class="brand-copy"><strong>Kontekstual</strong><small>PLAYGROUND</small></span></a><nav class="playground-nav" aria-label="Navigasi situs"><a href="/">Beranda</a><a href="/docs/">Dokumentasi</a><a href="/agent/">AI docs</a></nav><div class="appbar-spacer"></div><span class="runtime-badge"><i></i> Browser runtime</span><button class="theme-toggle playground-theme-toggle" type="button" data-theme-toggle aria-label="Aktifkan mode gelap" title="Mode gelap"><span data-theme-icon><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.1 15.4A8.5 8.5 0 0 1 8.6 3.9 8.6 8.6 0 1 0 20.1 15.4Z"/></svg></span><span class="theme-label" data-theme-label>Mode gelap</span></button><a class="github-link" href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer" aria-label="Lihat repository di GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.13c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.7 1.15 1.7 1.15.99 1.7 2.61 1.21 3.25.92.1-.72.39-1.21.71-1.49-2.47-.28-5.07-1.24-5.07-5.5 0-1.21.43-2.2 1.15-2.98-.12-.28-.5-1.42.11-2.95 0 0 .94-.3 3.05 1.14A10.6 10.6 0 0 1 12 6.16c.95 0 1.9.13 2.79.38 2.12-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.67.12 2.95.71.78 1.15 1.77 1.15 2.98 0 4.27-2.6 5.21-5.08 5.49.4.35.76 1.02.76 2.06v3.11c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"/></svg></a></header><main class="ide-shell"><section class="play-intro"><div class="play-title-wrap"><div class="eyebrow"><span class="eyebrow-dot"></span> RUANG EKSPERIMEN</div><h1>Tulis. Jalankan.<br><span>Temukan polanya.</span></h1><p>Ubah kode di editor, lalu jalankan untuk melihat hasilnya. Semua berjalan langsung di browser.</p></div><div class="play-intro-aside"><span class="intro-aside-mark">.k</span><div><strong>main.konteks</strong><small>Disimpan otomatis di perangkat ini</small></div></div></section><section class="workspace-toolbar" aria-label="Kontrol editor"><div class="workspace-file"><span class="file-symbol">K</span><div class="breadcrumb"><strong>main.konteks</strong><span id="save-state" class="save-state">Siap</span></div><span class="local-tag"><i></i> lokal</span></div><div class="toolbar-actions"><label class="example-picker"><span class="sr-only">Pilih contoh program</span><select id="examples" aria-label="Pilih contoh program"><option value="lengkap">Contoh lengkap</option><option value="sapaan">01 · Sapaan</option><option value="kondisi">02 · Kondisi</option><option value="perulangan">03 · Perulangan</option></select></label><button id="format" class="tool-button" title="Format kode (Ctrl+Shift+F)"><span class="format-icon">≡</span><span>Format</span></button><button id="copy" class="tool-button" title="Salin kode ke clipboard"><span class="copy-icon">▢</span><span>Salin kode</span></button><button id="reset" class="tool-button reset-button" title="Kembalikan contoh lengkap">Reset</button><button id="run" class="run-button" title="Jalankan program (Ctrl+Enter)"><span class="play-icon">▶</span><span>Jalankan</span><kbd>Ctrl ↵</kbd></button></div></section><section class="ide-layout" aria-label="Editor dan hasil program"><section class="editor-card"><div class="editor-tabbar"><div class="file-tab"><span class="file-tab-icon">K</span><span>main.konteks</span><span class="file-dot" aria-label="File lokal"></span></div><div class="editor-tab-actions"><span class="language-label">KONTEKSTUAL</span><button id="font-down" class="icon-button" aria-label="Perkecil teks editor" title="Perkecil teks">A−</button><button id="font-up" class="icon-button" aria-label="Perbesar teks editor" title="Perbesar teks">A+</button></div></div><div id="editor-mount" class="editor-mount" aria-label="Editor kode Kontekstual"></div><div class="editor-statusbar"><span id="cursor-position">Ln 1, Col 1</span><span id="line-count">1 baris</span><span>Indentasi: 4 spasi</span><span class="status-lang">Kontekstual</span></div></section><section class="console-card"><div class="console-heading"><div><div class="console-eyebrow">HASIL PROGRAM</div><div class="console-tabs" role="tablist" aria-label="Panel hasil"><button class="console-tab is-active" id="output-tab" role="tab" aria-selected="true" aria-controls="output-view" data-panel="output-view"><span class="terminal-glyph">›_</span> Output</button><button class="console-tab" id="problems-tab" role="tab" aria-selected="false" aria-controls="problems-view" data-panel="problems-view"><span class="problem-glyph">!</span> Masalah <span id="problem-count" class="problem-count">0</span></button></div></div><button id="clear-output" class="icon-button clear-button" title="Bersihkan output">Bersihkan</button></div><div class="console-content"><div id="output-view" class="console-view" role="tabpanel" aria-labelledby="output-tab" aria-live="polite"><div id="output" class="output-lines"></div></div><div id="problems-view" class="console-view problems-view" role="tabpanel" aria-labelledby="problems-tab" hidden><div id="problems-content" class="problems-empty"><span class="problem-check">✓</span><strong>Tidak ada masalah</strong><p>Pesan kesalahan akan muncul di sini saat program dijalankan.</p></div></div></div><div class="console-footer"><span><i class="runtime-dot"></i> Runtime browser</span><span id="execution-time">Belum dijalankan</span></div></section></section><div class="shortcut-footer"><div class="shortcut-group"><span class="shortcut-label">KUNCI CEPAT</span><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> Jalankan</span><span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> Format</span><span><kbd>Ctrl</kbd> + <kbd>F</kbd> Cari</span></div><a class="play-doc-link" href="/docs/grammar/">Bingung dengan sintaks? Baca panduan ↗</a></div><div class="play-bottom-row"><span><i class="runtime-dot"></i> Program berjalan lokal, tanpa dikirim ke server.</span><a href="/agent/">AI coding guide ↗</a></div></main>';
 
 function tokenForIdentifier(word) {
   const lower = word.toLocaleLowerCase("id");
@@ -52,34 +58,34 @@ const kontekstualLanguage = StreamLanguage.define({
 });
 
 const editorHighlight = HighlightStyle.define([
-  { tag: tags.keyword, color: "#a9c9ff", fontWeight: "600" },
-  { tag: tags.typeName, color: "#80d5c0" },
-  { tag: tags.bool, color: "#f3c17b" },
-  { tag: tags.string, color: "#b9dc93" },
-  { tag: tags.number, color: "#e8b48c" },
-  { tag: tags.operator, color: "#d4b4ff" },
-  { tag: tags.comment, color: "#78869b", fontStyle: "italic" },
-  { tag: tags.variableName, color: "#e0e6ef" },
-  { tag: tags.punctuation, color: "#9faec2" }
+  { tag: tags.keyword, color: "var(--syntax-keyword)", fontWeight: "600" },
+  { tag: tags.typeName, color: "var(--syntax-type)" },
+  { tag: tags.bool, color: "var(--syntax-bool)" },
+  { tag: tags.string, color: "var(--syntax-string)" },
+  { tag: tags.number, color: "var(--syntax-number)" },
+  { tag: tags.operator, color: "var(--syntax-operator)" },
+  { tag: tags.comment, color: "var(--syntax-comment)", fontStyle: "italic" },
+  { tag: tags.variableName, color: "var(--syntax-variable)" },
+  { tag: tags.punctuation, color: "var(--syntax-punctuation)" }
 ]);
 
 const editorTheme = EditorView.theme({
-  "&": { height: "100%", color: "#dce3ef", backgroundColor: "#171c26", fontSize: "13px" },
-  ".cm-scroller": { fontFamily: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace", lineHeight: "1.85", overflow: "auto" },
-  ".cm-gutters": { backgroundColor: "#171c26", color: "#68758a", border: "none", borderRight: "1px solid #293140" },
-  ".cm-lineNumbers .cm-gutterElement": { padding: "0 13px 0 11px", minWidth: "44px" },
-  ".cm-activeLineGutter": { backgroundColor: "#202735", color: "#c1cee0" },
-  ".cm-activeLine": { backgroundColor: "#1c2330" },
-  ".cm-content": { padding: "17px 0" },
-  ".cm-line": { padding: "0 18px" },
-  ".cm-cursor": { borderLeftColor: "#a9c9ff" },
-  ".cm-selectionBackground, ::selection": { backgroundColor: "#2b4162 !important" },
-  ".cm-focused .cm-selectionBackground": { backgroundColor: "#2b4162" },
-  ".cm-matchingBracket": { backgroundColor: "#29483f", outline: "1px solid #4b9d82", color: "#fff" },
-  ".cm-tooltip": { backgroundColor: "#222b39", color: "#e6edf7", border: "1px solid #354155" },
-  ".cm-tooltip-autocomplete > ul > li[aria-selected]": { backgroundColor: "#305084", color: "#fff" },
-  ".cm-foldPlaceholder": { backgroundColor: "#30394b", border: "none", color: "#bdc8d9" }
-}, { dark: true });
+  "&": { height: "100%", color: "var(--editor-text)", backgroundColor: "var(--editor-bg)", fontSize: "14px" },
+  ".cm-scroller": { fontFamily: "'DM Mono', 'SFMono-Regular', Consolas, monospace", lineHeight: "1.9", overflow: "auto" },
+  ".cm-gutters": { backgroundColor: "var(--editor-gutter-bg)", color: "var(--editor-muted)", border: "none", borderRight: "1px solid var(--editor-border)" },
+  ".cm-lineNumbers .cm-gutterElement": { padding: "0 13px 0 11px", minWidth: "45px" },
+  ".cm-activeLineGutter": { backgroundColor: "var(--editor-active)", color: "var(--editor-text)" },
+  ".cm-activeLine": { backgroundColor: "var(--editor-active)" },
+  ".cm-content": { padding: "22px 0" },
+  ".cm-line": { padding: "0 20px" },
+  ".cm-cursor": { borderLeftColor: "var(--editor-cursor)" },
+  ".cm-selectionBackground, ::selection": { backgroundColor: "var(--editor-selection) !important" },
+  ".cm-focused .cm-selectionBackground": { backgroundColor: "var(--editor-selection)" },
+  ".cm-matchingBracket": { backgroundColor: "var(--editor-bracket-bg)", outline: "1px solid var(--editor-bracket-border)", color: "var(--editor-text)" },
+  ".cm-tooltip": { backgroundColor: "var(--editor-popup)", color: "var(--editor-text)", border: "1px solid var(--editor-border)" },
+  ".cm-tooltip-autocomplete > ul > li[aria-selected]": { backgroundColor: "var(--editor-choice)", color: "var(--editor-text)" },
+  ".cm-foldPlaceholder": { backgroundColor: "var(--editor-active)", border: "none", color: "var(--editor-muted)" }
+});
 
 const completionWords = [
   { label: "Tetapkan", type: "keyword", detail: "Deklarasi variabel", apply: "Tetapkan " },
@@ -317,16 +323,23 @@ function formatSource() {
 
 runButton.addEventListener("click", runProgram);
 document.querySelector("#format").addEventListener("click", formatSource);
-document.querySelector("#reset").addEventListener("click", () => {
+function replaceSource(nextSource, label = "Contoh dimuat") {
   editorView.dispatch({
-    changes: { from: 0, to: editorView.state.doc.length, insert: starter },
+    changes: { from: 0, to: editorView.state.doc.length, insert: nextSource },
     selection: { anchor: 0 },
-    userEvent: "input.reset"
+    userEvent: "input.example"
   });
   clearProblems();
   output.replaceChildren();
-  setSaveState("Contoh dipulihkan");
+  setSaveState(label);
   runProgram();
+}
+document.querySelector("#examples").addEventListener("change", event => {
+  replaceSource(examples[event.target.value] || starter);
+});
+document.querySelector("#reset").addEventListener("click", () => {
+  document.querySelector("#examples").value = "lengkap";
+  replaceSource(starter, "Contoh dipulihkan");
 });
 document.querySelector("#copy").addEventListener("click", async () => {
   try {
@@ -353,5 +366,10 @@ function changeFontSize(delta) {
   editorView.dom.style.fontSize = fontSize + "px";
 }
 
+document.addEventListener("keydown", event => {
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+    if (!editorView.hasFocus) { event.preventDefault(); runProgram(); }
+  }
+});
 updateEditorStatus(editorView);
 runProgram();

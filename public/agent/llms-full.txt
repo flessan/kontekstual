@@ -1,0 +1,29 @@
+# Kontekstual: agent guide
+
+Kontekstual is an experimental programming language built around structured Indonesian keywords. Its current authoritative implementation is the Rust interpreter in https://github.com/flessan/kontekstual. The browser playground runs a JavaScript compatibility interpreter and does not compile native programs.
+
+## Required syntax rules
+Every complete instruction ends with a period. Quoted text is a string literal. Comments use {- and -}. Indentation is significant: code under Jika and Selama is indented on following lines. A block ends when indentation returns to its prior level or the source ends. An alternate branch is written Jika tidak, maka: at the same indentation level as its matching Jika. Do not add a closing statement like Selesai jika.
+
+## Implemented command patterns
+Tampilkan ekspresi.
+Tetapkan nama bernilai ekspresi.
+Tetapkan nama dengan nilai ekspresi.
+Ubah nama menjadi ekspresi.
+Jika kondisi, maka:
+    instruksi.
+Jika tidak, maka:
+    instruksi.
+Selama kondisi, lakukan:
+    instruksi.
+
+The currently supported subset covers text output, declarations, variable reassignment, arithmetic, text concatenation, comparisons, logical expressions, indentation-based conditionals and Selama loops. Boolean literals are benar and salah.
+
+## Numeric behavior
+The Rust interpreter uses signed 64-bit integers, checks overflow, and errors on division by zero. The browser runtime uses JavaScript safe integers. Both runtimes limit a program to 100,000 total loop iterations.
+
+## Explicit limitations
+User-defined functions, modules, interactive input, loop-control instructions, and native executable generation remain future scope. Never claim these features already work. If the request requires one, describe it as a design proposal, not valid current syntax.
+
+## Verification
+Use cargo test --all-targets for Rust. Sample programs can be checked with cargo run -- check examples/halo.konteks and executed with cargo run -- run examples/halo.konteks. For the browser app, run pnpm install --frozen-lockfile, pnpm test, then pnpm build. Keep examples small and verify expected output. If the checkout or environment is unavailable, state that limitation.

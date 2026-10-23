@@ -54,10 +54,16 @@ Selama hitungan kurang dari atau sama dengan 5, lakukan:
 
 Selama checks its logical condition before every iteration. Each iteration gets a local scope, while assignments can update variables declared outside the loop. For runtime safety, the interpreter permits at most 100,000 loop iterations per program execution.
 
-## Browser playground
+## Website and browser playground
+
+The website is a multi-page Vite build deployed as a static site. The root page introduces the language, /coba/ hosts the interactive browser playground, /docs/ contains human-facing documentation, and /agent/ provides AI-oriented instructions and crawler-friendly plain-text documentation.
 
 Open the repository in StackBlitz and run the web playground without Rust or Cargo:
 
+- Live site: https://dotkonteks.pages.dev/
+- Playground: https://dotkonteks.pages.dev/coba/
+- Documentation: https://dotkonteks.pages.dev/docs/
+- AI documentation: https://dotkonteks.pages.dev/agent/
 - StackBlitz: https://stackblitz.com/~/github.com/flessan/kontekstual
 - Install dependencies: \`pnpm install\`
 - Start command: \`pnpm dev\`
@@ -68,7 +74,7 @@ The playground includes a CodeMirror editor with Kontekstual syntax colors, line
 
 The formatter is language-specific rather than the standard Prettier package, because Kontekstual uses its own Indonesian syntax. Since blocks end through indentation and have no closing keyword, the formatter uses existing indentation to infer where blocks end; it can normalize indent levels and align \`Jika tidak\` branches, but it cannot safely infer every missing block boundary from completely unindented source.
 
-The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based \`Jika\` and \`Selama\` blocks, and comments. It is a compatibility implementation, not the Rust compiler itself, and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the browser tests and builds the web app.
+The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based \`Jika\` and \`Selama\` blocks, and comments. It is a compatibility implementation, not the Rust compiler itself, and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the browser tests and builds all site pages, including the home page, playground, documentation, and AI guide. The site remembers the selected light or dark theme locally and respects reduced-motion preferences.
 
 ## Dependency updates
 

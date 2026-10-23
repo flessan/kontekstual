@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="id" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="Tata bahasa Kontekstual: aturan titik, komentar, deklarasi, kondisi, cabang alternatif, perulangan, dan indentasi."><link rel="canonical" href="https://dotkonteks.pages.dev/docs/grammar/"><meta property="og:title" content="Tata bahasa Kontekstual"><title>Tata bahasa Kontekstual | Dokumentasi</title><script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}</script><link rel="stylesheet" href="/site.css"><script type="module" src="/site.js"></script></head>
+<body><a class="skip-link" href="#main">Lewati ke konten</a><header data-site-header></header><main id="main" class="docs-page wrap">
+<div class="docs-hero docs-hero-compact" data-reveal><div class="breadcrumbs"><a href="/">Beranda</a><span>/</span><a href="/docs/">Dokumentasi</a><span>/</span><span>Tata bahasa</span></div><div class="eyebrow">REFERENSI BAHASA · 01</div><h1>Tata bahasa<br><span class="docs-highlight">dan sintaks.</span></h1><p>Kontekstual memakai kata kunci eksplisit berbahasa Indonesia. Bahasa ini bukan pemroses kalimat bebas; instruksi harus mengikuti pola sintaks yang didefinisikan.</p></div>
+<div class="article-layout"><aside class="article-toc"><span class="sidebar-label">DI HALAMAN INI</span><a href="#instruksi">Instruksi</a><a href="#komentar">Komentar</a><a href="#variabel">Variabel dan nilai</a><a href="#kondisi">Kondisi</a><a href="#perulangan">Perulangan</a><a href="#indentasi">Indentasi</a></aside>
+<article class="doc-article">
+<section id="instruksi"><div class="article-kicker">01 / BENTUK DASAR</div><h2>Setiap instruksi berakhir dengan titik</h2><p>Tanda titik (<code>.</code>) menjadi penanda akhir sebuah instruksi. File program berakhir ketika seluruh isi file selesai dibaca; tidak perlu pembungkus awal atau kata penutup buatan.</p><pre><code>Tampilkan teks "Halo dunia!".
+Tetapkan umur bernilai 20.
+Tampilkan umur.</code></pre><div class="inline-note"><b>Ingat</b><span>Teks harus ditulis di antara tanda kutip. Kata di luar kutip dapat ditafsirkan sebagai nama variabel atau bagian sintaks.</span></div></section>
+<section id="komentar"><div class="article-kicker">02 / KOMENTAR</div><h2>Komentar satu baris atau beberapa baris</h2><p>Komentar dimulai dengan <code>{-</code> dan berakhir dengan <code>-}</code>. Komentar tidak dijalankan sebagai instruksi program.</p><pre><code>{- Catatan untuk pembaca -}
+Tampilkan "Halo".
+
+{-
+Komentar dapat menjelaskan
+tujuan bagian program ini.
+-}</code></pre></section>
+<section id="variabel"><div class="article-kicker">03 / NILAI</div><h2>Deklarasi dan perubahan variabel</h2><p>Gunakan <code>Tetapkan</code> untuk memperkenalkan nilai. Bentuk ringkas <code>bernilai</code> maupun bentuk eksplisit <code>dengan nilai</code> diterima oleh interpreter.</p><pre><code>Tetapkan nama bernilai "Thio".
+Tetapkan umur dengan nilai 20.
+Tetapkan aktif bernilai benar.
+Ubah umur menjadi umur + 1.</code></pre><p>Nilai yang tersedia pada interpreter saat ini mencakup angka bulat, teks, dan logika. Nilai logika ditulis <code>benar</code> atau <code>salah</code>.</p></section>
+<section id="kondisi"><div class="article-kicker">04 / KONTROL ALUR</div><h2>Kondisi memakai indentasi</h2><p>Bagian setelah <code>maka:</code> ditulis pada baris berikutnya dan menjorok ke dalam. Cabang alternatif memakai <code>Jika tidak, maka:</code> pada tingkat indentasi yang sama dengan <code>Jika</code>.</p><pre><code>Jika umur lebih dari atau sama dengan 18, maka:
+    Tampilkan "Dewasa".
+Jika tidak, maka:
+    Tampilkan "Belum dewasa".
+Tampilkan "Selesai memeriksa".</code></pre><p>Blok kondisi berakhir ketika indentasi kembali ke tingkat sebelumnya atau file selesai. Tidak ada kata penutup blok yang wajib ditulis.</p></section>
+<section id="perulangan"><div class="article-kicker">05 / PERULANGAN</div><h2><code>Selama</code> mengulang saat kondisi benar</h2><p>Kondisi diperiksa sebelum setiap iterasi. Pastikan isi blok mengubah nilai yang diperlukan agar kondisi pada akhirnya menjadi salah.</p><pre><code>Tetapkan hitungan bernilai 1.
+Selama hitungan kurang dari atau sama dengan 3, lakukan:
+    Tampilkan hitungan.
+    Ubah hitungan menjadi hitungan + 1.</code></pre><div class="inline-note"><b>Batas keamanan runtime</b><span>Interpreter dan playground membatasi total iterasi loop agar program eksperimen tidak berjalan tanpa batas.</span></div></section>
+<section id="indentasi"><div class="article-kicker">06 / STRUKTUR</div><h2>Indentasi adalah bagian dari sintaks</h2><p>Gunakan empat spasi untuk isi blok agar kode mudah dibaca. Formatter dapat merapikan sebagian indentasi berdasarkan indentasi sumber yang ada, tetapi tidak selalu bisa menebak batas blok jika seluruh informasi indentasi hilang.</p><div class="article-next"><span><small>BERIKUTNYA</small><b>Referensi perintah dan nilai</b></span><a href="/docs/reference/">Buka referensi ↗</a></div></section>
+</article></div>
+</main><footer data-site-footer></footer></body></html>

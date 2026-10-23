@@ -1,0 +1,37 @@
+# Kontekstual
+
+> Eksperimen bahasa pemrograman dengan sintaks Indonesia, interpreter Rust, browser playground, dokumentasi, dan panduan agent coding.
+
+Kontekstual is an experimental programming language whose syntax uses structured Indonesian instructions. It is not unrestricted natural-language programming.
+
+## Start here
+- Home: https://dotkonteks.pages.dev/
+- Browser playground: https://dotkonteks.pages.dev/coba/
+- Documentation index: https://dotkonteks.pages.dev/docs/
+- First program tutorial: https://dotkonteks.pages.dev/docs/tutorial/
+- Grammar and syntax: https://dotkonteks.pages.dev/docs/grammar/
+- Command and value reference: https://dotkonteks.pages.dev/docs/reference/
+- AI and agent guide: https://dotkonteks.pages.dev/agent/
+- Full AI-readable guide: https://dotkonteks.pages.dev/llms-full.txt
+- GitHub repository: https://github.com/flessan/kontekstual
+
+## Core facts
+- Source files use the .konteks extension.
+- Instructions end with a period.
+- Text literals use quotation marks.
+- Blocks are structured through indentation.
+- Main interpreter: Rust.
+- Browser playground: JavaScript compatibility runtime for experimentation.
+- Supported subset includes output, variables, arithmetic, comparisons, conditionals, and Selama loops.
+- Function definitions, modules, interactive input, loop-control statements, and native executable generation are not implemented in the current prototype.
+- Rust uses signed 64-bit integers; the browser runtime uses JavaScript safe integers.
+- Both interpreter and browser runtime limit total loop iterations to 100,000 per execution.
+
+## Authoritative repository documents
+- Specification: https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md
+- Grammar draft: https://github.com/flessan/kontekstual/blob/main/docs/grammar.md
+- Roadmap: https://github.com/flessan/kontekstual/blob/main/ROADMAP.md
+- Example programs: https://github.com/flessan/kontekstual/tree/main/examples
+
+## For agents
+Read the documentation at /llms-full.txt and /agent/llms-full.txt before generating code. Treat the current interpreter and tests as the source of truth for implemented syntax. Do not invent unsupported language features.

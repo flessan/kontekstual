@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="id" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="Tutorial program pertama dengan bahasa Kontekstual. Pelajari output, variabel, ekspresi, kondisi dan perulangan lewat contoh sederhana."><link rel="canonical" href="https://dotkonteks.pages.dev/docs/tutorial/"><meta property="og:title" content="Tutorial Kontekstual: program pertamamu"><title>Program pertamamu | Tutorial Kontekstual</title><script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}</script><link rel="stylesheet" href="/site.css"><script type="module" src="/site.js"></script></head>
+<body><a class="skip-link" href="#main">Lewati ke konten</a><header data-site-header></header><main id="main" class="docs-page wrap">
+<div class="docs-hero docs-hero-compact" data-reveal><div class="breadcrumbs"><a href="/">Beranda</a><span>/</span><a href="/docs/">Dokumentasi</a><span>/</span><span>Tutorial</span></div><div class="eyebrow">TUTORIAL PEMULA · 5 MENIT</div><h1>Program pertamamu<br><span class="docs-highlight">dimulai di sini.</span></h1><p>Kita akan menulis program kecil, mengubah data, dan melihat bagaimana Kontekstual membaca instruksi satu per satu.</p><a class="button button-primary tutorial-cta" href="/coba/">Coba contoh di browser <span aria-hidden="true">↗</span></a></div>
+<div class="article-layout"><aside class="article-toc"><span class="sidebar-label">LANGKAH</span><a href="#halo">01 · Output</a><a href="#variabel">02 · Variabel</a><a href="#ekspresi">03 · Ekspresi</a><a href="#kondisi">04 · Kondisi</a><a href="#coba">05 · Lanjutkan</a></aside>
+<article class="doc-article">
+<section id="halo"><div class="article-kicker">01 / TAMPILKAN TEKS</div><h2>Mulai dari sapaan</h2><p>Program paling kecil cukup memiliki satu instruksi. Kata <code>Tampilkan</code> meminta runtime mengeluarkan nilai ke panel output. Tanda titik mengakhiri instruksi.</p><pre><code>Tampilkan teks "Halo dunia!".</code></pre><p>Hasil yang diharapkan:</p><pre class="pre-output"><code>Halo dunia!</code></pre><div class="inline-note"><b>Kenapa teks dikutip?</b><span>Tanda kutip membedakan literal teks dari nama variabel atau kata sintaks.</span></div></section>
+<section id="variabel"><div class="article-kicker">02 / SIMPAN NILAI</div><h2>Berikan nama pada data</h2><p>Variabel membuat data bisa digunakan lagi. Deklarasi menerima bentuk <code>bernilai</code> dan <code>dengan nilai</code>.</p><pre><code>Tetapkan nama bernilai "Thio".
+Tetapkan umur dengan nilai 20.
+
+Tampilkan nama.
+Tampilkan umur.</code></pre><p>Nama variabel mengikuti aturan pengenal bahasa. Gunakan nama yang menggambarkan nilai agar program lebih mudah dipahami.</p></section>
+<section id="ekspresi"><div class="article-kicker">03 / UBAH DAN HITUNG</div><h2>Ekspresi menghasilkan nilai baru</h2><p>Operator aritmetika dapat dipakai dalam ekspresi. Gunakan <code>Ubah</code> untuk memperbarui variabel yang telah dibuat.</p><pre><code>Tetapkan harga bernilai 12000.
+Tetapkan jumlah bernilai 3.
+Tetapkan total bernilai harga * jumlah.
+Ubah jumlah menjadi jumlah + 1.
+
+Tampilkan total.
+Tampilkan jumlah.</code></pre><p>Instruksi dijalankan sesuai urutannya. Karena itu, nilai yang digunakan pada suatu baris bergantung pada deklarasi atau perubahan yang sudah terjadi sebelumnya.</p></section>
+<section id="kondisi"><div class="article-kicker">04 / PILIH CABANG</div><h2>Jalankan instruksi saat kondisi sesuai</h2><p>Blok kondisi ditandai titik dua setelah <code>maka</code>. Baris di dalam blok harus menjorok dengan indentasi.</p><pre><code>Tetapkan umur bernilai 20.
+
+Jika umur lebih dari atau sama dengan 17, maka:
+    Tampilkan "Boleh melanjutkan".
+Jika tidak, maka:
+    Tampilkan "Perlu menunggu".</code></pre><p>Cabang alternatif memiliki tingkat indentasi yang sama seperti baris <code>Jika</code>, sementara isi setiap cabang lebih menjorok.</p></section>
+<section id="coba"><div class="article-kicker">05 / EKSPLORASI</div><h2>Lanjutkan dengan eksperimen kecil</h2><p>Coba ubah nilai umur, buat variabel baru, atau tulis loop <code>Selama</code>. Jalankan ulang setelah setiap perubahan dan baca pesannya jika runtime menemukan kesalahan.</p><div class="next-cards"><a href="/docs/grammar/"><b>Tata bahasa</b><span>Pahami indentasi dan aturan tanda baca ↗</span></a><a href="/docs/reference/"><b>Referensi perintah</b><span>Lihat sintaks yang didukung ↗</span></a><a href="/agent/"><b>AI docs</b><span>Hubungkan bahasa ini ke agent coding ↗</span></a></div></section>
+</article></div></main><footer data-site-footer></footer></body></html>

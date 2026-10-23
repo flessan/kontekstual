@@ -1,0 +1,73 @@
+# Kontekstual: complete guide for AI and crawlers
+
+Canonical website: https://dotkonteks.pages.dev/
+Repository: https://github.com/flessan/kontekstual
+Language: Indonesian-first structured syntax. Source files use the .konteks extension.
+Project status: experimental. The Rust interpreter is authoritative for the current runtime subset; the browser playground is a JavaScript compatibility implementation.
+
+## Site map
+- / product introduction
+- /coba/ interactive browser playground
+- /docs/ documentation index
+- /docs/tutorial/ beginner tutorial
+- /docs/grammar/ syntax and indentation rules
+- /docs/reference/ commands, values, expressions, conditionals, and loops
+- /agent/ instructions for AI agents
+- /llms.txt concise crawl index
+- /llms-full.txt this full context guide
+- /agent/llms.txt agent-first index
+- /agent/llms-full.txt detailed agent guidance
+
+## Language model
+Kontekstual aims to make programs readable through structured Indonesian instructions while preserving strict, predictable syntax. It is not free-form Indonesian and should not be treated as a natural-language guessing system.
+
+Every instruction ends with a period. String literals are quoted. Blocks begin with Jika ..., maka: or Selama ..., lakukan: and their body is indented. A block ends when indentation returns to a previous level or when the file ends. An optional alternate branch is written Jika tidak, maka: at the same indentation level as its matching Jika. There is no required block terminator such as Selesai jika.
+
+## Supported commands and syntax
+Output:
+Tampilkan ekspresi.
+
+Declarations:
+Tetapkan nama bernilai ekspresi.
+Tetapkan nama dengan nilai ekspresi.
+
+Assignment:
+Ubah nama menjadi ekspresi.
+
+Comments:
+{- komentar -}
+
+Condition:
+Jika kondisi, maka:
+    instruksi.
+Jika tidak, maka:
+    instruksi.
+
+Loop:
+Selama kondisi, lakukan:
+    instruksi.
+
+Supported concepts include text, integer and boolean values; arithmetic; text concatenation; comparisons; logical expressions; indentation-based conditional branches; and Selama loops. Literals for logical values are benar and salah.
+
+## Runtime and validation
+The Rust interpreter uses signed 64-bit integers and reports division-by-zero and arithmetic overflow. The browser runtime uses JavaScript safe integers, so numeric range behavior is not identical. Both runtimes cap total loop iterations at 100,000 per program execution. The browser runtime is not a compiler and does not generate native executables.
+
+Useful repository commands:
+- cargo test --all-targets
+- cargo run -- check examples/halo.konteks
+- cargo run -- run examples/halo.konteks
+- pnpm install --frozen-lockfile
+- pnpm test
+- pnpm build
+
+## Unsupported or future scope
+Do not claim that user-defined functions, modules, interactive input, loop-control instructions, or native executable generation are implemented. These are future work in the current prototype. Check the repository specification and tests if a particular expression or edge case is uncertain.
+
+## Agent instructions
+1. Read this document and the grammar reference before producing .konteks source.
+2. Generate only syntax described above or confirmed by tests.
+3. End each complete instruction with a period.
+4. Preserve block indentation and align Jika tidak, maka: to its matching Jika.
+5. Keep code samples small and validate them using the Rust interpreter when a checkout is available.
+6. When a tool or feature is unsupported, explain the limitation instead of inventing syntax.
+7. Distinguish confirmed implementation behavior from design ideas or roadmap items.
