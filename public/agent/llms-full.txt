@@ -1,11 +1,12 @@
-# Kontekstual: agent guide
+# Kontekstual: panduan untuk agen AI
 
-Kontekstual is an experimental programming language built around structured Indonesian keywords. Its current authoritative implementation is the Rust interpreter in https://github.com/flessan/kontekstual. The browser playground runs a JavaScript compatibility interpreter and does not compile native programs.
+Kontekstual adalah bahasa pemrograman eksperimental dengan kata kunci terstruktur berbahasa Indonesia. Implementasi acuan saat ini adalah interpreter Rust di https://github.com/flessan/kontekstual. Playground di peramban menjalankan interpreter kompatibilitas JavaScript dan tidak mengompilasi program native.
 
-## Required syntax rules
-Every complete instruction ends with a period. Quoted text is a string literal. Comments use {- and -}. Indentation is significant: code under Jika and Selama is indented on following lines. A block ends when indentation returns to its prior level or the source ends. An alternate branch is written Jika tidak, maka: at the same indentation level as its matching Jika. Do not add a closing statement like Selesai jika.
+## Aturan sintaks wajib
+Setiap instruksi lengkap diakhiri tanda titik. Literal teks diapit tanda kutip. Komentar memakai `{-` dan `-}`. Indentasi menentukan struktur blok: isi `Jika` dan `Selama` ditulis pada baris berikutnya dengan indentasi. Blok berakhir saat indentasi kembali ke tingkat sebelumnya atau sumber program selesai. Cabang alternatif ditulis sebagai `Jika tidak, maka:` pada tingkat indentasi yang sama dengan `Jika` pasangannya. Jangan menambahkan penutup seperti `Selesai jika.`.
 
-## Implemented command patterns
+## Pola perintah yang diimplementasikan
+```text
 Tampilkan ekspresi.
 Tetapkan nama bernilai ekspresi.
 Tetapkan nama dengan nilai ekspresi.
@@ -16,14 +17,15 @@ Jika tidak, maka:
     instruksi.
 Selama kondisi, lakukan:
     instruksi.
+```
 
-The currently supported subset covers text output, declarations, variable reassignment, arithmetic, text concatenation, comparisons, logical expressions, indentation-based conditionals and Selama loops. Boolean literals are benar and salah.
+Subset yang didukung mencakup hasil teks, deklarasi, perubahan nilai variabel, aritmetika, penggabungan teks, perbandingan, ekspresi logika, kondisi berbasis indentasi, dan perulangan `Selama`. Nilai logika ditulis sebagai `benar` dan `salah`.
 
-## Numeric behavior
-The Rust interpreter uses signed 64-bit integers, checks overflow, and errors on division by zero. The browser runtime uses JavaScript safe integers. Both runtimes limit a program to 100,000 total loop iterations.
+## Perilaku angka
+Interpreter Rust menggunakan bilangan bulat bertanda 64-bit, memeriksa luapan, dan melaporkan kesalahan pembagian dengan nol. Runtime peramban memakai rentang bilangan bulat aman JavaScript. Kedua runtime membatasi program hingga 100.000 total iterasi.
 
-## Explicit limitations
-User-defined functions, modules, interactive input, loop-control instructions, and native executable generation remain future scope. Never claim these features already work. If the request requires one, describe it as a design proposal, not valid current syntax.
+## Batasan yang dinyatakan jelas
+Fungsi buatan pengguna, modul, input interaktif, instruksi kendali perulangan, dan pembuatan executable native masih direncanakan. Jangan menyatakan fitur tersebut sudah berjalan. Jika permintaan memerlukannya, jelaskan sebagai usulan desain, bukan sintaks yang valid saat ini.
 
-## Verification
-Use cargo test --all-targets for Rust. Sample programs can be checked with cargo run -- check examples/halo.konteks and executed with cargo run -- run examples/halo.konteks. For the browser app, run pnpm install --frozen-lockfile, pnpm test, then pnpm build. Keep examples small and verify expected output. If the checkout or environment is unavailable, state that limitation.
+## Validasi
+Gunakan `cargo test --all-targets` untuk Rust. Contoh program dapat diperiksa dengan `cargo run -- check examples/halo.konteks` dan dijalankan dengan `cargo run -- run examples/halo.konteks`. Untuk aplikasi peramban, jalankan `pnpm install --frozen-lockfile`, `pnpm test`, lalu `pnpm build`. Buat contoh sekecil mungkin dan periksa hasil yang diharapkan. Jika repositori atau lingkungan tidak tersedia, nyatakan batasan tersebut.

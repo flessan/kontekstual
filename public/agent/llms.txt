@@ -1,16 +1,16 @@
-# Kontekstual: agent-first index
+# Kontekstual: indeks khusus agen
 
-Use this page for coding agents and retrieval systems that need concise and reliable project context.
+Gunakan panduan ini untuk agen pemrograman dan sistem pencarian informasi yang membutuhkan konteks proyek yang ringkas dan dapat diandalkan.
 
-1. Read https://dotkonteks.pages.dev/llms.txt for the canonical route index.
-2. Read https://dotkonteks.pages.dev/llms-full.txt for supported syntax and limitations.
-3. Use https://dotkonteks.pages.dev/docs/grammar/ for punctuation and indentation.
-4. Use https://dotkonteks.pages.dev/docs/reference/ for commands, values, and expressions.
-5. Use https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md for the evolving language specification.
-6. Validate against the interpreter and automated tests in the repository.
+1. Baca https://dotkonteks.pages.dev/llms.txt untuk indeks halaman utama.
+2. Baca https://dotkonteks.pages.dev/llms-full.txt untuk sintaks dan batas yang didukung.
+3. Baca https://dotkonteks.pages.dev/docs/grammar/ untuk aturan tanda baca dan indentasi.
+4. Baca https://dotkonteks.pages.dev/docs/reference/ untuk perintah, nilai, dan ekspresi.
+5. Baca https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md untuk spesifikasi bahasa yang terus berkembang.
+6. Validasi hasil dengan interpreter dan pengujian otomatis di repositori.
 
-Never treat Kontekstual as unrestricted natural language. Complete instructions end with a period; quoted text is a string literal; conditional and loop bodies rely on indentation. Do not invent unsupported language features.
+Jangan perlakukan Kontekstual sebagai bahasa alami bebas. Setiap instruksi lengkap diakhiri tanda titik; teks diapit tanda kutip; isi kondisi dan perulangan menggunakan indentasi. Jangan mengarang fitur bahasa yang belum didukung.
 
-Canonical implementation: https://github.com/flessan/kontekstual
-Website: https://dotkonteks.pages.dev/
+Implementasi acuan: https://github.com/flessan/kontekstual
+Situs: https://dotkonteks.pages.dev/
 Playground: https://dotkonteks.pages.dev/coba/

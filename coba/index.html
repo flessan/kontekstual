@@ -1,13 +1,191 @@
 <!doctype html>
-<html lang="id" data-theme="light">
+<html lang="id" data-theme="light" data-bs-theme="light">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="theme-color" content="#f6f7f2">
-<meta name="description" content="Playground Kontekstual untuk menulis dan menjalankan kode bahasa Indonesia langsung di browser. Gratis, tanpa instalasi.">
-<link rel="canonical" href="https://dotkonteks.pages.dev/coba/"><meta property="og:title" content="Coba Kontekstual | Playground interaktif"><meta property="og:description" content="Tulis, format, dan jalankan program Kontekstual langsung di browser.">
-<title>Coba Kontekstual | Playground interaktif</title>
-<script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}</script>
-<link rel="stylesheet" href="/site.css"><link rel="stylesheet" href="/playground/ide.css">
-<script type="module" src="/site.js"></script><script type="module" src="/playground/ide.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<title>Playground Kontekstual — Jalankan Kode Bahasa Indonesia di Peramban</title>
+<meta name="description" content="Playground Kontekstual gratis: tulis, format, dan jalankan program bahasa Indonesia langsung di peramban. Tanpa instalasi, tanpa akun, dan kode tetap tersimpan di perangkatmu.">
+<meta name="keywords" content="playground coding Indonesia, editor kode bahasa Indonesia, belajar coding di peramban, Kontekstual playground, latihan pemrograman pemula">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://dotkonteks.pages.dev/coba/">
+<link rel="alternate" hreflang="id" href="https://dotkonteks.pages.dev/coba/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kontekstual">
+<meta property="og:locale" content="id_ID">
+<meta property="og:title" content="Playground Kontekstual — Editor kode berbahasa Indonesia">
+<meta property="og:description" content="Tulis, format, dan jalankan program Kontekstual langsung di peramban. Gratis, privat, dan ramah pemula.">
+<meta property="og:url" content="https://dotkonteks.pages.dev/coba/">
+<meta property="og:image" content="https://dotkonteks.pages.dev/og-kontekstual.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Playground Kontekstual — Editor kode berbahasa Indonesia">
+<meta name="twitter:description" content="Tulis, format, dan jalankan program Kontekstual langsung di peramban. Gratis, privat, dan ramah pemula.">
+<meta name="twitter:image" content="https://dotkonteks.pages.dev/og-kontekstual.png">
+<script>try{var t=localStorage.getItem("kontekstual-theme");var d=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=d;document.documentElement.setAttribute("data-bs-theme",d)}catch(e){}</script>
+<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/playground/ide.css">
+<script type="module" src="/site.js"></script>
+<script type="module" src="/playground/ide.js"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Kontekstual Playground","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://dotkonteks.pages.dev/coba/","description":"Editor dan runtime di peramban untuk bahasa pemrograman Kontekstual dengan sintaks bahasa Indonesia.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"IDR"},"publisher":{"@type":"Organization","name":"Kontekstual","url":"https://dotkonteks.pages.dev/"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Beranda","item":"https://dotkonteks.pages.dev/"},{"@type":"ListItem","position":2,"name":"Playground","item":"https://dotkonteks.pages.dev/coba/"}]}
+</script>
 </head>
-<body class="playground-page"><a class="skip-link" href="#app">Lewati ke editor</a><div id="app"></div></body>
+<body class="playground-page">
+<a class="skip-link" href="#workspace">Lewati ke editor</a>
+  <header class="site-header classic-header">
+    <div class="nav-inner">
+      <a class="site-brand" href="/" aria-label="Kontekstual, halaman utama">
+        <span class="classic-mark" aria-hidden="true">K.</span>
+        <span class="brand-label"><strong>Kontekstual</strong><small>BAHASA PEMROGRAMAN</small></span>
+      </a>
+      <nav class="nav-links" aria-label="Navigasi utama"><a href="/">Beranda</a><a href="/docs/">Dokumentasi</a><a href="/docs/tutorial/">Tutorial</a><a href="/docs/grammar/">Sintaks</a><a href="/docs/reference/">Referensi</a><a href="/agent/">Dokumentasi AI</a></nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Aktifkan mode gelap" title="Mode gelap">
+          <span data-theme-icon><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.1 15.4A8.5 8.5 0 0 1 8.6 3.9 8.6 8.6 0 1 0 20.1 15.4Z"/></svg></span>
+          <span class="theme-label" data-theme-label>Mode gelap</span>
+        </button>
+        <a class="nav-cta d-none d-md-inline-flex" href="/coba/" aria-current="page">Coba Playground <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <a class="nav-cta d-inline-flex d-md-none" href="/coba/" aria-label="Coba Playground">Coba <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <button class="mobile-menu-btn d-grid d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-label="Buka menu">
+          <i class="bi bi-list" aria-hidden="true" style="font-size:20px"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="offcanvas offcanvas-end offcanvas-kontekstual d-md-none" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
+    <div class="offcanvas-header">
+      <a class="site-brand" href="/">
+        <span class="classic-mark" aria-hidden="true">K.</span>
+        <span class="brand-label"><strong id="mobileNavLabel">Kontekstual</strong><small>NAVIGASI</small></span>
+      </a>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup menu"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column gap-2">
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/">Beranda</a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/tutorial/">Tutorial</a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/">Dokumentasi<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/grammar/">Sintaks<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/reference/">Referensi<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/agent/">Dokumentasi AI<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+      <hr>
+      <a class="btn btn-kontekstual w-100" href="/coba/"><i class="bi bi-code-square" aria-hidden="true"></i> Coba Playground</a>
+      <div class="mt-auto p-3 rounded-3 mobile-nav-note">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="avatar" aria-hidden="true">K.</span>
+          <strong>Kontekstual</strong>
+        </div>
+        <p>Bahasa pemrograman dengan sintaks Indonesia. Gratis, lokal, aman untuk pemula.</p>
+        <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer" class="btn btn-sm btn-outline-kontekstual w-100 d-inline-flex align-items-center justify-content-center gap-2"><i class="bi bi-github" aria-hidden="true"></i> Lihat GitHub</a>
+      </div>
+    </div>
+  </div>
+
+<main class="play-shell">
+  <nav class="play-breadcrumbs" aria-label="Jejak halaman">
+    <a href="/">Beranda</a><span aria-hidden="true">/</span><span aria-current="page">Playground</span>
+  </nav>
+
+  <section class="play-hero">
+    <div class="play-hero-copy">
+      <div class="eyebrow"><span class="eyebrow-dot"></span> RUANG EKSPERIMEN · GRATIS</div>
+      <h1>Tulis. Jalankan.<br><span class="headline-mark">Lihat hasilnya.</span></h1>
+      <p>Tulis program dengan kata kunci berbahasa Indonesia, jalankan, lalu pelajari hasilnya. Kode tersimpan di perangkatmu; akun dan pemasangan tidak diperlukan.</p>
+      <div class="play-hero-badges">
+        <span class="trust-badge"><i class="bi bi-shield-lock-fill" aria-hidden="true"></i> Kode tetap lokal</span>
+        <span class="trust-badge"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Hasil instan</span>
+        <span class="trust-badge"><i class="bi bi-save" aria-hidden="true"></i> Simpan otomatis</span>
+      </div>
+    </div>
+    <aside class="play-hero-aside" aria-label="Mulai cepat">
+      <div class="quickstart-card">
+        <div class="quickstart-head"><i class="bi bi-stars" aria-hidden="true"></i> Mulai dalam 3 langkah</div>
+        <ol>
+          <li>Pilih contoh di toolbar editor.</li>
+          <li>Ubah nilai atau teks sesukamu.</li>
+          <li>Tekan <b>Jalankan</b> atau <kbd>Ctrl</kbd>+<kbd>Enter</kbd>.</li>
+        </ol>
+        <a href="/docs/tutorial/" class="quickstart-link">Baru mulai? Ikuti tutorial pemula 5 menit <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+      </div>
+    </aside>
+  </section>
+
+  <div class="workbench-kicker"><span><i class="bi bi-pencil-square" aria-hidden="true"></i> RUANG KERJA</span><p>Mulai dari contoh, ubah barisnya, lalu jalankan.</p></div>
+  <div id="app">
+    <noscript>
+      <div class="play-noscript">
+        <h2>Editor membutuhkan JavaScript</h2>
+        <p>Aktifkan JavaScript untuk memakai playground. Sementara itu, kamu tetap bisa membaca tata bahasa di <a href="/docs/grammar/">dokumentasi sintaks</a> atau mengikuti <a href="/docs/tutorial/">tutorial pemula</a>.</p>
+      </div>
+    </noscript>
+  </div>
+
+  <section class="play-extra" aria-labelledby="bantuan-title">
+    <div class="play-extra-head">
+      <div>
+        <div class="eyebrow">PANDUAN CEPAT</div>
+        <h2 id="bantuan-title">Sintaks inti dalam satu layar.</h2>
+      </div>
+      <a href="/docs/reference/" class="text-link">Referensi lengkap <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+    </div>
+    <div class="cheatsheet-grid">
+      <article class="cheat-card">
+        <div class="cheat-head"><span class="cheat-tag">HASIL</span><span class="cheat-note">Tampilkan nilai</span></div>
+        <pre><code><span class="kw">Tampilkan</span> teks <span class="str">"Halo dunia!"</span>.</code></pre>
+        <p>Setiap instruksi diakhiri titik.</p>
+      </article>
+      <article class="cheat-card">
+        <div class="cheat-head"><span class="cheat-tag">VARIABEL</span><span class="cheat-note">Simpan dan ubah nilai</span></div>
+        <pre><code><span class="kw">Tetapkan</span> nama <span class="kw">bernilai</span> <span class="str">"Thio"</span>.
+<span class="kw">Ubah</span> nama <span class="kw">menjadi</span> <span class="str">"Dunia"</span>.</code></pre>
+        <p>Gunakan <code>bernilai</code> atau <code>dengan nilai</code>.</p>
+      </article>
+      <article class="cheat-card">
+        <div class="cheat-head"><span class="cheat-tag">KONDISI</span><span class="cheat-note">Pilih satu cabang</span></div>
+        <pre><code><span class="kw">Jika</span> umur lebih dari 17, <span class="kw">maka</span>:
+    <span class="kw">Tampilkan</span> <span class="str">"Dewasa"</span>.
+<span class="kw">Jika tidak, maka</span>:
+    <span class="kw">Tampilkan</span> <span class="str">"Belum"</span>.</code></pre>
+        <p>Blok dibentuk oleh indentasi 4 spasi.</p>
+      </article>
+      <article class="cheat-card">
+        <div class="cheat-head"><span class="cheat-tag">PERULANGAN</span><span class="cheat-note">Ulangi selama benar</span></div>
+        <pre><code><span class="kw">Selama</span> i kurang dari 4, <span class="kw">lakukan</span>:
+    <span class="kw">Tampilkan</span> i.
+    <span class="kw">Ubah</span> i <span class="kw">menjadi</span> i + 1.</code></pre>
+        <p>Maksimal 100.000 iterasi per eksekusi.</p>
+      </article>
+    </div>
+    <div class="play-tips">
+      <div class="play-tip"><i class="bi bi-keyboard" aria-hidden="true"></i><div><b>Pintasan editor</b><span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> jalankan · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> format · <kbd>Ctrl</kbd>+<kbd>F</kbd> cari</span></div></div>
+      <div class="play-tip"><i class="bi bi-arrow-repeat" aria-hidden="true"></i><div><b>Perbaiki bertahap</b><span>Pesan kesalahan menyebut nomor baris, jadi kamu bisa memperbaiki satu hal setiap kali.</span></div></div>
+      <div class="play-tip"><i class="bi bi-people" aria-hidden="true"></i><div><b>Untuk kelas</b><span>Buka halaman ini di lab komputer tanpa instalasi, lalu bagikan contoh dari toolbar.</span></div></div>
+    </div>
+  </section>
+
+  <section class="play-cta" aria-labelledby="lanjut-title">
+    <div>
+      <div class="eyebrow">LANJUTKAN</div>
+      <h2 id="lanjut-title">Sudah bisa menjalankan program? Pelajari aturannya.</h2>
+      <p>Dokumentasi memisahkan fitur yang sudah tersedia dari yang masih direncanakan, sehingga kamu tidak mempelajari hal yang belum berjalan.</p>
+    </div>
+    <div class="play-cta-actions">
+      <a class="button button-primary" href="/docs/tutorial/">Tutorial pemula <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+      <a class="button button-secondary" href="/docs/grammar/">Tata bahasa</a>
+      <a class="button button-ghost" href="/agent/">Dokumentasi AI</a>
+    </div>
+  </section>
+</main>
+
+  <footer class="site-footer classic-footer"><div class="wrap classic-footer-inner"><a class="site-brand" href="/" aria-label="Kontekstual"><span class="classic-mark" aria-hidden="true">K.</span><span class="brand-label"><strong>Kontekstual</strong><small>EKSPERIMEN BAHASA INDONESIA</small></span></a><nav aria-label="Tautan footer"><a href="/docs/">Dokumentasi</a><a href="/docs/tutorial/">Tutorial</a><a href="/coba/">Playground</a><a href="/agent/">Dokumentasi AI</a><a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">GitHub</a></nav><span>Sumber terbuka · Lisensi MIT</span></div></footer>
+</body>
 </html>
