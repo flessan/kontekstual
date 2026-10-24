@@ -85,7 +85,7 @@ const examples = [
   {
     id: "perulangan",
     label: "Perulangan Selama",
-    hint: "Loop terkontrol",
+    hint: "Perulangan terkontrol",
     code: 'Tetapkan hitungan bernilai 1.\n\nSelama hitungan kurang dari atau sama dengan 5, lakukan:\n    Tampilkan "Putaran:".\n    Tampilkan hitungan.\n    Ubah hitungan menjadi hitungan + 1.'
   },
   {
@@ -125,10 +125,10 @@ const keywordDocs = {
   maka: "maka — bagian dari header Jika. Wajib diikuti titik dua.",
   lakukan: "lakukan — bagian dari header Selama. Wajib diikuti titik dua.",
   bernilai: "bernilai — bentuk deklarasi singkat. Contoh: Tetapkan umur bernilai 20.",
-  benar: "benar — nilai logika true.",
-  salah: "salah — nilai logika false.",
-  dan: "dan — operator logika AND. Contoh: benar dan salah.",
-  atau: "atau — operator logika OR.",
+  benar: "benar — nilai logika yang terpenuhi.",
+  salah: "salah — nilai logika yang tidak terpenuhi.",
+  dan: "dan — operator logika. Contoh: benar dan salah.",
+  atau: "atau — operator logika untuk memilih salah satu kondisi.",
   tidak: "tidak — negasi logika. Contoh: tidak benar.",
   "lebih dari": "lebih dari — perbandingan angka (>).",
   "kurang dari": "kurang dari — perbandingan angka (<).",
@@ -198,8 +198,12 @@ document.querySelector("#app").innerHTML = `
     <span><kbd>Tab</kbd> melengkapi · <kbd>Ctrl</kbd>+<kbd>Space</kbd> lihat saran · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> jalankan</span>
   </div>
 
-  <div class="ide-layout">
-    <section class="editor-card" aria-label="Editor kode">
+  <div class="mobile-workspace-tabs" role="tablist" aria-label="Tampilan ruang kerja">
+    <button class="mobile-workspace-tab is-active" id="mobile-editor-tab" type="button" role="tab" aria-selected="true" aria-controls="editor-pane" data-workspace-panel="editor"> <i class="bi bi-code-slash" aria-hidden="true"></i> Editor</button>
+    <button class="mobile-workspace-tab" id="mobile-console-tab" type="button" role="tab" aria-selected="false" aria-controls="console-pane" data-workspace-panel="console" tabindex="-1"><i class="bi bi-terminal" aria-hidden="true"></i> Hasil <span class="mobile-problem-count" aria-hidden="true">0</span></button>
+  </div>
+  <div class="ide-layout show-editor">
+    <section class="editor-card" id="editor-pane" aria-label="Editor kode">
       <div class="editor-tabbar">
         <div class="file-tab">
           <span class="file-tab-icon" aria-hidden="true">K</span>
@@ -213,7 +217,7 @@ document.querySelector("#app").innerHTML = `
       </div>
       <div id="editor-mount" class="editor-mount" aria-label="Editor kode Kontekstual — tekan Tab untuk melengkapi, Ctrl+Space untuk saran"></div>
       <div class="editor-statusbar" role="status" aria-live="polite">
-        <span id="cursor-position">Ln 1, Col 1</span>
+        <span id="cursor-position">Baris 1, Kolom 1</span>
         <span id="line-count">1 baris</span>
         <span id="char-count">0 karakter</span>
         <span id="completion-hint" class="completion-hint" style="display:none"><i class="bi bi-lightbulb"></i> <span>Tekan Tab untuk melengkapi</span></span>
@@ -222,7 +226,7 @@ document.querySelector("#app").innerHTML = `
       </div>
     </section>
 
-    <section class="console-card" aria-label="Hasil program">
+    <section class="console-card" id="console-pane" aria-label="Hasil program">
       <div class="console-heading">
         <div class="console-tabs" role="tablist" aria-label="Panel hasil">
           <button class="console-tab is-active" id="output-tab" role="tab" aria-selected="true" aria-controls="output-view" data-panel="output-view">
@@ -386,7 +390,7 @@ function updateEditorStatus(view) {
   const head = view.state.selection.main.head;
   const line = view.state.doc.lineAt(head);
   const doc = view.state.doc;
-  document.querySelector("#cursor-position").textContent = "Ln " + line.number + ", Col " + (head - line.from + 1);
+  document.querySelector("#cursor-position").textContent = "Baris " + line.number + ", Kolom " + (head - line.from + 1);
   document.querySelector("#line-count").textContent = doc.lines + " baris";
   document.querySelector("#char-count").textContent = doc.length + " karakter";
   // Show Tab hint when completion available
@@ -633,6 +637,8 @@ editorView = new EditorView({ state: sourceInput, parent: document.querySelector
 
 function clearProblems() {
   problemCount.textContent = "0";
+  const mobileProblemCount = document.querySelector(".mobile-problem-count");
+  if (mobileProblemCount) mobileProblemCount.textContent = "0";
   problemsContent.className = "problems-empty";
   problemsContent.replaceChildren();
   const icon = document.createElement("span");
@@ -647,6 +653,8 @@ function clearProblems() {
 
 function setProblem(message, lineNumber = null) {
   problemCount.textContent = "1";
+  const mobileProblemCount = document.querySelector(".mobile-problem-count");
+  if (mobileProblemCount) mobileProblemCount.textContent = "1";
   problemsContent.className = "problem-entry";
   problemsContent.replaceChildren();
   const icon = document.createElement("span");
@@ -669,6 +677,22 @@ function setProblem(message, lineNumber = null) {
   else if (message.includes("Belum ditetapkan")) suggestion.textContent = "Tips: gunakan Tetapkan untuk membuat variabel sebelum dipakai.";
   details.append(title, body);
   if (suggestion.textContent) details.append(suggestion);
+  if (lineNumber) {
+    const jump = document.createElement("button");
+    jump.type = "button";
+    jump.className = "problem-jump";
+    jump.textContent = "Buka baris " + lineNumber;
+    jump.addEventListener("click", () => {
+      const targetLine = editorView.state.doc.line(Math.min(lineNumber, editorView.state.doc.lines));
+      editorView.dispatch({
+        selection: { anchor: targetLine.from },
+        effects: EditorView.scrollIntoView(targetLine.from, { y: "center" })
+      });
+      setMobileWorkspacePanel("editor");
+      editorView.focus();
+    });
+    details.append(jump);
+  }
   problemsContent.append(icon, details);
 }
 
@@ -696,7 +720,7 @@ function setConsolePanel(panelId) {
   document.querySelector("#problems-view").hidden = panelId !== "problems-view";
 }
 
-function runProgram() {
+function runProgram({ focusResults = true } = {}) {
   runButton.disabled = true;
   runButton.classList.add("is-running");
   const label = runButton.querySelector(".run-label");
@@ -743,7 +767,7 @@ function runProgram() {
     details.append(title, description);
     row.append(icon, details);
     output.append(row);
-    executionTime.textContent = (performance.now() - startedAt).toFixed(1) + " ms · error";
+    executionTime.textContent = (performance.now() - startedAt).toFixed(1) + " ms · gagal";
     setConsolePanel("problems-view");
   } finally {
     runButton.disabled = false;
@@ -751,6 +775,7 @@ function runProgram() {
     const label2 = runButton.querySelector(".run-label");
     if (label2) label2.textContent = "Jalankan";
     document.querySelector(".workspace-card")?.classList.remove("is-running");
+    if (focusResults && window.matchMedia("(max-width: 860px)").matches) setMobileWorkspacePanel("console");
     // Announce to screen readers
     const hint = document.querySelector("#suggestion-hint");
     if (hint) {
@@ -788,7 +813,7 @@ function replaceSource(nextSource, label = "Contoh dimuat") {
   output.replaceChildren();
   setSaveState(label);
   runProgram();
-  editorView.focus();
+  if (!window.matchMedia("(max-width: 860px)").matches) editorView.focus();
 }
 
 function insertSnippet(code) {
@@ -818,7 +843,7 @@ document.querySelector("#copy")?.addEventListener("click", async () => {
     setSaveState("Kode disalin ✓");
     setTimeout(() => setSaveState("Tersimpan"), 1800);
   } catch {
-    setSaveState("Clipboard tidak tersedia");
+    setSaveState("Papan klip tidak tersedia");
   }
 });
 document.querySelector("#reset")?.addEventListener("click", () => {
@@ -846,6 +871,31 @@ document.querySelector("#clear-output")?.addEventListener("click", () => {
   output.append(empty);
   executionTime.textContent = "Hasil dihapus";
 });
+function setMobileWorkspacePanel(panel) {
+  const layout = document.querySelector(".ide-layout");
+  if (!layout) return;
+  layout.classList.toggle("show-editor", panel === "editor");
+  layout.classList.toggle("show-console", panel === "console");
+  for (const tab of document.querySelectorAll(".mobile-workspace-tab")) {
+    const active = tab.dataset.workspacePanel === panel;
+    tab.classList.toggle("is-active", active);
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+  }
+}
+
+document.querySelectorAll(".mobile-workspace-tab").forEach(tab => {
+  tab.addEventListener("click", () => setMobileWorkspacePanel(tab.dataset.workspacePanel));
+  tab.addEventListener("keydown", event => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const tabs = Array.from(document.querySelectorAll(".mobile-workspace-tab"));
+    const next = tabs[(tabs.indexOf(tab) + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+    next.focus();
+    setMobileWorkspacePanel(next.dataset.workspacePanel);
+  });
+});
+
 document.querySelectorAll(".console-tab").forEach(button => {
   button.addEventListener("click", () => setConsolePanel(button.dataset.panel));
   button.addEventListener("keydown", e => {
@@ -883,7 +933,8 @@ document.addEventListener("keydown", event => {
 });
 
 updateEditorStatus(editorView);
-runProgram();
+setMobileWorkspacePanel("editor");
+runProgram({ focusResults: false });
 
 // Announce Tab completion to first-time users
 try {
