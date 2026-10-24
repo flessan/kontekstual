@@ -118,7 +118,7 @@ const BLOCK_HEADER = /^(?:Jika\s+.+,\s*maka|Selama\s+.+,\s*lakukan|Jika\s+tidak,
 // Keyword docs for hover tooltips
 const keywordDocs = {
   tetapkan: "Tetapkan — deklarasi variabel. Contoh: Tetapkan nama bernilai \"Dunia\".",
-  tampilkan: "Tampilkan — cetak nilai ke output. Contoh: Tampilkan \"Halo!\".",
+  tampilkan: "Tampilkan — menampilkan hasil. Contoh: Tampilkan \"Halo!\".",
   ubah: "Ubah — ubah nilai variabel. Contoh: Ubah umur menjadi 20.",
   jika: "Jika — kondisi. Pola: Jika <kondisi>, maka: (indentasi 4 spasi).",
   selama: "Selama — perulangan. Pola: Selama <kondisi>, lakukan: (maks 100.000 iterasi).",
@@ -168,13 +168,13 @@ document.querySelector("#app").innerHTML = `
         <i class="bi bi-plus-lg" aria-hidden="true"></i><span class="ws-btn-label">Sisipkan</span>
       </button>
       <button id="format" class="ws-btn" type="button" title="Rapikan indentasi (Ctrl+Shift+F)">
-        <i class="bi bi-text-indent-left" aria-hidden="true"></i><span class="ws-btn-label">Format</span>
+        <i class="bi bi-text-indent-left" aria-hidden="true"></i><span class="ws-btn-label">Rapikan</span>
       </button>
       <button id="copy" class="ws-btn" type="button" title="Salin seluruh kode ke clipboard">
         <i class="bi bi-clipboard" aria-hidden="true"></i><span class="ws-btn-label">Salin</span>
       </button>
       <button id="reset" class="ws-btn ws-btn-quiet" type="button" title="Kembalikan contoh lengkap">
-        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i><span class="ws-btn-label">Reset</span>
+        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i><span class="ws-btn-label">Pulihkan</span>
       </button>
       <div class="ws-fontsize" role="group" aria-label="Ukuran teks editor">
         <button id="font-down" type="button" aria-label="Perkecil ukuran teks" title="Perkecil teks (A-)">A−</button>
@@ -222,17 +222,17 @@ document.querySelector("#app").innerHTML = `
       </div>
     </section>
 
-    <section class="console-card" aria-label="Output program">
+    <section class="console-card" aria-label="Hasil program">
       <div class="console-heading">
         <div class="console-tabs" role="tablist" aria-label="Panel hasil">
           <button class="console-tab is-active" id="output-tab" role="tab" aria-selected="true" aria-controls="output-view" data-panel="output-view">
-            <i class="bi bi-terminal" aria-hidden="true"></i> Output
+            <i class="bi bi-terminal" aria-hidden="true"></i> Hasil
           </button>
           <button class="console-tab" id="problems-tab" role="tab" aria-selected="false" aria-controls="problems-view" data-panel="problems-view">
             <i class="bi bi-exclamation-circle" aria-hidden="true"></i> Masalah <span id="problem-count" class="problem-count" aria-label="Jumlah masalah">0</span>
           </button>
         </div>
-        <button id="clear-output" class="ws-btn ws-btn-quiet ws-btn-small" type="button" title="Bersihkan output">Bersihkan</button>
+        <button id="clear-output" class="ws-btn ws-btn-quiet ws-btn-small" type="button" title="Bersihkan hasil">Bersihkan</button>
       </div>
       <div class="console-content">
         <div id="output-view" class="console-view" role="tabpanel" aria-labelledby="output-tab" aria-live="polite">
@@ -247,7 +247,7 @@ document.querySelector("#app").innerHTML = `
         </div>
       </div>
       <div class="console-footer" role="status" aria-live="polite">
-        <span><i class="runtime-dot" aria-hidden="true"></i> Runtime browser · lokal</span>
+        <span><i class="runtime-dot" aria-hidden="true"></i> Runtime lokal · peramban</span>
         <span id="execution-time">Belum dijalankan</span>
       </div>
     </section>
@@ -343,11 +343,11 @@ const editorTheme = EditorView.theme({
 // Completion definitions with rich info
 const baseCompletions = [
   { label: "Tetapkan", type: "keyword", detail: "Deklarasi variabel", info: "Tetapkan nama bernilai \"Dunia\". — buat variabel baru", apply: "Tetapkan " },
-  { label: "Tampilkan", type: "keyword", detail: "Cetak ke output", info: "Tampilkan \"Halo!\" — tampilkan teks atau variabel", apply: "Tampilkan " },
+  { label: "Tampilkan", type: "keyword", detail: "Tampilkan hasil", info: "Tampilkan \"Halo!\" — tampilkan teks atau variabel", apply: "Tampilkan " },
   { label: "Ubah", type: "keyword", detail: "Ubah nilai variabel", info: "Ubah umur menjadi umur + 1 — perbarui variabel", apply: "Ubah " },
   { label: "Jika ... maka:", type: "keyword", detail: "Blok kondisi", info: "Jika kondisi benar, maka: — butuh indentasi 4 spasi", apply: "Jika kondisi benar, maka:\n    " },
   { label: "Jika tidak, maka:", type: "keyword", detail: "Cabang alternatif", info: "Jika tidak, maka: — alternatif dari Jika", apply: "Jika tidak, maka:\n    " },
-  { label: "Selama ... lakukan:", type: "keyword", detail: "Blok perulangan", info: "Selama kondisi benar, lakukan: — loop hingga 100rb iterasi", apply: "Selama kondisi benar, lakukan:\n    " },
+  { label: "Selama ... lakukan:", type: "keyword", detail: "Blok perulangan", info: "Selama kondisi benar, lakukan: — perulangan hingga 100 ribu iterasi", apply: "Selama kondisi benar, lakukan:\n    " },
   { label: "bernilai", type: "keyword", detail: "Deklarasi singkat", info: "Tetapkan umur bernilai 20 — bentuk ringkas", apply: "bernilai " },
   { label: "dengan nilai", type: "keyword", detail: "Deklarasi eksplisit", info: "Tetapkan umur dengan nilai 20 — bentuk lengkap", apply: "dengan nilai " },
   { label: "menjadi", type: "keyword", detail: "Penugasan ulang", info: "Ubah nama menjadi \"Baru\" — ubah nilai", apply: "menjadi " },
@@ -710,7 +710,7 @@ function runProgram() {
     if (!result.output.length) {
       const empty = document.createElement("div");
       empty.className = "console-empty";
-      empty.innerHTML = "<strong>Program selesai tanpa output.</strong><br>Tambahkan <code>Tampilkan \"Halo!\"</code> untuk melihat hasilnya.";
+      empty.innerHTML = "<strong>Program selesai tanpa hasil.</strong><br>Tambahkan <code>Tampilkan \"Halo!\"</code> untuk melihat hasilnya.";
       output.append(empty);
     } else {
       result.output.forEach((line, index) => appendOutputLine(line, index));
@@ -721,7 +721,7 @@ function runProgram() {
     successMark.className = "success-mark";
     successMark.innerHTML = '<i class="bi bi-check-lg" aria-hidden="true"></i>';
     const successText = document.createElement("span");
-    successText.textContent = result.output.length ? result.output.length + " baris output dihasilkan." : "Program berhasil dijalankan.";
+    successText.textContent = result.output.length ? result.output.length + " baris hasil ditampilkan." : "Program berhasil dijalankan.";
     statusMessage.append(successMark, successText);
     output.append(statusMessage);
     executionTime.textContent = (performance.now() - startedAt).toFixed(1) + " ms · " + result.output.length + " baris";
@@ -754,7 +754,7 @@ function runProgram() {
     // Announce to screen readers
     const hint = document.querySelector("#suggestion-hint");
     if (hint) {
-      hint.textContent = "Program dijalankan — lihat output atau masalah";
+      hint.textContent = "Program dijalankan — lihat hasil atau masalah";
       setTimeout(() => {
         hint.innerHTML = '<i class="bi bi-keyboard" aria-hidden="true"></i><span><kbd>Tab</kbd> melengkapi · <kbd>Ctrl</kbd>+<kbd>Space</kbd> lihat saran · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> jalankan</span>';
       }, 2500);
@@ -842,9 +842,9 @@ document.querySelector("#clear-output")?.addEventListener("click", () => {
   output.replaceChildren();
   const empty = document.createElement("div");
   empty.className = "console-empty";
-  empty.textContent = "Output dibersihkan. Tekan Jalankan untuk melihat hasil baru.";
+  empty.textContent = "Hasil dihapus. Tekan Jalankan untuk melihat hasil baru.";
   output.append(empty);
-  executionTime.textContent = "Output dibersihkan";
+  executionTime.textContent = "Hasil dihapus";
 });
 document.querySelectorAll(".console-tab").forEach(button => {
   button.addEventListener("click", () => setConsolePanel(button.dataset.panel));

@@ -1,14 +1,14 @@
 {
   "name": "Kontekstual — Playground Bahasa Pemrograman Indonesia",
   "short_name": "Kontekstual",
-  "description": "Belajar dan menjalankan kode dengan sintaks bahasa Indonesia langsung di browser.",
+  "description": "Belajar dan menjalankan kode dengan sintaks bahasa Indonesia langsung di peramban.",
   "lang": "id",
   "dir": "ltr",
   "start_url": "/coba/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f6f7f2",
-  "theme_color": "#f6f7f2",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "categories": ["education", "developer", "productivity"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

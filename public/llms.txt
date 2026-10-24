@@ -1,42 +1,39 @@
 # Kontekstual
 
-> Eksperimen bahasa pemrograman dengan sintaks Indonesia, interpreter Rust, browser playground, dokumentasi, dan panduan agent coding.
+> Eksperimen bahasa pemrograman dengan sintaks Indonesia, interpreter Rust, playground di peramban, dokumentasi, dan panduan agen pemrograman.
 
-Kontekstual is an experimental programming language whose syntax uses structured Indonesian instructions. It is not unrestricted natural-language programming.
+Kontekstual adalah bahasa pemrograman eksperimental dengan instruksi terstruktur berbahasa Indonesia. Bahasa ini tidak menerima kalimat bebas sebagai kode.
 
-## Start here
-- Home: https://dotkonteks.pages.dev/  (audience paths, live examples, FAQ, classroom guidance)
-- For beginners: https://dotkonteks.pages.dev/#untuk-pemula
-- For teachers: https://dotkonteks.pages.dev/#untuk-guru
-- For parents: https://dotkonteks.pages.dev/#untuk-orangtua
-- Browser playground: https://dotkonteks.pages.dev/coba/
-- Documentation index: https://dotkonteks.pages.dev/docs/
-- First program tutorial: https://dotkonteks.pages.dev/docs/tutorial/
-- Grammar and syntax: https://dotkonteks.pages.dev/docs/grammar/
-- Command and value reference: https://dotkonteks.pages.dev/docs/reference/
-- AI and agent guide: https://dotkonteks.pages.dev/agent/
-- Full AI-readable guide: https://dotkonteks.pages.dev/llms-full.txt
-- GitHub repository: https://github.com/flessan/kontekstual
+## Mulai dari sini
+- Beranda: https://dotkonteks.pages.dev/ (pengenalan, contoh, status fitur, dan tautan belajar)
+- Playground Kontekstual: https://dotkonteks.pages.dev/coba/
+- Indeks dokumentasi: https://dotkonteks.pages.dev/docs/
+- Tutorial program pertama: https://dotkonteks.pages.dev/docs/tutorial/
+- Tata bahasa dan sintaks: https://dotkonteks.pages.dev/docs/grammar/
+- Referensi perintah dan nilai: https://dotkonteks.pages.dev/docs/reference/
+- Panduan AI dan agen pemrograman: https://dotkonteks.pages.dev/agent/
+- Panduan lengkap yang ramah AI: https://dotkonteks.pages.dev/llms-full.txt
+- Repositori GitHub: https://github.com/flessan/kontekstual
 
-## Core facts
-- Source files use the .konteks extension.
-- Instructions end with a period.
-- Text literals use quotation marks.
-- Blocks are structured through indentation.
-- Main interpreter: Rust.
-- Browser playground: JavaScript compatibility runtime for experimentation.
-- Supported subset includes output, variables, arithmetic, comparisons, conditionals, and Selama loops.
-- Function definitions, modules, interactive input, loop-control statements, and native executable generation are not implemented in the current prototype.
-- Rust uses signed 64-bit integers; the browser runtime uses JavaScript safe integers.
-- Both interpreter and browser runtime limit total loop iterations to 100,000 per execution.
-- The playground stores source in browser localStorage; no code is sent to a server.
-- The playground offers an Indonesian formatter, syntax highlighting, example programs, and separate output/problem panels.
+## Fakta utama
+- Berkas sumber menggunakan ekstensi .konteks.
+- Setiap instruksi diakhiri tanda titik.
+- Literal teks ditulis di antara tanda kutip.
+- Blok program menggunakan indentasi.
+- Interpreter utama ditulis dalam Rust.
+- Playground di peramban menggunakan runtime kompatibilitas JavaScript untuk eksperimen.
+- Subset yang tersedia mencakup hasil teks, variabel, aritmetika, perbandingan, kondisi, dan perulangan Selama.
+- Fungsi buatan pengguna, modul, input interaktif, instruksi kendali perulangan, dan pembuatan executable native belum tersedia.
+- Rust memakai bilangan bulat bertanda 64-bit; runtime peramban memakai rentang bilangan bulat aman JavaScript.
+- Kedua runtime membatasi total iterasi perulangan hingga 100.000 untuk setiap eksekusi.
+- Playground menyimpan kode di localStorage peramban; kode tidak dikirim ke server.
+- Playground menyediakan formatter berbahasa Indonesia, pewarnaan sintaks, contoh program, serta panel hasil dan masalah yang terpisah.
 
-## Authoritative repository documents
-- Specification: https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md
-- Grammar draft: https://github.com/flessan/kontekstual/blob/main/docs/grammar.md
-- Roadmap: https://github.com/flessan/kontekstual/blob/main/ROADMAP.md
-- Example programs: https://github.com/flessan/kontekstual/tree/main/examples
+## Dokumen repositori utama
+- Spesifikasi: https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md
+- Draf tata bahasa: https://github.com/flessan/kontekstual/blob/main/docs/grammar.md
+- Peta jalan: https://github.com/flessan/kontekstual/blob/main/ROADMAP.md
+- Contoh program: https://github.com/flessan/kontekstual/tree/main/examples
 
-## For agents
-Read the documentation at /llms-full.txt and /agent/llms-full.txt before generating code. Treat the current interpreter and tests as the source of truth for implemented syntax. Do not invent unsupported language features.
+## Panduan untuk agen
+Baca /llms-full.txt dan /agent/llms-full.txt sebelum menghasilkan kode. Jadikan interpreter saat ini dan pengujiannya sebagai acuan sintaks yang benar-benar tersedia. Jangan mengarang fitur bahasa yang belum didukung.

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="Dokumentasi agent AI untuk Kontekstual: llms.txt, llms-full.txt, panduan membuat proyek, contoh program, sintaks yang didukung, dan batas runtime."><meta name="robots" content="index, follow, max-image-preview:large">
+<html lang="id" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="Dokumentasi agen AI untuk Kontekstual: llms.txt, llms-full.txt, panduan membuat proyek, contoh program, sintaks yang didukung, dan batas implementasi."><meta name="robots" content="index, follow, max-image-preview:large">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Kontekstual">
 <meta property="og:locale" content="id_ID">
@@ -11,28 +11,23 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:url" content="https://dotkonteks.pages.dev/agent/">
-<link rel="canonical" href="https://dotkonteks.pages.dev/agent/"><meta property="og:title" content="Kontekstual Agent Docs | Dokumentasi untuk AI"><title>Kontekstual Agent Docs — Panduan AI untuk Proyek Kontekstual</title><script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}document.documentElement.classList.add("js")</script><link rel="stylesheet" href="/site.css"><script type="module" src="/site.js"></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Kontekstual Agent Documentation","description":"Panduan untuk model bahasa dan agent coding yang membuat proyek Kontekstual.","inLanguage":"id-ID","url":"https://dotkonteks.pages.dev/agent/"}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Beranda","item":"https://dotkonteks.pages.dev/"},{"@type":"ListItem","position":2,"name":"Dokumentasi","item":"https://dotkonteks.pages.dev/docs/"},{"@type":"ListItem","position":3,"name":"Kontekstual Agent Docs","item":"https://dotkonteks.pages.dev/agent/"}]}</script></head>
-<body><a class="skip-link" href="#main">Lewati ke konten</a>  <header class="site-header">
+<link rel="canonical" href="https://dotkonteks.pages.dev/agent/"><link rel="alternate" hreflang="id" href="https://dotkonteks.pages.dev/agent/"><meta property="og:title" content="Dokumentasi Agen Kontekstual | Panduan AI"><title>Dokumentasi Agen Kontekstual — Panduan AI untuk Proyek Kontekstual</title><script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}document.documentElement.classList.add("js")</script><link rel="stylesheet" href="/site.css"><script type="module" src="/site.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Dokumentasi Agen Kontekstual","description":"Panduan untuk model bahasa dan agen pemrograman yang membuat proyek Kontekstual.","inLanguage":"id-ID","url":"https://dotkonteks.pages.dev/agent/"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Beranda","item":"https://dotkonteks.pages.dev/"},{"@type":"ListItem","position":2,"name":"Dokumentasi","item":"https://dotkonteks.pages.dev/docs/"},{"@type":"ListItem","position":3,"name":"Dokumentasi Agen Kontekstual","item":"https://dotkonteks.pages.dev/agent/"}]}</script></head>
+<body><a class="skip-link" href="#main">Lewati ke konten</a>  <header class="site-header classic-header">
     <div class="nav-inner">
       <a class="site-brand" href="/" aria-label="Kontekstual, halaman utama">
-        <span class="brand-mark" aria-hidden="true">K.</span>
+        <span class="classic-mark" aria-hidden="true">K.</span>
         <span class="brand-label"><strong>Kontekstual</strong><small>BAHASA PEMROGRAMAN</small></span>
       </a>
-      <nav class="nav-links" aria-label="Navigasi utama">
-        <a href="/docs/">Dokumentasi</a>
-        <a href="/docs/grammar/">Sintaks</a>
-        <a href="/docs/reference/">Referensi</a>
-        <a href="/agent/" aria-current="page">AI Docs</a>
-      </nav>
+      <nav class="nav-links" aria-label="Navigasi utama"><a href="/">Beranda</a><a href="/docs/">Dokumentasi</a><a href="/docs/tutorial/">Tutorial</a><a href="/docs/grammar/">Sintaks</a><a href="/docs/reference/">Referensi</a><a href="/agent/" aria-current="page">Dokumentasi AI</a></nav>
       <div class="nav-actions">
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Aktifkan mode gelap" title="Mode gelap">
           <span data-theme-icon><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.1 15.4A8.5 8.5 0 0 1 8.6 3.9 8.6 8.6 0 1 0 20.1 15.4Z"/></svg></span>
           <span class="theme-label" data-theme-label>Mode gelap</span>
         </button>
-        <a class="nav-cta d-none d-md-inline-flex" href="/coba/">Coba sekarang <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
-        <a class="nav-cta d-inline-flex d-md-none" href="/coba/" aria-label="Coba sekarang">Coba <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <a class="nav-cta d-none d-md-inline-flex" href="/coba/">Coba Playground <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <a class="nav-cta d-inline-flex d-md-none" href="/coba/" aria-label="Coba Playground">Coba <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
         <button class="mobile-menu-btn d-grid d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-label="Buka menu">
           <i class="bi bi-list" aria-hidden="true" style="font-size:20px"></i>
         </button>
@@ -43,19 +38,20 @@
   <div class="offcanvas offcanvas-end offcanvas-kontekstual d-md-none" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
     <div class="offcanvas-header">
       <a class="site-brand" href="/">
-        <span class="brand-mark" aria-hidden="true">K.</span>
-        <span class="brand-label"><strong id="mobileNavLabel">Kontekstual</strong><small>MENU</small></span>
+        <span class="classic-mark" aria-hidden="true">K.</span>
+        <span class="brand-label"><strong id="mobileNavLabel">Kontekstual</strong><small>NAVIGASI</small></span>
       </a>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup menu"></button>
     </div>
     <div class="offcanvas-body d-flex flex-column gap-2">
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/">Beranda</a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/tutorial/">Tutorial</a>
           <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/">Dokumentasi<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
           <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/grammar/">Sintaks<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
           <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/reference/">Referensi<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
-          <a class="btn btn-outline-kontekstual text-start w-100" href="/agent/">AI Docs<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/agent/">Dokumentasi AI<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
       <hr>
-      <a class="btn btn-kontekstual w-100" href="/coba/"><i class="bi bi-code-square" aria-hidden="true"></i> Buka Playground</a>
-      <a class="btn btn-outline-kontekstual w-100 d-inline-flex align-items-center justify-content-center gap-2" href="/docs/tutorial/"><i class="bi bi-book" aria-hidden="true"></i> Tutorial Pemula</a>
+      <a class="btn btn-kontekstual w-100" href="/coba/"><i class="bi bi-code-square" aria-hidden="true"></i> Coba Playground</a>
       <div class="mt-auto p-3 rounded-3 mobile-nav-note">
         <div class="d-flex align-items-center gap-2 mb-2">
           <span class="avatar" aria-hidden="true">K.</span>
@@ -66,74 +62,17 @@
       </div>
     </div>
   </div><main id="main" class="docs-page wrap agent-page">
-<div class="docs-hero docs-hero-compact" data-reveal><div class="breadcrumbs"><a href="/">Beranda</a><span>/</span><span>AI docs</span></div><div class="eyebrow">DOKUMENTASI UNTUK MODEL DAN AGENT</div><h1>Context for agents.<br><span class="docs-highlight">Rules, not guesses.</span></h1><p>Gunakan halaman ini sebagai pintu masuk untuk agent coding, model bahasa, crawler dokumentasi, dan tool yang ingin membuat atau memeriksa proyek Kontekstual.</p><div class="agent-actions"><a class="button button-primary" href="/llms.txt">Buka llms.txt <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a><a class="button button-secondary" href="/llms-full.txt">Baca dokumentasi penuh <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div></div>
-<div class="agent-layout"><aside class="agent-index"><span class="sidebar-label">UNTUK AI / AGENT</span><a href="#mulai">01 · Mulai dari sumber</a><a href="#prosedur">02 · Buat proyek</a><a href="#aturan">03 · Aturan penting</a><a href="#cek">04 · Validasi kode</a></aside>
+<div class="docs-hero docs-hero-compact" data-reveal><div class="breadcrumbs"><a href="/">Beranda</a><span>/</span><span>Dokumentasi AI</span></div><div class="eyebrow">PANDUAN UNTUK MODEL BAHASA DAN AGEN AI</div><h1>Panduan untuk agen AI.<br><span class="docs-highlight">Aturan, bukan tebakan.</span></h1><p>Gunakan halaman ini sebagai pintu masuk untuk agen pemrograman, model bahasa, perayap dokumentasi, dan alat yang ingin membuat atau memeriksa proyek Kontekstual.</p><div class="agent-actions"><a class="button button-primary" href="/llms.txt">Buka llms.txt <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a><a class="button button-secondary" href="/llms-full.txt">Baca dokumentasi penuh <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div></div>
+<div class="agent-layout"><aside class="agent-index"><span class="sidebar-label">UNTUK ASISTEN AI</span><a href="#mulai">01 · Mulai dari sumber</a><a href="#prosedur">02 · Siapkan proyek</a><a href="#aturan">03 · Aturan penting</a><a href="#cek">04 · Periksa kode</a></aside>
 <article class="doc-article agent-article">
-<section id="mulai"><div class="article-kicker">01 / SUMBER YANG BISA DI-CRAWL</div><h2>Mulai dari teks yang eksplisit</h2><p>Dokumen ini menyediakan tautan stabil bagi agen. Gunakan teks biasa untuk ingest cepat, lalu buka spesifikasi dan contoh sumber saat butuh detail yang lebih dalam.</p><div class="machine-links"><a href="/llms.txt"><span class="machine-file">TXT</span><span><b>/llms.txt</b><small>Indeks ringkas, rute penting, dan aturan inti.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="/llms-full.txt"><span class="machine-file">TXT</span><span><b>/llms-full.txt</b><small>Ringkasan panjang sintaks, contoh, dan batas implementasi.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="/agent/llms.txt"><span class="machine-file">TXT</span><span><b>/agent/llms.txt</b><small>Versi khusus agen yang memperjelas urutan baca.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="/agent/llms-full.txt"><span class="machine-file">TXT</span><span><b>/agent/llms-full.txt</b><small>Dokumentasi agent yang lebih lengkap untuk konteks retrieval.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="https://github.com/flessan/kontekstual"><span class="machine-file machine-git">GIT</span><span><b>Repository sumber</b><small>Interpreter Rust, runtime browser, pengujian, dan contoh aktual.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a></div></section>
-<section id="prosedur"><div class="article-kicker">02 / ALUR PEMBUATAN PROYEK</div><h2>Prosedur yang dianjurkan untuk agent</h2><ol class="agent-steps"><li><b>Baca sumber otoritatif.</b><span>Mulai dengan llms.txt, lalu spesifikasi dan docs grammar. Jangan menyimpulkan kemampuan dari nama bahasa.</span></li><li><b>Batasi sintaks ke fitur yang didukung.</b><span>Pilih perintah, tipe nilai, kondisi, dan loop yang sudah ada di interpreter. Tandai sintaks yang belum terimplementasi sebagai usulan.</span></li><li><b>Buat contoh terkecil yang valid.</b><span>Setiap instruksi berakhir dengan titik; teks memakai tanda kutip dan blok memakai indentasi.</span></li><li><b>Validasi lewat tool yang tersedia.</b><span>Untuk repository checkout, jalankan cargo test dan contoh cargo run. Untuk browser playground, gunakan pnpm test dan pnpm build.</span></li><li><b>Laporkan perbedaan runtime.</b><span>Rust menggunakan signed 64-bit integers; interpreter browser berbasis JavaScript memiliki batas safe integer.</span></li></ol></section>
-<section id="aturan"><div class="article-kicker">03 / RULES OF ENGAGEMENT</div><h2>Aturan penting saat menghasilkan kode</h2><div class="agent-rules"><div><span>01</span><p>Jangan membuat sintaks penutup blok seperti <code>Selesai jika.</code>. Blok selesai berdasarkan indentasi.</p></div><div><span>02</span><p>Gunakan kata kunci sesuai ejaan sintaks yang terdokumentasi, misalnya <code>Tetapkan</code>, <code>Tampilkan</code>, <code>Ubah</code>, <code>Jika</code>, dan <code>Selama</code>.</p></div><div><span>03</span><p>Jangan mengklaim fitur fungsi, modul, input interaktif, atau kompilasi executable native sudah tersedia.</p></div><div><span>04</span><p>Untuk error, sertakan program minimal yang memicu error serta hasil tes. Hindari mengubah grammar berdasarkan asumsi.</p></div></div></section>
-<section id="cek"><div class="article-kicker">04 / VALIDASI</div><h2>Command yang bisa digunakan pada repository</h2><pre><code>pnpm install --frozen-lockfile
+<section id="mulai"><div class="article-kicker">01 / SUMBER YANG DAPAT DITELUSURI</div><h2>Mulai dari sumber teks yang jelas</h2><p>Halaman ini menyediakan tautan stabil bagi agen. Gunakan berkas teks untuk membaca ringkasan dengan cepat, lalu buka spesifikasi dan contoh sumber saat butuh detail yang lebih dalam.</p><div class="machine-links"><a href="/llms.txt"><span class="machine-file">TXT</span><span><b>/llms.txt</b><small>Indeks ringkas, rute penting, dan aturan inti.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="/llms-full.txt"><span class="machine-file">TXT</span><span><b>/llms-full.txt</b><small>Ringkasan panjang sintaks, contoh, dan batas implementasi.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="/agent/llms.txt"><span class="machine-file">TXT</span><span><b>/agent/llms.txt</b><small>Versi khusus agen yang menjelaskan urutan pembacaan.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="/agent/llms-full.txt"><span class="machine-file">TXT</span><span><b>/agent/llms-full.txt</b><small>Panduan agen yang lebih lengkap untuk konteks pencarian informasi.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a><a href="https://github.com/flessan/kontekstual"><span class="machine-file machine-git">GIT</span><span><b>Repositori sumber</b><small>Interpreter Rust, runtime di peramban, pengujian, dan contoh aktual.</small></span><span class="machine-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></a></div></section>
+<section id="prosedur"><div class="article-kicker">02 / ALUR PEMBUATAN PROYEK</div><h2>Prosedur yang dianjurkan untuk agen</h2><ol class="agent-steps"><li><b>Baca sumber otoritatif.</b><span>Mulai dengan llms.txt, lalu spesifikasi dan dokumentasi tata bahasa. Jangan menyimpulkan kemampuan dari nama bahasa.</span></li><li><b>Batasi sintaks ke fitur yang tersedia.</b><span>Pilih perintah, tipe nilai, kondisi, dan perulangan yang sudah ada di interpreter. Tandai sintaks yang belum terimplementasi sebagai usulan.</span></li><li><b>Buat contoh terkecil yang valid.</b><span>Setiap instruksi berakhir dengan titik; teks memakai tanda kutip dan blok memakai indentasi.</span></li><li><b>Validasi lewat alat yang tersedia.</b><span>Untuk salinan repositori lokal, jalankan cargo test dan contoh cargo run. Untuk playground di peramban, gunakan pnpm test dan pnpm build.</span></li><li><b>Laporkan perbedaan batas implementasi.</b><span>Rust menggunakan bilangan bulat bertanda 64-bit; interpreter peramban berbasis JavaScript memiliki batas bilangan bulat aman JavaScript.</span></li></ol></section>
+<section id="aturan"><div class="article-kicker">03 / ATURAN PENTING</div><h2>Aturan penting saat menulis kode</h2><div class="agent-rules"><div><span>01</span><p>Jangan membuat sintaks penutup blok seperti <code>Selesai jika.</code>. Blok selesai berdasarkan indentasi.</p></div><div><span>02</span><p>Gunakan kata kunci sesuai ejaan sintaks yang terdokumentasi, misalnya <code>Tetapkan</code>, <code>Tampilkan</code>, <code>Ubah</code>, <code>Jika</code>, dan <code>Selama</code>.</p></div><div><span>03</span><p>Jangan mengklaim fitur fungsi, modul, input interaktif, atau kompilasi program biner mandiri sudah tersedia.</p></div><div><span>04</span><p>Untuk kesalahan, sertakan program terkecil yang memicunya serta hasil pengujian. Hindari mengubah tata bahasa berdasarkan asumsi.</p></div></div></section>
+<section id="cek"><div class="article-kicker">04 / VALIDASI</div><h2>Perintah untuk menjalankan pemeriksaan di repositori</h2><pre><code>pnpm install --frozen-lockfile
 pnpm test
 pnpm build
 
 cargo test --all-targets
 cargo run -- check examples/halo.konteks
-cargo run -- run examples/halo.konteks</code></pre><p>Website dan playground browser adalah fasilitas pembelajaran. Interpreter Rust tetap menjadi referensi implementasi utama untuk validasi semantik saat ini.</p><div class="article-next"><span><small>SUMBER OTORITATIF</small><b>Spesifikasi bahasa Kontekstual</b></span><a href="https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md">Buka spesifikasi <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div></section>
-</article></div></main>  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-copy">
-        <span class="brand-mark" aria-hidden="true">K.</span>
-        <span><strong>Kontekstual</strong> · bahasa pemrograman eksperimental</span>
-      </div>
-      <nav class="footer-links" aria-label="Tautan footer">
-        <a href="/docs/">Dokumentasi</a>
-        <a href="/docs/tutorial/">Tutorial</a>
-        <a href="/coba/">Playground</a>
-        <a href="/agent/">AI docs</a>
-        <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">GitHub <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
-      </nav>
-      <span class="footer-meta">Dibangun terbuka.</span>
-    </div>
-    <div class="footer-grid-wrap">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <h2 class="footer-col-heading">Kontekstual</h2>
-          <p class="footer-intro">Eksperimen bahasa pemrograman yang memakai kalimat terstruktur berbahasa Indonesia. Interpreter Rust + playground browser.</p>
-          <div class="d-flex gap-2 flex-wrap">
-            <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer" class="btn btn-sm btn-outline-kontekstual d-inline-flex align-items-center gap-2"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a>
-            <a href="/llms.txt" class="btn btn-sm btn-outline-kontekstual">llms.txt</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h2 class="footer-col-heading">Belajar</h2>
-          <a href="/coba/">Playground interaktif</a>
-          <a href="/docs/tutorial/">Tutorial 5 menit</a>
-          <a href="/docs/grammar/">Tata bahasa</a>
-          <a href="/docs/reference/">Referensi perintah</a>
-          <a href="/docs/">Indeks dokumentasi</a>
-        </div>
-        <div class="footer-col">
-          <h2 class="footer-col-heading">Untuk siapa</h2>
-          <a href="/#untuk-pemula">Pemula &amp; siswa</a>
-          <a href="/#untuk-guru">Guru &amp; pengajar</a>
-          <a href="/#untuk-orangtua">Orang tua</a>
-          <a href="/#faq">Pertanyaan umum</a>
-        </div>
-        <div class="footer-col">
-          <h2 class="footer-col-heading">Sumber</h2>
-          <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">Kode sumber</a>
-          <a href="/agent/">Dokumentasi AI</a>
-          <a href="/llms-full.txt">Panduan lengkap (txt)</a>
-          <a href="/sitemap.xml">Sitemap</a>
-          <span class="footer-copyline">© 2025 Kontekstual · MIT License</span>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>Dibuat dengan <i class="bi bi-heart-fill" aria-label="cinta" style="color:#e25555"></i> untuk pendidikan Indonesia. Data playground tetap di perangkatmu.</span>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge badge-soft rounded-pill px-2 py-1"><i class="bi bi-shield-check" aria-hidden="true"></i> Privasi lokal</span>
-          <span class="badge badge-soft rounded-pill px-2 py-1"><i class="bi bi-lightning" aria-hidden="true"></i> Tanpa instalasi</span>
-        </div>
-      </div>
-    </div>
-  </footer></body></html>
+cargo run -- run examples/halo.konteks</code></pre><p>Situs dan playground di peramban ini dibuat untuk belajar. Interpreter Rust tetap menjadi acuan utama untuk memvalidasi perilaku bahasa saat ini.</p><div class="article-next"><span><small>SUMBER OTORITATIF</small><b>Spesifikasi bahasa Kontekstual</b></span><a href="https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md">Buka spesifikasi <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div></section>
+</article></div></main>  <footer class="site-footer classic-footer"><div class="wrap classic-footer-inner"><a class="site-brand" href="/" aria-label="Kontekstual"><span class="classic-mark" aria-hidden="true">K.</span><span class="brand-label"><strong>Kontekstual</strong><small>EKSPERIMEN BAHASA INDONESIA</small></span></a><nav aria-label="Tautan footer"><a href="/docs/">Dokumentasi</a><a href="/docs/tutorial/">Tutorial</a><a href="/coba/">Playground</a><a href="/agent/">Dokumentasi AI</a><a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">GitHub</a></nav><span>Sumber terbuka · Lisensi MIT</span></div></footer></body></html>
