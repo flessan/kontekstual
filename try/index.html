@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="A practical Python playground by Kontekstual. Write Python, provide stdin, and run it in your browser with Pyodide.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="canonical" href="https://dotkonteks.pages.dev/try/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600;700&display=swap">
+  <title>Python Playground — Kontekstual</title>
+  <script type="module" src="/try/try.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#editor">Skip to editor</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/try/" aria-label="Kontekstual Python playground">
+        <span class="brand-mark" aria-hidden="true"><span>&lt;</span><b>/</b><span>&gt;</span></span>
+        <span class="brand-name">Kontekstual <small>PYTHON LAB</small></span>
+      </a>
+      <nav class="top-links" aria-label="Tool navigation"><a href="#about-python">Python</a><a href="#libraries">Libraries</a><a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">Source <span aria-hidden="true">↗</span></a></nav>
+      <div class="runtime-chip"><span class="runtime-dot" aria-hidden="true"></span><span>Runs in your browser</span></div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <div class="page-heading">
+      <div><p class="eyebrow">ONLINE PYTHON PLAYGROUND</p><h1>Write Python. Run it here.</h1><p class="intro">A compact, browser-based Python workspace. Your code stays on this device.</p></div>
+      <div class="heading-meta"><span class="version-tag">Python 3</span><span class="meta-separator" aria-hidden="true">·</span><span id="runtime-status" class="runtime-status" role="status" aria-live="polite">Ready when you are</span></div>
+    </div>
+
+    <section class="workspace" aria-label="Python editor and console">
+      <div class="workspace-toolbar">
+        <div class="toolbar-left"><span class="project-icon" aria-hidden="true">Py</span><div><strong>Untitled project</strong><span class="project-subtitle">Browser session · saved locally</span></div></div>
+        <div class="toolbar-actions"><button type="button" id="share-button" class="button button-quiet" title="Copy a shareable link"><span aria-hidden="true">↗</span> Share</button><button type="button" id="ai-button" class="button button-ai" aria-expanded="false" aria-controls="ai-panel"><span aria-hidden="true">✳</span> AI assist</button><button type="button" id="run-button" class="button button-run"><span class="play-icon" aria-hidden="true">▶</span><span id="run-label">Run</span><kbd>Ctrl ↵</kbd></button></div>
+      </div>
+
+      <div class="workspace-grid" id="editor">
+        <section class="editor-panel" aria-label="Python code editor">
+          <div class="panel-heading editor-heading"><div class="file-tab"><span class="python-file-icon" aria-hidden="true">Py</span><span>main.py</span><span class="unsaved-dot" title="Saved locally"></span></div><span class="editor-hint">Python 3 <span aria-hidden="true">·</span> UTF-8</span></div>
+          <div id="python-editor" class="editor-mount" aria-label="Code editor"></div>
+          <div class="editor-footer"><span><span class="footer-dot"></span> <span id="editor-saved">Example ready</span></span><span>Indent: 4 spaces</span></div>
+        </section>
+
+        <section class="console-panel" aria-label="Program console">
+          <div class="panel-heading console-heading"><div class="console-tabs" role="tablist" aria-label="Output panels"><button class="console-tab is-active" id="console-tab" role="tab" aria-selected="true" aria-controls="console-view">Console</button><button class="console-tab" id="io-tab" role="tab" aria-selected="false" aria-controls="io-view" tabindex="-1">I/O</button></div><button type="button" class="icon-button" id="clear-console" aria-label="Clear console" title="Clear console"><span aria-hidden="true">⌫</span></button></div>
+          <div class="console-view" id="console-view" role="tabpanel" aria-labelledby="console-tab">
+            <div class="console-label"><span class="console-indicator" aria-hidden="true"></span> OUTPUT</div>
+            <pre id="console-output" class="console-output" aria-live="polite" aria-label="Program output">Click Run to start your program.</pre>
+          </div>
+          <div class="io-view" id="io-view" role="tabpanel" aria-labelledby="io-tab" hidden>
+            <label for="stdin-input" class="input-label">STANDARD INPUT <span>stdin</span></label>
+            <p class="io-description">Input read by <code>input()</code>, passed one line at a time.</p>
+            <textarea id="stdin-input" class="stdin-input" rows="5" spellcheck="false" aria-label="Standard input" placeholder="Type input for your program here">Ada Lovelace</textarea>
+            <span class="io-note">Use a new line for each input prompt.</span>
+          </div>
+          <div class="console-footer"><span id="execution-time">No run yet</span><span id="console-state">Waiting</span></div>
+        </section>
+      </div>
+
+      <div class="workspace-bottom"><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span><button type="button" class="text-button" id="reset-code">Reset example</button></div>
+      <aside class="ai-panel" id="ai-panel" hidden aria-label="AI code helper">
+        <div class="ai-panel-heading"><span class="ai-mark" aria-hidden="true">✳</span><div><strong>AI code helper</strong><span>Compose a prompt using your current code</span></div><button type="button" class="icon-button" id="close-ai" aria-label="Close AI helper">×</button></div>
+        <label class="input-label" for="ai-question">WHAT WOULD YOU LIKE HELP WITH?</label>
+        <div class="ai-compose"><input type="text" id="ai-question" value="Explain this code and suggest one improvement." aria-label="Question for AI assistant"><button type="button" id="copy-ai-prompt" class="button button-ai-copy">Copy prompt</button></div>
+        <p class="ai-disclaimer">This prepares a prompt for an AI service you choose; no code is sent from this page.</p>
+      </aside>
+    </section>
+
+    <div class="runtime-note"><span class="info-icon" aria-hidden="true">i</span><span>First run downloads the Python runtime (Pyodide) from a CDN. Programs execute locally in your browser; this page does not send your code to a server.</span></div>
+
+    <section class="docs-section" id="about-python" aria-labelledby="about-heading">
+      <div class="docs-intro"><p class="eyebrow">QUICK REFERENCE</p><h2 id="about-heading">Python, at a glance</h2><p>Start with the essentials, then explore the examples in the editor.</p></div>
+      <div class="reference-grid">
+        <article class="reference-card"><span class="reference-index">01</span><h3>Fundamentals</h3><p>Assign values, work with strings and numbers, and define reusable functions.</p><pre><code>name = "Ada"
+count = 3
+print(f"Hello, {name}")</code></pre></article>
+        <article class="reference-card"><span class="reference-index">02</span><h3>Loops</h3><p>Repeat work with <code>for</code> and <code>while</code>; use <code>range()</code> for a sequence of numbers.</p><pre><code>for step in range(3):
+    print(step)</code></pre></article>
+        <article class="reference-card"><span class="reference-index">03</span><h3>Data collections</h3><p>Group values with lists, tuples, dictionaries, and sets.</p><pre><code>tools = ["editor", "console"]
+settings = {"theme": "light"}</code></pre></article>
+      </div>
+    </section>
+
+    <section class="libraries-section" id="libraries" aria-labelledby="libraries-heading">
+      <div><p class="eyebrow">INCLUDED WITH PYTHON</p><h2 id="libraries-heading">Useful modules, ready to import.</h2><p>The Python standard library is available in the browser runtime.</p></div>
+      <div class="library-list" aria-label="Supported Python standard library modules"><code>math</code><code>json</code><code>datetime</code><code>re</code><code>statistics</code><code>collections</code><code>itertools</code><code>random</code></div>
+      <p class="library-note">Third-party package support depends on Pyodide’s available wheels; this minimal workspace does not install packages automatically.</p>
+    </section>
+
+    <footer class="page-footer"><a class="footer-brand" href="/try/">Kontekstual <span>PYTHON LAB</span></a><span>Independent browser tool · powered by Pyodide</span><a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">Open source <span aria-hidden="true">↗</span></a></footer>
+  </main>
+  <div id="announcer" class="sr-only" aria-live="polite"></div>
+</body>
+</html>

@@ -17,7 +17,8 @@ export default defineConfig({
         grammar: "docs/grammar/index.html",
         reference: "docs/reference/index.html",
         tutorial: "docs/tutorial/index.html",
-        agent: "agent/index.html"
+        agent: "agent/index.html",
+        try: "try/index.html"
       }
     }
   }
