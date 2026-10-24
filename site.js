@@ -17,15 +17,10 @@ function applyTheme(theme) {
     const label = button.querySelector("[data-theme-label]");
     if (label) label.textContent = dark ? "Mode terang" : "Mode gelap";
   });
-
-  // Update theme-color meta for mobile browser
   const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) {
-    metaTheme.setAttribute("content", theme === "dark" ? "#0f1310" : "#f6f7f2");
-  }
+  if (metaTheme) metaTheme.setAttribute("content", theme === "dark" ? "#18181B" : "#FFFFFF");
 }
 
-// Initial theme
 try {
   const stored = localStorage.getItem(THEME_KEY);
   if (stored) document.documentElement.dataset.theme = stored;
@@ -38,10 +33,9 @@ document.addEventListener("click", event => {
   const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
   document.documentElement.classList.add("theme-transitioning");
   applyTheme(next);
-  window.setTimeout(() => document.documentElement.classList.remove("theme-transitioning"), 520);
+  window.setTimeout(() => document.documentElement.classList.remove("theme-transitioning"), 420);
 });
 
-// Header: scroll elevation + theme toggle label refresh.
 const header = document.querySelector(".site-header");
 if (header) {
   let ticking = false;
@@ -55,7 +49,6 @@ if (header) {
   }, { passive: true });
 }
 
-// Reveal animation
 const revealEls = document.querySelectorAll("[data-reveal]");
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const observer = new IntersectionObserver(entries => {
@@ -68,8 +61,8 @@ if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: re
   }, { threshold: 0.12, rootMargin: "0px 0px -28px 0px" });
   revealEls.forEach(el => observer.observe(el));
 } else revealEls.forEach(el => el.classList.add("is-visible"));
+document.documentElement.classList.add("js");
 
-// Press "/" to jump into the documentation search.
 document.addEventListener("keydown", event => {
   const input = document.querySelector("[data-doc-search]");
   if (!input || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -81,7 +74,6 @@ document.addEventListener("keydown", event => {
   input.select?.();
 });
 
-// Doc search
 document.querySelectorAll("[data-doc-search]").forEach(input => {
   const container = document.querySelector(input.dataset.docSearch);
   if (!container) return;
@@ -96,6 +88,49 @@ document.querySelectorAll("[data-doc-search]").forEach(input => {
     });
     const count = document.querySelector("[data-search-count]");
     if (count) count.textContent = term ? visible + " topik ditemukan" : "Jelajahi topik dokumentasi";
+  });
+});
+
+// Copy installation commands
+document.querySelectorAll("[data-copy]").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const text = btn.getAttribute("data-copy");
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="bi bi-check-lg"></i> Tersalin';
+      btn.classList.add("is-copied");
+      setTimeout(() => {
+        btn.innerHTML = orig;
+        btn.classList.remove("is-copied");
+      }, 1400);
+    } catch {
+      btn.textContent = "Gagal menyalin";
+    }
+  });
+});
+
+// Toggle showcase interactivity (demo purposes)
+document.querySelectorAll('[data-toggle][role="switch"]').forEach(toggle => {
+  toggle.addEventListener("click", () => {
+    const isOn = toggle.getAttribute("aria-checked") !== "true";
+    toggle.classList.toggle("is-on", isOn);
+    toggle.setAttribute("aria-checked", String(isOn));
+  });
+});
+
+// Palette copy
+document.querySelectorAll("[data-copy-color]").forEach(card => {
+  card.addEventListener("click", async () => {
+    const color = card.getAttribute("data-copy-color");
+    if (!color) return;
+    try { await navigator.clipboard.writeText(color); } catch {}
+    const note = card.querySelector(".palette-copied");
+    if (note) {
+      note.hidden = false;
+      setTimeout(() => note.hidden = true, 1200);
+    }
   });
 });
 
