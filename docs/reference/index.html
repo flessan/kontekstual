@@ -1,6 +1,71 @@
 <!doctype html>
-<html lang="id" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="Referensi Kontekstual yang merangkum deklarasi variabel, perintah output, penugasan ulang, tipe nilai, perbandingan, kondisi, dan loop."><link rel="canonical" href="https://dotkonteks.pages.dev/docs/reference/"><meta property="og:title" content="Referensi perintah Kontekstual"><title>Referensi bahasa Kontekstual | Perintah dan nilai</title><script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}</script><link rel="stylesheet" href="/site.css"><script type="module" src="/site.js"></script></head>
-<body><a class="skip-link" href="#main">Lewati ke konten</a><header data-site-header></header><main id="main" class="docs-page wrap">
+<html lang="id" data-theme="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="description" content="Referensi Kontekstual yang merangkum deklarasi variabel, perintah output, penugasan ulang, tipe nilai, perbandingan, kondisi, dan loop."><meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kontekstual">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://dotkonteks.pages.dev/og-kontekstual.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dotkonteks.pages.dev/og-kontekstual.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:url" content="https://dotkonteks.pages.dev/docs/reference/">
+<link rel="canonical" href="https://dotkonteks.pages.dev/docs/reference/"><meta property="og:title" content="Referensi perintah Kontekstual"><title>Referensi Kontekstual — Perintah, Nilai, dan Ekspresi</title><script>try{var t=localStorage.getItem("kontekstual-theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}document.documentElement.classList.add("js")</script><link rel="stylesheet" href="/site.css"><script type="module" src="/site.js"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Referensi perintah dan nilai Kontekstual","description":"Deklarasi variabel, output, penugasan ulang, tipe nilai, perbandingan, kondisi, dan perulangan.","inLanguage":"id-ID","url":"https://dotkonteks.pages.dev/docs/reference/","mainEntityOfPage":"https://dotkonteks.pages.dev/docs/reference/","publisher":{"@type":"Organization","name":"Kontekstual","url":"https://dotkonteks.pages.dev/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Beranda","item":"https://dotkonteks.pages.dev/"},{"@type":"ListItem","position":2,"name":"Dokumentasi","item":"https://dotkonteks.pages.dev/docs/"},{"@type":"ListItem","position":3,"name":"Referensi bahasa Kontekstual","item":"https://dotkonteks.pages.dev/docs/reference/"}]}</script></head>
+<body><a class="skip-link" href="#main">Lewati ke konten</a>  <header class="site-header">
+    <div class="nav-inner">
+      <a class="site-brand" href="/" aria-label="Kontekstual, halaman utama">
+        <span class="brand-mark" aria-hidden="true">K.</span>
+        <span class="brand-label"><strong>Kontekstual</strong><small>BAHASA PEMROGRAMAN</small></span>
+      </a>
+      <nav class="nav-links" aria-label="Navigasi utama">
+        <a href="/docs/">Dokumentasi</a>
+        <a href="/docs/grammar/">Sintaks</a>
+        <a href="/docs/reference/" aria-current="page">Referensi</a>
+        <a href="/agent/">AI Docs</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Aktifkan mode gelap" title="Mode gelap">
+          <span data-theme-icon><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.1 15.4A8.5 8.5 0 0 1 8.6 3.9 8.6 8.6 0 1 0 20.1 15.4Z"/></svg></span>
+          <span class="theme-label" data-theme-label>Mode gelap</span>
+        </button>
+        <a class="nav-cta d-none d-md-inline-flex" href="/coba/">Coba sekarang <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <a class="nav-cta d-inline-flex d-md-none" href="/coba/" aria-label="Coba sekarang">Coba <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+        <button class="mobile-menu-btn d-grid d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-label="Buka menu">
+          <i class="bi bi-list" aria-hidden="true" style="font-size:20px"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="offcanvas offcanvas-end offcanvas-kontekstual d-md-none" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
+    <div class="offcanvas-header">
+      <a class="site-brand" href="/">
+        <span class="brand-mark" aria-hidden="true">K.</span>
+        <span class="brand-label"><strong id="mobileNavLabel">Kontekstual</strong><small>MENU</small></span>
+      </a>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup menu"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column gap-2">
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/">Dokumentasi<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/grammar/">Sintaks<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/docs/reference/">Referensi<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+          <a class="btn btn-outline-kontekstual text-start w-100" href="/agent/">AI Docs<span class="float-end" aria-hidden="true"><i class="bi bi-arrow-up-right"></i></span></a>
+      <hr>
+      <a class="btn btn-kontekstual w-100" href="/coba/"><i class="bi bi-code-square" aria-hidden="true"></i> Buka Playground</a>
+      <a class="btn btn-outline-kontekstual w-100 d-inline-flex align-items-center justify-content-center gap-2" href="/docs/tutorial/"><i class="bi bi-book" aria-hidden="true"></i> Tutorial Pemula</a>
+      <div class="mt-auto p-3 rounded-3 mobile-nav-note">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="avatar" aria-hidden="true">K.</span>
+          <strong>Kontekstual</strong>
+        </div>
+        <p>Bahasa pemrograman dengan sintaks Indonesia. Gratis, lokal, aman untuk pemula.</p>
+        <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer" class="btn btn-sm btn-outline-kontekstual w-100 d-inline-flex align-items-center justify-content-center gap-2"><i class="bi bi-github" aria-hidden="true"></i> Lihat GitHub</a>
+      </div>
+    </div>
+  </div><main id="main" class="docs-page wrap">
 <div class="docs-hero docs-hero-compact" data-reveal><div class="breadcrumbs"><a href="/">Beranda</a><span>/</span><a href="/docs/">Dokumentasi</a><span>/</span><span>Referensi</span></div><div class="eyebrow">REFERENSI BAHASA · 02</div><h1>Perintah, nilai,<br><span class="docs-highlight">dan ekspresi.</span></h1><p>Ringkasan sintaks dari subset yang sudah didukung interpreter saat ini. Kemampuan lanjutan bisa berubah seiring perkembangan bahasa.</p></div>
 <div class="article-layout"><aside class="article-toc"><span class="sidebar-label">DI HALAMAN INI</span><a href="#perintah">Perintah</a><a href="#tipe">Tipe nilai</a><a href="#ekspresi">Ekspresi</a><a href="#logika">Logika dan kondisi</a><a href="#loop">Perulangan</a><a href="#batas">Batas implementasi</a></aside>
 <article class="doc-article">
@@ -20,5 +85,62 @@ Tampilkan "Total: " + total.</code></pre><p>Operasi aritmetika dan perbandingan 
 Selama i kurang dari atau sama dengan 5, lakukan:
     Tampilkan i.
     Ubah i menjadi i + 1.</code></pre><p>Loop mengevaluasi kondisi sebelum iterasi dan dibatasi maksimum 100.000 iterasi total per eksekusi dalam interpreter dan runtime browser.</p></section>
-<section id="batas"><div class="article-kicker">06 / STATUS</div><h2>Yang belum menjadi bagian implementasi saat ini</h2><p>Fitur seperti definisi fungsi buatan pengguna, modul, masukan interaktif, instruksi untuk menghentikan atau melewati iterasi, dan pembuatan executable native masih termasuk pekerjaan mendatang. Selalu periksa spesifikasi dan tes repositori saat membuat tool yang mengandalkan sintaks tertentu.</p><div class="article-next"><span><small>LANJUTKAN BELAJAR</small><b>Pahami bentuk lengkap program</b></span><a href="/docs/tutorial/">Baca tutorial ↗</a></div></section>
-</article></div></main><footer data-site-footer></footer></body></html>
+<section id="batas"><div class="article-kicker">06 / STATUS</div><h2>Yang belum menjadi bagian implementasi saat ini</h2><p>Fitur seperti definisi fungsi buatan pengguna, modul, masukan interaktif, instruksi untuk menghentikan atau melewati iterasi, dan pembuatan executable native masih termasuk pekerjaan mendatang. Selalu periksa spesifikasi dan tes repositori saat membuat tool yang mengandalkan sintaks tertentu.</p><div class="article-next"><span><small>LANJUTKAN BELAJAR</small><b>Pahami bentuk lengkap program</b></span><a href="/docs/tutorial/">Baca tutorial <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a></div></section>
+</article></div></main>  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-copy">
+        <span class="brand-mark" aria-hidden="true">K.</span>
+        <span><strong>Kontekstual</strong> · bahasa pemrograman eksperimental</span>
+      </div>
+      <nav class="footer-links" aria-label="Tautan footer">
+        <a href="/docs/">Dokumentasi</a>
+        <a href="/docs/tutorial/">Tutorial</a>
+        <a href="/coba/">Playground</a>
+        <a href="/agent/">AI docs</a>
+        <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">GitHub <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+      </nav>
+      <span class="footer-meta">Dibangun terbuka.</span>
+    </div>
+    <div class="footer-grid-wrap">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h2 class="footer-col-heading">Kontekstual</h2>
+          <p class="footer-intro">Eksperimen bahasa pemrograman yang memakai kalimat terstruktur berbahasa Indonesia. Interpreter Rust + playground browser.</p>
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer" class="btn btn-sm btn-outline-kontekstual d-inline-flex align-items-center gap-2"><i class="bi bi-github" aria-hidden="true"></i> GitHub</a>
+            <a href="/llms.txt" class="btn btn-sm btn-outline-kontekstual">llms.txt</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h2 class="footer-col-heading">Belajar</h2>
+          <a href="/coba/">Playground interaktif</a>
+          <a href="/docs/tutorial/">Tutorial 5 menit</a>
+          <a href="/docs/grammar/">Tata bahasa</a>
+          <a href="/docs/reference/">Referensi perintah</a>
+          <a href="/docs/">Indeks dokumentasi</a>
+        </div>
+        <div class="footer-col">
+          <h2 class="footer-col-heading">Untuk siapa</h2>
+          <a href="/#untuk-pemula">Pemula &amp; siswa</a>
+          <a href="/#untuk-guru">Guru &amp; pengajar</a>
+          <a href="/#untuk-orangtua">Orang tua</a>
+          <a href="/#faq">Pertanyaan umum</a>
+        </div>
+        <div class="footer-col">
+          <h2 class="footer-col-heading">Sumber</h2>
+          <a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">Kode sumber</a>
+          <a href="/agent/">Dokumentasi AI</a>
+          <a href="/llms-full.txt">Panduan lengkap (txt)</a>
+          <a href="/sitemap.xml">Sitemap</a>
+          <span class="footer-copyline">© 2025 Kontekstual · MIT License</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Dibuat dengan <i class="bi bi-heart-fill" aria-label="cinta" style="color:#e25555"></i> untuk pendidikan Indonesia. Data playground tetap di perangkatmu.</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge badge-soft rounded-pill px-2 py-1"><i class="bi bi-shield-check" aria-hidden="true"></i> Privasi lokal</span>
+          <span class="badge badge-soft rounded-pill px-2 py-1"><i class="bi bi-lightning" aria-hidden="true"></i> Tanpa instalasi</span>
+        </div>
+      </div>
+    </div>
+  </footer></body></html>

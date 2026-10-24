@@ -1,8 +1,12 @@
+import "bootstrap";
+
 const THEME_KEY = "kontekstual-theme";
 const moon = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.1 15.4A8.5 8.5 0 0 1 8.6 3.9 8.6 8.6 0 1 0 20.1 15.4Z"/></svg>';
 const sun = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>';
+
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
+  document.documentElement.setAttribute("data-bs-theme", theme === "dark" ? "dark" : "light");
   try { localStorage.setItem(THEME_KEY, theme); } catch {}
   document.querySelectorAll("[data-theme-toggle]").forEach(button => {
     const dark = theme === "dark";
@@ -13,8 +17,21 @@ function applyTheme(theme) {
     const label = button.querySelector("[data-theme-label]");
     if (label) label.textContent = dark ? "Mode terang" : "Mode gelap";
   });
+
+  // Update theme-color meta for mobile browser
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute("content", theme === "dark" ? "#0f1310" : "#f6f7f2");
+  }
 }
-applyTheme(document.documentElement.dataset.theme || "light");
+
+// Initial theme
+try {
+  const stored = localStorage.getItem(THEME_KEY);
+  if (stored) document.documentElement.dataset.theme = stored;
+} catch {}
+applyTheme(document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+
 document.addEventListener("click", event => {
   const button = event.target.closest("[data-theme-toggle]");
   if (!button) return;
@@ -23,29 +40,22 @@ document.addEventListener("click", event => {
   applyTheme(next);
   window.setTimeout(() => document.documentElement.classList.remove("theme-transitioning"), 520);
 });
-function iconThemeButton() {
-  return '<button class="theme-toggle" type="button" data-theme-toggle aria-label="Aktifkan mode gelap" title="Mode gelap"><span data-theme-icon>' + (document.documentElement.dataset.theme === "dark" ? sun : moon) + '</span><span class="theme-label" data-theme-label>Mode gelap</span></button>';
-}
-const header = document.querySelector("[data-site-header]");
+
+// Header: scroll elevation + theme toggle label refresh.
+const header = document.querySelector(".site-header");
 if (header) {
-  const path = location.pathname.replace(/\/+$/, "") || "/";
-  const nav = [
-    ["/docs/", "Dokumentasi"],
-    ["/docs/grammar/", "Sintaks"],
-    ["/agent/", "AI docs"]
-  ];
-  header.className = "site-header";
-  header.innerHTML = '<div class="nav-inner"><a class="site-brand" href="/" aria-label="Kontekstual, halaman utama"><span class="brand-mark">K.</span><span class="brand-label"><strong>Kontekstual</strong><small>BAHASA PEMROGRAMAN</small></span></a><nav class="nav-links" aria-label="Navigasi utama">' + nav.map(item => '<a href="' + item[0] + '"' + (path === item[0].replace(/\/$/, "") ? ' aria-current="page"' : "") + '>' + item[1] + '</a>').join("") + '</nav><div class="nav-actions">' + iconThemeButton() + '<a class="nav-cta" href="/coba/">Coba sekarang <span aria-hidden="true">↗</span></a></div></div>';
+  let ticking = false;
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      header.classList.toggle("is-scrolled", window.scrollY > 8);
+      ticking = false;
+    });
+  }, { passive: true });
 }
-const footer = document.querySelector("[data-site-footer]");
-if (footer) {
-  footer.className = "site-footer";
-  footer.innerHTML = '<div class="footer-inner"><div class="footer-copy"><span class="brand-mark">K.</span><span>Kontekstual · bahasa pemrograman eksperimental</span></div><nav class="footer-links" aria-label="Tautan footer"><a href="/docs/">Dokumentasi</a><a href="/docs/tutorial/">Tutorial</a><a href="/agent/">AI docs</a><a href="/llms.txt">llms.txt</a><a href="https://github.com/flessan/kontekstual" target="_blank" rel="noreferrer">GitHub ↗</a></nav><span class="footer-meta">Dibangun terbuka.</span></div>';
-}
-document.querySelectorAll("[data-theme-toggle]").forEach(button => {
-  const dark = document.documentElement.dataset.theme === "dark";
-  button.setAttribute("aria-label", dark ? "Aktifkan mode terang" : "Aktifkan mode gelap");
-});
+
+// Reveal animation
 const revealEls = document.querySelectorAll("[data-reveal]");
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const observer = new IntersectionObserver(entries => {
@@ -58,6 +68,20 @@ if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: re
   }, { threshold: 0.12, rootMargin: "0px 0px -28px 0px" });
   revealEls.forEach(el => observer.observe(el));
 } else revealEls.forEach(el => el.classList.add("is-visible"));
+
+// Press "/" to jump into the documentation search.
+document.addEventListener("keydown", event => {
+  const input = document.querySelector("[data-doc-search]");
+  if (!input || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+  const tag = document.activeElement?.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || document.activeElement?.isContentEditable) return;
+  if (event.key !== "/") return;
+  event.preventDefault();
+  input.focus();
+  input.select?.();
+});
+
+// Doc search
 document.querySelectorAll("[data-doc-search]").forEach(input => {
   const container = document.querySelector(input.dataset.docSearch);
   if (!container) return;
@@ -74,4 +98,5 @@ document.querySelectorAll("[data-doc-search]").forEach(input => {
     if (count) count.textContent = term ? visible + " topik ditemukan" : "Jelajahi topik dokumentasi";
   });
 });
+
 document.addEventListener("DOMContentLoaded", () => applyTheme(document.documentElement.dataset.theme || "light"), { once: true });

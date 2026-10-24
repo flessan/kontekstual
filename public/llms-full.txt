@@ -6,8 +6,8 @@ Language: Indonesian-first structured syntax. Source files use the .konteks exte
 Project status: experimental. The Rust interpreter is authoritative for the current runtime subset; the browser playground is a JavaScript compatibility implementation.
 
 ## Site map
-- / product introduction
-- /coba/ interactive browser playground
+- / product introduction (hero, live examples, audience paths, comparison, FAQ, project status)
+- /coba/ interactive browser playground (editor, cheat sheet, quick-start guide)
 - /docs/ documentation index
 - /docs/tutorial/ beginner tutorial
 - /docs/grammar/ syntax and indentation rules
@@ -22,6 +22,9 @@ Project status: experimental. The Rust interpreter is authoritative for the curr
 Kontekstual aims to make programs readable through structured Indonesian instructions while preserving strict, predictable syntax. It is not free-form Indonesian and should not be treated as a natural-language guessing system.
 
 Every instruction ends with a period. String literals are quoted. Blocks begin with Jika ..., maka: or Selama ..., lakukan: and their body is indented. A block ends when indentation returns to a previous level or when the file ends. An optional alternate branch is written Jika tidak, maka: at the same indentation level as its matching Jika. There is no required block terminator such as Selesai jika.
+
+## Playground experience
+The playground at /coba/ is designed for beginners, teachers, and parents. It runs entirely in the browser, stores the current program in localStorage, and never uploads source code. It offers: syntax highlighting for Kontekstual keywords, Indonesian syntax autocompletion, automatic indentation after block headers, an Indonesian formatter (Ctrl+Shift+F), run with Ctrl+Enter, search with Ctrl+F, font size controls, curated example programs, one-click snippet insertion, a separate output panel and problem panel with line numbers, and a cheat sheet of the core syntax below the editor. Nothing requires an account, installation, or network access after the page loads.
 
 ## Supported commands and syntax
 Output:

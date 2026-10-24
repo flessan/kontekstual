@@ -5,7 +5,10 @@
 Kontekstual is an experimental programming language whose syntax uses structured Indonesian instructions. It is not unrestricted natural-language programming.
 
 ## Start here
-- Home: https://dotkonteks.pages.dev/
+- Home: https://dotkonteks.pages.dev/  (audience paths, live examples, FAQ, classroom guidance)
+- For beginners: https://dotkonteks.pages.dev/#untuk-pemula
+- For teachers: https://dotkonteks.pages.dev/#untuk-guru
+- For parents: https://dotkonteks.pages.dev/#untuk-orangtua
 - Browser playground: https://dotkonteks.pages.dev/coba/
 - Documentation index: https://dotkonteks.pages.dev/docs/
 - First program tutorial: https://dotkonteks.pages.dev/docs/tutorial/
@@ -26,6 +29,8 @@ Kontekstual is an experimental programming language whose syntax uses structured
 - Function definitions, modules, interactive input, loop-control statements, and native executable generation are not implemented in the current prototype.
 - Rust uses signed 64-bit integers; the browser runtime uses JavaScript safe integers.
 - Both interpreter and browser runtime limit total loop iterations to 100,000 per execution.
+- The playground stores source in browser localStorage; no code is sent to a server.
+- The playground offers an Indonesian formatter, syntax highlighting, example programs, and separate output/problem panels.
 
 ## Authoritative repository documents
 - Specification: https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md
