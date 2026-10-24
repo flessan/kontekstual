@@ -7,7 +7,9 @@ const sun = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="cur
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   document.documentElement.setAttribute("data-bs-theme", theme === "dark" ? "dark" : "light");
-  try { localStorage.setItem(THEME_KEY, theme); } catch {}
+  if (document.querySelector("[data-theme-toggle]")) {
+    try { localStorage.setItem(THEME_KEY, theme); } catch {}
+  }
   document.querySelectorAll("[data-theme-toggle]").forEach(button => {
     const dark = theme === "dark";
     button.setAttribute("aria-label", dark ? "Aktifkan mode terang" : "Aktifkan mode gelap");
@@ -21,11 +23,14 @@ function applyTheme(theme) {
   if (metaTheme) metaTheme.setAttribute("content", theme === "dark" ? "#18181B" : "#FFFFFF");
 }
 
-try {
-  const stored = localStorage.getItem(THEME_KEY);
-  if (stored) document.documentElement.dataset.theme = stored;
-} catch {}
-applyTheme(document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+const themeControls = document.querySelectorAll("[data-theme-toggle]");
+if (themeControls.length) {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored) document.documentElement.dataset.theme = stored;
+  } catch {}
+}
+applyTheme(themeControls.length ? (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) : "light");
 
 document.addEventListener("click", event => {
   const button = event.target.closest("[data-theme-toggle]");
