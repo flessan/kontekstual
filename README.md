@@ -56,7 +56,7 @@ Selama checks its logical condition before every iteration. Each iteration gets 
 
 ## Website and browser playground
 
-The website is a multi-page Vite build deployed as a static site. The root page introduces the language and its current status. `/coba/` hosts the interactive Kontekstual browser playground, `/docs/` contains human-facing documentation, and `/agent/` provides AI-oriented instructions and crawler-friendly plain-text documentation. `/try/` is a separate Python browser playground powered by Pyodide; it is not a Python backend for the Kontekstual language.
+The website is a multi-page Vite build deployed as a static site. The root page introduces the language with audience-specific starting points, a live syntax tour, a comparison, an FAQ, and a project status board. `/coba/` hosts the interactive browser playground, `/docs/` contains human-facing documentation, and `/agent/` provides AI-oriented instructions and crawler-friendly plain-text documentation.
 
 Both the marketing pages and the playground are built on Bootstrap 5 (imported through Vite in `site.css`) with Bootstrap Icons, a custom brand token layer, and a light/dark theme that is applied before first paint. The landing page is written for three audiences in particular: beginners and students, teachers, and parents. Each has its own section anchor (`#untuk-pemula`, `#untuk-guru`, `#untuk-orangtua`) that the footer links to.
 
