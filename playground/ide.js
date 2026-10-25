@@ -263,7 +263,7 @@ const sourceFromStorage = (() => {
   catch { return starter; }
 })();
 
-let fontSize = 14;
+let fontSize = 15;
 
 // Helper to extract variable names from document
 function extractVariables(docText) {
@@ -327,7 +327,7 @@ const editorHighlight = HighlightStyle.define([
 
 const editorTheme = EditorView.theme({
   "&": { height: "100%", color: "var(--editor-text)", backgroundColor: "var(--editor-bg)", fontSize: fontSize + "px" },
-  ".cm-scroller": { fontFamily: "\"DM Mono\", \"SFMono-Regular\", Consolas, monospace", lineHeight: "1.95", overflow: "auto" },
+  ".cm-scroller": { fontFamily: "var(--editor-font)", lineHeight: "1.95", overflow: "auto" },
   ".cm-gutters": { backgroundColor: "var(--editor-gutter-bg)", color: "var(--editor-gutter-text)", border: "none", borderRight: "1px solid var(--editor-border)" },
   ".cm-lineNumbers .cm-gutterElement": { padding: "0 14px 0 12px", minWidth: "48px", fontSize: "11px" },
   ".cm-activeLineGutter": { backgroundColor: "var(--editor-active)", color: "var(--editor-text)" },

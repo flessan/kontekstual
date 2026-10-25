@@ -696,3 +696,103 @@
 :root[data-theme=dark] .play-hero .eyebrow,:root[data-theme=dark] .workbench-kicker>span{color:#F07896}
 :root[data-theme=dark] .quickstart-head i{color:#F07896}
 :root[data-theme=dark] .mobile-workspace-tab:focus-visible{outline-color:#C5BCE5}
+
+/* Spacious editor workspace and strictly scoped editor typography. */
+:root{--editor-selection:#E8BBC6;--editor-active:#FFF8E7}
+.editor-mount{--editor-font:"DM Mono","SFMono-Regular",Consolas,monospace}
+:root[data-theme=dark]{--editor-selection:#68404C;--editor-active:#29262A}
+.play-shell{width:min(1520px,calc(100% - 56px));padding:30px 0 76px}
+.workspace-card{border-radius:3px}
+.workspace-toolbar{padding:15px 18px;gap:16px}
+.ws-actions{gap:9px}
+.ws-btn{height:40px;padding-inline:13px;font-size:12px}
+.ws-fontsize{height:40px}
+.ws-fontsize button{width:38px}
+.run-button{height:44px;min-height:44px;padding-inline:18px;font-size:13px}
+.ide-layout{grid-template-columns:minmax(0,1.24fr) minmax(360px,.76fr);gap:16px;padding:16px}
+.editor-card,.console-card{height:clamp(580px,72vh,900px);border-radius:3px}
+.editor-tabbar,.console-heading{min-height:52px;padding-inline:17px}
+.editor-mount,.editor-mount .cm-editor,.editor-mount .cm-scroller,
+.editor-mount .cm-content,.editor-mount .cm-line,.editor-mount .cm-gutters,
+.editor-mount .cm-gutterElement{font-family:var(--editor-font)!important}
+.editor-mount .cm-editor{font-size:15px}
+.editor-mount .cm-scroller{line-height:2;scrollbar-width:thin}
+.editor-mount .cm-content{padding-block:24px}
+.editor-mount .cm-line{padding-inline:22px}
+.editor-mount .cm-lineNumbers .cm-gutterElement{min-width:56px;padding-inline:16px;font-size:12px}
+.editor-mount .cm-cursor{border-left-width:2px}
+.editor-mount .cm-selectionBackground,
+.editor-mount .cm-editor:not(.cm-focused) .cm-selectionBackground,
+.editor-mount .cm-content ::selection,
+.editor-mount .cm-line ::selection{
+  background-color:var(--editor-selection)!important;
+  color:var(--editor-text)!important;
+  -webkit-text-fill-color:var(--editor-text)!important;
+  opacity:1!important;
+}
+.editor-mount .cm-selectionBackground{display:block!important}
+.editor-mount .cm-content,.editor-mount .cm-line{-webkit-user-select:text;user-select:text}
+.editor-mount .cm-activeLine{background:color-mix(in srgb,var(--editor-active) 75%,transparent)}
+.editor-mount .cm-activeLineGutter{border-left:2px solid var(--primary-border)}
+.editor-mount .cm-matchingBracket{border-radius:2px}
+.editor-statusbar{min-height:38px;padding-inline:17px;font-size:11px}
+.console-heading{min-height:52px}
+.console-content{min-height:0}
+.output-lines{padding:20px 20px;font-size:14px;line-height:1.9}
+.output-line{grid-template-columns:32px minmax(0,1fr);gap:14px;margin-bottom:10px}
+.output-index{font-size:11px}
+.output-value{font-size:14px;line-height:1.9}
+.console-footer{min-height:38px;padding-inline:17px;font-size:11px}
+.problems-empty{padding:32px}
+.problems-empty strong{font-size:14px}
+.problems-empty p{font-size:12px;line-height:1.75}
+.example-menu{min-width:310px;padding:8px}
+.example-item{padding:12px}
+.example-item strong{font-size:13px}
+.example-item small{font-size:11px}
+.ws-file-icon,.ws-file-copy strong,.save-state,.ws-hint,.language-label,.file-tab,.file-tab-icon,
+.editor-statusbar,.console-tab,.console-footer,.output-lines,.output-value,.output-error pre,
+.problem-details p,.play-breadcrumbs,.playground-page kbd,.snippet-label,.cheat-tag,
+.cheat-card p code,.quickstart-card li::before,.mobile-problem-count{font-family:var(--font-body)}
+.ws-file-copy strong{font-size:13px;font-weight:600}
+.save-state{font-size:11px}
+.language-label{font-size:10px;letter-spacing:.5px}
+.ws-hint{font-size:11px}
+.editor-statusbar{letter-spacing:0}
+.console-tab{font-size:12px}
+.cheat-card pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.9}
+.playground-page kbd{font-size:.9em}
+:root[data-theme=dark] .editor-mount .cm-selectionBackground,
+:root[data-theme=dark] .editor-mount .cm-editor:not(.cm-focused) .cm-selectionBackground,
+:root[data-theme=dark] .editor-mount .cm-content ::selection,
+:root[data-theme=dark] .editor-mount .cm-line ::selection{
+  background-color:var(--editor-selection)!important;
+  color:var(--editor-text)!important;
+  -webkit-text-fill-color:var(--editor-text)!important;
+}
+@media(max-width:1100px){
+  .play-shell{width:calc(100% - 40px)}
+  .ide-layout{grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr)}
+}
+@media(max-width:860px){
+  .play-shell{width:calc(100% - 28px);padding:18px 0 52px}
+  .ide-layout{grid-template-columns:1fr;gap:14px;padding:14px}
+  .editor-card,.console-card{height:clamp(440px,64vh,680px)}
+  .editor-mount .cm-content{padding-block:20px}
+  .editor-mount .cm-line{padding-inline:18px}
+  .output-lines{padding:18px}
+}
+@media(max-width:600px){
+  .play-shell{width:calc(100% - 20px);padding-bottom:44px}
+  .workspace-toolbar{padding:12px}
+  .ws-actions{gap:7px}
+  .ws-btn{min-height:42px;height:42px}
+  .run-button{height:44px}
+  .ide-layout{padding:10px}
+  .editor-card,.console-card{height:clamp(430px,62svh,650px);min-height:430px}
+  .editor-mount .cm-editor{font-size:15px}
+  .editor-mount .cm-line{padding-inline:14px}
+  .editor-mount .cm-lineNumbers .cm-gutterElement{min-width:46px;padding-inline:10px}
+  .editor-statusbar{min-height:36px;gap:9px;padding-inline:10px;font-size:10px}
+  .console-footer{padding-inline:11px;font-size:10px}
+}
