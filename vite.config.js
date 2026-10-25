@@ -1,6 +1,13 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  server: {
+    // Allow the sandbox preview host (and any other host) to reach the dev server.
+    allowedHosts: true
+  },
+  preview: {
+    allowedHosts: true
+  },
   build: {
     rollupOptions: {
       input: {

@@ -56,7 +56,9 @@ Selama checks its logical condition before every iteration. Each iteration gets 
 
 ## Website and browser playground
 
-The website is a multi-page Vite build deployed as a static site. The root page introduces the language, /coba/ hosts the interactive browser playground, /docs/ contains human-facing documentation, and /agent/ provides AI-oriented instructions and crawler-friendly plain-text documentation.
+The website is a multi-page Vite build deployed as a static site. The root page introduces the language with audience-specific starting points, a live syntax tour, a comparison, an FAQ, and a project status board. `/coba/` hosts the interactive browser playground, `/docs/` contains human-facing documentation, and `/agent/` provides AI-oriented instructions and crawler-friendly plain-text documentation.
+
+Both the marketing pages and the playground are built on Bootstrap 5 (imported through Vite in `site.css`) with Bootstrap Icons, a custom brand token layer, and a light/dark theme that is applied before first paint. The landing page is written for three audiences in particular: beginners and students, teachers, and parents. Each has its own section anchor (`#untuk-pemula`, `#untuk-guru`, `#untuk-orangtua`) that the footer links to.
 
 Open the repository in StackBlitz and run the web playground without Rust or Cargo:
 
@@ -74,7 +76,7 @@ The playground includes a CodeMirror editor with Kontekstual syntax colors, line
 
 The formatter is language-specific rather than the standard Prettier package, because Kontekstual uses its own Indonesian syntax. Since blocks end through indentation and have no closing keyword, the formatter uses existing indentation to infer where blocks end; it can normalize indent levels and align \`Jika tidak\` branches, but it cannot safely infer every missing block boundary from completely unindented source.
 
-The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based \`Jika\` and \`Selama\` blocks, and comments. It is a compatibility implementation, not the Rust compiler itself, and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the browser tests and builds all site pages, including the home page, playground, documentation, and AI guide. The site remembers the selected light or dark theme locally and respects reduced-motion preferences.
+The browser playground uses a small JavaScript runtime for quick experiments. It intentionally mirrors the supported Rust interpreter syntax for text output, declarations, arithmetic, comparisons, indentation-based \`Jika\` and \`Selama\` blocks, and comments. It is a compatibility implementation, not the Rust compiler itself, and currently uses JavaScript safe integers rather than Rust's full signed 64-bit integer range. Both runtimes stop a program after 100,000 total loop iterations. CI runs the browser tests and builds all site pages, including the home page, playground, documentation, and AI guide. The site remembers the selected light or dark theme locally and respects reduced-motion preferences. Search engine metadata is generated per page: descriptive titles and descriptions, canonical URLs, Open Graph and Twitter cards with a shared 1200×630 image, a web manifest with PNG icons, and JSON-LD for `WebSite`, `SoftwareApplication`, `FAQPage`, `TechArticle`, `HowTo`, and `BreadcrumbList`.
 
 ## Dependency updates
 

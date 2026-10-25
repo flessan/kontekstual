@@ -1,73 +1,89 @@
-# Kontekstual: complete guide for AI and crawlers
+# Kontekstual: panduan lengkap untuk AI dan perayap
 
-Canonical website: https://dotkonteks.pages.dev/
-Repository: https://github.com/flessan/kontekstual
-Language: Indonesian-first structured syntax. Source files use the .konteks extension.
-Project status: experimental. The Rust interpreter is authoritative for the current runtime subset; the browser playground is a JavaScript compatibility implementation.
+Situs utama: https://dotkonteks.pages.dev/
+Repositori: https://github.com/flessan/kontekstual
+Bahasa: sintaks terstruktur yang mengutamakan bahasa Indonesia. Berkas sumber memakai ekstensi .konteks.
+Status proyek: eksperimental. Interpreter Rust menjadi acuan untuk subset runtime saat ini; playground di peramban memakai implementasi kompatibilitas JavaScript.
 
-## Site map
-- / product introduction
-- /coba/ interactive browser playground
-- /docs/ documentation index
-- /docs/tutorial/ beginner tutorial
-- /docs/grammar/ syntax and indentation rules
-- /docs/reference/ commands, values, expressions, conditionals, and loops
-- /agent/ instructions for AI agents
-- /llms.txt concise crawl index
-- /llms-full.txt this full context guide
-- /agent/llms.txt agent-first index
-- /agent/llms-full.txt detailed agent guidance
+## Peta situs
+- / pengenalan proyek, contoh program, status fitur, dan tautan belajar
+- /coba/ playground Kontekstual di peramban dengan editor dan panduan sintaks
+- /docs/ indeks dokumentasi
+- /docs/tutorial/ tutorial pemula
+- /docs/grammar/ aturan sintaks dan indentasi
+- /docs/reference/ referensi perintah, nilai, ekspresi, kondisi, dan perulangan
+- /agent/ panduan untuk AI dan agen pemrograman
+- /llms.txt indeks ringkas situs
+- /llms-full.txt panduan konteks lengkap ini
+- /agent/llms.txt indeks khusus agen
+- /agent/llms-full.txt panduan agen yang lebih terperinci
 
-## Language model
-Kontekstual aims to make programs readable through structured Indonesian instructions while preserving strict, predictable syntax. It is not free-form Indonesian and should not be treated as a natural-language guessing system.
+## Model bahasa
+Kontekstual dirancang agar program mudah dibaca melalui instruksi terstruktur berbahasa Indonesia dengan sintaks yang tegas dan dapat diprediksi. Bahasa ini bukan bahasa Indonesia bebas dan tidak boleh diperlakukan sebagai sistem yang menebak maksud kalimat.
 
-Every instruction ends with a period. String literals are quoted. Blocks begin with Jika ..., maka: or Selama ..., lakukan: and their body is indented. A block ends when indentation returns to a previous level or when the file ends. An optional alternate branch is written Jika tidak, maka: at the same indentation level as its matching Jika. There is no required block terminator such as Selesai jika.
+Setiap instruksi diakhiri tanda titik. Literal teks ditulis di antara tanda kutip. Blok dimulai dengan `Jika ..., maka:` atau `Selama ..., lakukan:` dan isi bloknya menggunakan indentasi. Blok berakhir ketika indentasi kembali ke tingkat sebelumnya atau ketika berkas selesai. Cabang alternatif ditulis sebagai `Jika tidak, maka:` pada tingkat indentasi yang sama dengan `Jika` pasangannya. Tidak diperlukan penutup blok seperti `Selesai jika.`.
 
-## Supported commands and syntax
-Output:
+## Fitur playground
+Playground di `/coba/` ditujukan bagi pemula, guru, dan orang tua. Program berjalan di peramban, kode disimpan di localStorage, dan sumber kode tidak diunggah. Fitur yang tersedia mencakup pewarnaan sintaks Kontekstual, pelengkapan otomatis sintaks Indonesia, indentasi otomatis setelah pembuka blok, formatter Indonesia (`Ctrl+Shift+F`), menjalankan program dengan `Ctrl+Enter`, pencarian dengan `Ctrl+F`, pengaturan ukuran teks, contoh program, penyisipan cuplikan, panel hasil dan masalah yang terpisah dengan nomor baris, serta ringkasan sintaks di bawah editor. Akun dan instalasi tidak diperlukan; setelah halaman dimuat, runtime tidak memerlukan akses jaringan.
+
+## Perintah dan sintaks yang didukung
+
+Tampilkan nilai:
+```text
 Tampilkan ekspresi.
+```
 
-Declarations:
+Deklarasi:
+```text
 Tetapkan nama bernilai ekspresi.
 Tetapkan nama dengan nilai ekspresi.
+```
 
-Assignment:
+Penugasan ulang:
+```text
 Ubah nama menjadi ekspresi.
+```
 
-Comments:
+Komentar:
+```text
 {- komentar -}
+```
 
-Condition:
+Kondisi:
+```text
 Jika kondisi, maka:
     instruksi.
 Jika tidak, maka:
     instruksi.
+```
 
-Loop:
+Perulangan:
+```text
 Selama kondisi, lakukan:
     instruksi.
+```
 
-Supported concepts include text, integer and boolean values; arithmetic; text concatenation; comparisons; logical expressions; indentation-based conditional branches; and Selama loops. Literals for logical values are benar and salah.
+Konsep yang didukung mencakup teks, angka bulat dan nilai logika; aritmetika; penggabungan teks; perbandingan; ekspresi logika; cabang kondisi berbasis indentasi; serta perulangan `Selama`. Literal logika adalah `benar` dan `salah`.
 
-## Runtime and validation
-The Rust interpreter uses signed 64-bit integers and reports division-by-zero and arithmetic overflow. The browser runtime uses JavaScript safe integers, so numeric range behavior is not identical. Both runtimes cap total loop iterations at 100,000 per program execution. The browser runtime is not a compiler and does not generate native executables.
+## Runtime dan validasi
+Interpreter Rust menggunakan bilangan bulat bertanda 64-bit serta melaporkan pembagian dengan nol dan luapan aritmetika. Runtime peramban menggunakan rentang bilangan bulat aman JavaScript, sehingga rentang numeriknya berbeda. Kedua runtime membatasi total iterasi hingga 100.000 untuk setiap eksekusi. Runtime peramban bukan kompilator dan tidak menghasilkan executable native.
 
-Useful repository commands:
-- cargo test --all-targets
-- cargo run -- check examples/halo.konteks
-- cargo run -- run examples/halo.konteks
-- pnpm install --frozen-lockfile
-- pnpm test
-- pnpm build
+Perintah repositori yang berguna:
+- `cargo test --all-targets`
+- `cargo run -- check examples/halo.konteks`
+- `cargo run -- run examples/halo.konteks`
+- `pnpm install --frozen-lockfile`
+- `pnpm test`
+- `pnpm build`
 
-## Unsupported or future scope
-Do not claim that user-defined functions, modules, interactive input, loop-control instructions, or native executable generation are implemented. These are future work in the current prototype. Check the repository specification and tests if a particular expression or edge case is uncertain.
+## Fitur yang belum didukung atau masih direncanakan
+Jangan menyatakan bahwa fungsi buatan pengguna, modul, input interaktif, instruksi kendali perulangan, atau pembuatan executable native sudah tersedia. Semua itu masih termasuk pekerjaan mendatang dalam prototipe saat ini. Periksa spesifikasi dan pengujian repositori jika suatu ekspresi atau kasus tepi belum jelas.
 
-## Agent instructions
-1. Read this document and the grammar reference before producing .konteks source.
-2. Generate only syntax described above or confirmed by tests.
-3. End each complete instruction with a period.
-4. Preserve block indentation and align Jika tidak, maka: to its matching Jika.
-5. Keep code samples small and validate them using the Rust interpreter when a checkout is available.
-6. When a tool or feature is unsupported, explain the limitation instead of inventing syntax.
-7. Distinguish confirmed implementation behavior from design ideas or roadmap items.
+## Petunjuk untuk agen
+1. Baca dokumen ini dan referensi tata bahasa sebelum menghasilkan kode `.konteks`.
+2. Hasilkan hanya sintaks yang dijelaskan di atas atau dikonfirmasi oleh pengujian.
+3. Akhiri setiap instruksi lengkap dengan tanda titik.
+4. Pertahankan indentasi blok dan sejajarkan `Jika tidak, maka:` dengan `Jika` pasangannya.
+5. Buat contoh kecil dan validasi dengan interpreter Rust bila salinan repositori tersedia.
+6. Jika suatu alat atau fitur belum didukung, jelaskan batasannya; jangan mengarang sintaks.
+7. Bedakan perilaku implementasi yang terverifikasi dari gagasan desain atau item peta jalan.
