@@ -1,0 +1,5 @@
+{- Shared conformance fixture for the Rust interpreter and browser playground. -}
+Tetapkan skor bernilai 7. Tetapkan Skor bernilai 11.
+Tetapkan punya_tiket bernilai benar.
+Tampilkan skor. Tampilkan Skor. Tampilkan punya_tiket.
+Tampilkan "Titik. dan {- teks -} tetap literal.".

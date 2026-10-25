@@ -4,7 +4,7 @@ This is the grammar draft for Kontekstual's structured Indonesian instructions. 
 
 ## 1. Lexical conventions
 
-- `IDENTIFIER`: a name beginning with a letter and followed by letters or digits
+- `IDENTIFIER`: a name beginning with a Unicode letter or underscore and followed by Unicode letters, digits, or underscores
 - `INTEGER`: one or more decimal digits
 - `STRING`: a double-quoted, single-line text literal; supports escapes `\\\"`, `\\\\`, `\\n`, and `\\t`
 - `PERIOD`: `.`, which terminates an instruction
@@ -143,6 +143,6 @@ Tampilkan teks "Halo".
 3. The supported syntax includes declarations, output instructions, arithmetic expressions, comparisons, conditional blocks, and Selama loops, but parsing a construct does not imply runtime behavior exists.
 4. The initial draft does not support nested comments or multiline string literals.
 5. Variable initialization also accepts `Tetapkan nama bernilai ekspresi.` and `Tetapkan nama dengan nilai ekspresi.`; reassignment accepts `Ubah nama menjadi ekspresi.`.
-6. Identifier Unicode details and a source formatter still need a formal decision.
+6. Identifiers support Unicode letters, digits, and underscores; names are case-sensitive while reserved words are case-insensitive.
 7. `Jika tidak, maka:` must immediately follow its matching `Jika` block at the same indentation level, and its body must not be empty.
 8. `Selama kondisi, lakukan:` checks a logical condition before each iteration; its body must not be empty.

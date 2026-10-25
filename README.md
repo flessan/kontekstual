@@ -101,6 +101,10 @@ Program selesai.
 
 The interpreter uses signed 64-bit integers, reports division by zero and arithmetic overflow, and prints logical values as \`benar\` or \`salah\`.
 
+## Language reliability
+
+Identifiers are case-sensitive and may contain underscores. Ordinary instructions can share a line because each ends with a period. A shared `.konteks` fixture is tested by both the Rust interpreter and browser runtime to catch compatibility regressions.
+
 ## Repository guide
 
 - [SPECIFICATION.md](SPECIFICATION.md) - language design and draft rules
