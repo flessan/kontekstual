@@ -539,7 +539,7 @@ impl Parser {
                     "bernilai", "dengan", "nilai", "ubah", "menjadi", "tampilkan", "jika", "maka", "selesai",
                     "selama", "lakukan",
                     "ditambah", "dikurangi", "dikali", "dibagi", "lebih", "dari",
-                    "kurang", "sama", "tidak", "atau",
+                    "kurang", "sama", "tidak", "atau", "dan", "bukan",
                 ];
                 if reserved.contains(&lower.as_str()) {
                     return Err(Diagnostic::new(
@@ -1985,5 +1985,30 @@ Selama benar, lakukan:
             .expect("fixture kompatibilitas bersama harus berjalan di interpreter Rust");
         assert_eq!(actual, expected);
     }
+
+    #[test]
+    fn rejects_logical_operator_words_as_identifiers() {
+        for name in ["dan", "bukan"] {
+            let source = format!("Tetapkan {} bernilai 1.", name);
+            let error = parse_source(&source)
+                .expect_err("kata operator logika tidak boleh menjadi nama variabel");
+            assert!(error.message.contains("kata khusus"), "{name}: {error}");
+        }
+    }
+
+    #[test]
+    fn rejects_chained_comparisons() {
+        let error = parse_source("Tampilkan 1 < 2 < 3.")
+            .expect_err("perbandingan tidak boleh dirangkai tanpa operator logika");
+        assert!(error.message.contains("Instruksi harus diakhiri dengan tanda titik"));
+    }
+
+    #[test]
+    fn accepts_non_four_space_consistent_indentation() {
+        let output = execute_source("Jika benar, maka:\n   Tampilkan \"Berhasil\".")
+            .expect("indentasi yang lebih dalam dan konsisten harus diterima");
+        assert_eq!(output, vec!["Berhasil"]);
+    }
+
 
 }
