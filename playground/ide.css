@@ -491,6 +491,11 @@
 .play-hero h1 .headline-mark{padding:0 6px 2px;background:#FFF1BF;color:#A72145;border-radius:1px}
 .play-hero p{max-width:620px;color:#3E3B36;font-size:14px;line-height:1.75}
 .play-hero-badges{gap:7px;margin-top:18px}
+.play-share-button{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink-soft);font:600 11px/1.2 var(--font-body);cursor:pointer;transition:background-color .15s,border-color .15s,color .15s}
+.play-share-button:hover{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.play-share-button:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 55%,transparent);outline-offset:2px}
+.play-share-status{display:none}
+.play-share-status:not(:empty){display:inline-flex;align-items:center;min-height:30px;color:var(--muted);font:11px/1.4 var(--font-body)}
 .play-hero-aside{max-width:430px}
 .quickstart-card{padding:18px;background:#FAF9F6;border:1px solid #D8D5CF;border-left:3px solid #A72145;border-radius:2px;box-shadow:none}
 .quickstart-head{margin-bottom:14px;font-size:13px;letter-spacing:0}

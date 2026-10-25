@@ -96,6 +96,34 @@ document.querySelectorAll("[data-doc-search]").forEach(input => {
   });
 });
 
+// Share the canonical page URL without exposing locally stored playground code.
+document.querySelectorAll("[data-share-page]").forEach(button => {
+  button.addEventListener("click", async () => {
+    const canonical = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
+    const shareData = {
+      title: "Playground Kontekstual",
+      text: "Tulis program, jalankan di peramban, lalu lihat hasilnya.",
+      url: canonical
+    };
+    const status = document.querySelector("[data-share-status]");
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        if (status) status.textContent = "Tautan Playground siap dibagikan.";
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(canonical);
+      if (status) status.textContent = "Tautan Playground tersalin.";
+    } catch {
+      if (status) status.textContent = "Tidak dapat membagikan otomatis. Salin alamat halaman ini dari bilah peramban.";
+    }
+  });
+});
+
 // Copy installation commands
 document.querySelectorAll("[data-copy]").forEach(btn => {
   btn.addEventListener("click", async () => {

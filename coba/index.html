@@ -20,13 +20,15 @@
 <meta property="og:title" content="Playground Kontekstual — Editor kode berbahasa Indonesia">
 <meta property="og:description" content="Tulis, format, dan jalankan program Kontekstual langsung di peramban. Gratis, privat, dan ramah pemula.">
 <meta property="og:url" content="https://dotkonteks.pages.dev/coba/">
-<meta property="og:image" content="https://dotkonteks.pages.dev/og-kontekstual.png">
-<meta property="og:image:width" content="1200">
+<meta property="og:image" content="https://dotkonteks.pages.dev/og-playground.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="Tulis, jalankan, lihat hasilnya di Playground Kontekstual"><meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Playground Kontekstual — Editor kode berbahasa Indonesia">
 <meta name="twitter:description" content="Tulis, format, dan jalankan program Kontekstual langsung di peramban. Gratis, privat, dan ramah pemula.">
-<meta name="twitter:image" content="https://dotkonteks.pages.dev/og-kontekstual.png">
+<meta name="twitter:image" content="https://dotkonteks.pages.dev/og-playground.png">
+<meta name="twitter:image:alt" content="Tulis, jalankan, lihat hasilnya di Playground Kontekstual">
 <script>try{var t=localStorage.getItem("kontekstual-theme");var d=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=d;document.documentElement.setAttribute("data-bs-theme",d)}catch(e){}</script>
 <link rel="stylesheet" href="/site.css">
 <link rel="stylesheet" href="/playground/ide.css">
@@ -104,6 +106,8 @@
         <span class="trust-badge"><i class="bi bi-shield-lock-fill" aria-hidden="true"></i> Kode tetap lokal</span>
         <span class="trust-badge"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Hasil instan</span>
         <span class="trust-badge"><i class="bi bi-save" aria-hidden="true"></i> Simpan otomatis</span>
+        <button class="play-share-button" type="button" data-share-page><i class="bi bi-share" aria-hidden="true"></i> Bagikan tautan</button>
+        <span class="play-share-status" role="status" aria-live="polite" data-share-status></span>
       </div>
     </div>
     <aside class="play-hero-aside" aria-label="Mulai cepat">

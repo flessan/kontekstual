@@ -689,6 +689,12 @@ p{color:var(--muted-strong);line-height:1.7}
 /* ===== Docs (preserve but update palette) ===== */
 .docs-page{padding-top:28px;padding-bottom:64px}
 .docs-hero{max-width:780px;padding:8px 0 28px}
+.docs-hero-index{max-width:none;padding-bottom:36px}
+.docs-hero-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.72fr);gap:44px;align-items:center}
+.docs-hero-copy{min-width:0}
+.docs-hero-copy>p{max-width:660px;color:var(--muted);font-size:13px;line-height:1.8;margin:0 0 14px}
+.docs-hero-art{margin:36px 0 0;overflow:hidden;border:1px solid var(--line);background:#F7F3E8}
+.docs-hero-art img{display:block;width:100%;height:auto}
 .breadcrumbs{display:flex;align-items:center;gap:8px;margin-bottom:20px;color:var(--muted);font:11px var(--font-mono)}
 .breadcrumbs a{color:var(--muted);text-decoration:none}
 .breadcrumbs a:hover{color:var(--ink)}
@@ -1077,6 +1083,8 @@ h1,h2,.docs-hero h1,.doc-article h2,.section-heading h2,.faq-intro h2{font-famil
   .rust-section-heading-row>p{margin-top:12px}
 }
 @media(max-width:760px){
+  .docs-hero-layout{grid-template-columns:1fr;gap:12px}
+  .docs-hero-art{width:min(100%,500px);margin:12px 0 0}
   .classic-header .nav-inner{height:68px;width:calc(100% - 28px)}
   .classic-header .nav-links{display:none}
   .classic-header .mobile-menu-btn{display:grid}
