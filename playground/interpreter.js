@@ -142,9 +142,44 @@ const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika",
 
 function parseProgram(source) {
   const stripped = stripComments(source);
-  const lines = stripped.split(/\r?\n/).map((raw, index) => {
+  function splitInlineStatements(sourceLine) {
+    const statements = [];
+    let start = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (let i = 0; i < sourceLine.length; i++) {
+      const character = sourceLine[i];
+
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (character === "\\") escaped = true;
+        else if (character === '"') inString = false;
+        continue;
+      }
+
+      if (character === '"') {
+        inString = true;
+      } else if (character === ".") {
+        statements.push(sourceLine.slice(start, i + 1));
+        start = i + 1;
+      }
+    }
+
+    const remainder = sourceLine.slice(start);
+    if (remainder.trim() || statements.length === 0) statements.push(remainder);
+    return statements;
+  }
+
+  const lines = stripped.split(/\r?\n/).flatMap((raw, index) => {
     const expanded = raw.replace(/\t/g, "    ");
-    return { raw, text: expanded.trim(), indent: expanded.match(/^ */)[0].length, line: index + 1 };
+    const indent = expanded.match(/^ */)[0].length;
+    return splitInlineStatements(expanded).map(segment => ({
+      raw: segment,
+      text: segment.trim(),
+      indent,
+      line: index + 1
+    }));
   });
   const meaningful = lines.filter(x => x.text);
   let cursor = 0;
@@ -274,7 +309,7 @@ function parseProgram(source) {
 }
 
 function lookup(scopes, name, line) {
-  const key = name.toLocaleLowerCase("id");
+  const key = name;
   for (let i = scopes.length - 1; i >= 0; i--) if (scopes[i].has(key)) return scopes[i].get(key);
   throw new KontekstualError("Variabel '" + name + "' belum ditetapkan sebelum digunakan.", line);
 }
@@ -320,7 +355,7 @@ function evaluate(tree, scopes, line) {
 }
 
 function assignExisting(scopes, name, value, line) {
-  const key = name.toLocaleLowerCase("id");
+  const key = name;
   for (let i = scopes.length - 1; i >= 0; i--) {
     if (scopes[i].has(key)) {
       const old = scopes[i].get(key);
@@ -341,7 +376,7 @@ function execute(statements, scopes, output, state) {
       const value = evaluate(statement.value, scopes, line);
       const type = statement.type || valueType(value);
       if (valueType(value) !== type) throw new KontekstualError("Nilai awal bertipe " + valueType(value) + ", sedangkan variabel '" + statement.name + "' memerlukan tipe " + type + ".", line);
-      const scope = scopes[scopes.length - 1], key = statement.name.toLocaleLowerCase("id");
+      const scope = scopes[scopes.length - 1], key = statement.name;
       if (scope.has(key)) throw new KontekstualError("Variabel '" + statement.name + "' sudah ditetapkan pada blok ini.", line);
       scope.set(key, value);
     } else if (statement.kind === "assign") {

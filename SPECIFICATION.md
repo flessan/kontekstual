@@ -219,7 +219,7 @@ The loop body has a local scope for each iteration. It can read and reassign var
 - A conditional or loop body must begin on the line after its colon and contain at least one indented instruction.
 - Leading spaces count as one column each; a tab advances to the next multiple of four columns. Four spaces per nesting level are recommended, and indentation must return to a level already used.
 - Reserved keywords and multiword phrases are recognized case-insensitively.
-- Identifiers must start with a letter and may contain letters and digits afterward. Support for the full Unicode letter range must be specified and tested before release.
+- Identifiers begin with a Unicode letter or underscore and may contain Unicode letters, digits, or underscores afterward. Identifiers are case-sensitive; reserved words and phrases are case-insensitive.
 - Parentheses must be balanced and may only be used in expressions in the initial grammar.
 - Comments cannot be nested in draft v0.1.
 

@@ -212,10 +212,10 @@ fn lex(source: &str) -> Result<Vec<Token>, Diagnostic> {
             continue;
         }
 
-        if ch.is_alphabetic() {
+        if ch.is_alphabetic() || ch == '_' {
             let mut word = String::new();
             while let Some(current) = chars.get(index).copied() {
-                if current.is_alphanumeric() {
+                if current.is_alphanumeric() || current == '_' {
                     word.push(current);
                     advance(&chars, &mut index, &mut line, &mut column);
                 } else {
@@ -1973,5 +1973,17 @@ Selama benar, lakukan:
         assert!(error.message.contains("batas 100000 putaran"));
     }
 
+
+    #[test]
+    fn shared_conformance_fixture_matches_expected_output() {
+        let source = include_str!("../conformance/core-compatibility.konteks");
+        let expected = include_str!("../conformance/core-compatibility.out")
+            .lines()
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        let actual = execute_source(source)
+            .expect("fixture kompatibilitas bersama harus berjalan di interpreter Rust");
+        assert_eq!(actual, expected);
+    }
 
 }
