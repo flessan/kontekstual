@@ -63,6 +63,17 @@ This roadmap separates language design from implementation so the grammar can be
 
 **Exit criteria:** the included program runs predictably on the development platform. The prototype interpreter is working, but it is not a native executable backend.
 
+## Phase 4.1 — Language reliability and runtime compatibility
+
+- [x] Define identifier rules for Unicode letters, digits, underscores, and case sensitivity
+- [x] Align Rust identifier tokenization with the documented underscore rule
+- [x] Align browser variable lookup with case-sensitive identifier semantics
+- [x] Support multiple period-terminated instructions on one physical line in the browser runtime
+- [x] Run a shared `.konteks` conformance fixture in Rust and JavaScript tests
+- [ ] Audit the remaining grammar, static-checking, and runtime-diagnostic differences between both implementations
+
+**Exit criteria:** behavior shared by both runtimes is covered by a common test fixture. Full parity is not claimed until the remaining syntax and diagnostic differences are audited.
+
 ## Phase 5 — Native executable backend
 
 - [ ] Select target operating systems and architectures
