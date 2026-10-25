@@ -796,3 +796,9 @@
   .editor-statusbar{min-height:36px;gap:9px;padding-inline:10px;font-size:10px}
   .console-footer{padding-inline:11px;font-size:10px}
 }
+
+/* Keep each numbered quick-start step as one content column; keep the shortcut chord together. */
+.quickstart-card li>.quickstart-copy{display:block;min-width:0;align-self:center}
+.quickstart-shortcut{display:inline-flex;align-items:center;gap:3px;margin-inline:2px;white-space:nowrap;vertical-align:baseline}
+.quickstart-shortcut kbd{display:inline-block;flex:none;padding:2px 5px;border:1px solid #CFCBC2;border-radius:2px;background:#fff;color:#2E2459;font:600 10px/1.35 var(--font-body);box-shadow:0 1px 0 #D8D5CF}
+:root[data-theme=dark] .quickstart-shortcut kbd{border-color:#52525B;background:#242428;color:#FFD969;box-shadow:0 1px 0 #414047}
