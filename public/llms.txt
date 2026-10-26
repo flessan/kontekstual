@@ -22,8 +22,8 @@ Kontekstual adalah bahasa pemrograman eksperimental dengan instruksi terstruktur
 - Blok program menggunakan indentasi.
 - Interpreter utama ditulis dalam Rust.
 - Playground di peramban menggunakan runtime kompatibilitas JavaScript untuk eksperimen.
-- Subset yang tersedia mencakup hasil teks, variabel, aritmetika, perbandingan, kondisi, dan perulangan Selama.
-- Fungsi buatan pengguna, modul, input interaktif, instruksi kendali perulangan, dan pembuatan executable native belum tersedia.
+- Subset yang tersedia mencakup hasil teks, variabel, masukan teks melalui `Tanyakan`, aritmetika, perbandingan, kondisi, dan perulangan Selama.
+- Fungsi buatan pengguna, modul, konversi tipe masukan, instruksi kendali perulangan, dan pembuatan executable native belum tersedia.
 - Rust memakai bilangan bulat bertanda 64-bit; runtime peramban memakai rentang bilangan bulat aman JavaScript.
 - Kedua runtime membatasi total iterasi perulangan hingga 100.000 untuk setiap eksekusi.
 - Playground menyimpan kode di localStorage peramban; kode tidak dikirim ke server.

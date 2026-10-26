@@ -44,6 +44,14 @@ Penugasan ulang:
 Ubah nama menjadi ekspresi.
 ```
 
+Masukan teks:
+```text
+Tanyakan "Siapa namamu?" dan simpan sebagai nama.
+Tampilkan "Halo, " + nama.
+```
+
+`Tanyakan` menampilkan pertanyaan dan menyimpan satu baris jawaban sebagai teks. Di CLI Rust, jawaban dibaca dari standard input; di playground, jawaban diminta melalui dialog peramban. Membatalkan dialog atau mencapai akhir masukan di CLI menghasilkan kesalahan yang jelas.
+
 Komentar:
 ```text
 {- komentar -}
@@ -63,7 +71,7 @@ Selama kondisi, lakukan:
     instruksi.
 ```
 
-Konsep yang didukung mencakup teks, angka bulat dan nilai logika; aritmetika; penggabungan teks; perbandingan; ekspresi logika; cabang kondisi berbasis indentasi; serta perulangan `Selama`. Literal logika adalah `benar` dan `salah`.
+Konsep yang didukung mencakup teks, masukan satu baris, angka bulat dan nilai logika; aritmetika; penggabungan teks; perbandingan; ekspresi logika; cabang kondisi berbasis indentasi; serta perulangan `Selama`. Literal logika adalah `benar` dan `salah`.
 
 ## Runtime dan validasi
 Interpreter Rust menggunakan bilangan bulat bertanda 64-bit serta melaporkan pembagian dengan nol dan luapan aritmetika. Runtime peramban menggunakan rentang bilangan bulat aman JavaScript, sehingga rentang numeriknya berbeda. Kedua runtime membatasi total iterasi hingga 100.000 untuk setiap eksekusi. Runtime peramban bukan kompilator dan tidak menghasilkan executable native.
@@ -77,7 +85,7 @@ Perintah repositori yang berguna:
 - `pnpm build`
 
 ## Fitur yang belum didukung atau masih direncanakan
-Jangan menyatakan bahwa fungsi buatan pengguna, modul, input interaktif, instruksi kendali perulangan, atau pembuatan executable native sudah tersedia. Semua itu masih termasuk pekerjaan mendatang dalam prototipe saat ini. Periksa spesifikasi dan pengujian repositori jika suatu ekspresi atau kasus tepi belum jelas.
+Jangan menyatakan bahwa fungsi buatan pengguna, modul, konversi tipe masukan, instruksi kendali perulangan, atau pembuatan executable native sudah tersedia. Masukan teks satu baris melalui `Tanyakan` telah diimplementasikan; fitur lainnya masih termasuk pekerjaan mendatang dalam prototipe saat ini. Periksa spesifikasi dan pengujian repositori jika suatu ekspresi atau kasus tepi belum jelas.
 
 ## Petunjuk untuk agen
 1. Baca dokumen ini dan referensi tata bahasa sebelum menghasilkan kode `.konteks`.
