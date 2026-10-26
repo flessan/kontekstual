@@ -132,3 +132,63 @@ test("pemeriksaan statis menolak operator bertipe salah di cabang yang tidak dip
     /Operator '\+' hanya menerima angka atau menggabungkan dua teks/
   );
 });
+
+
+test("Tanyakan menyimpan jawaban sebagai teks dan dapat digabungkan", () => {
+  const prompts = [];
+  const result = runKontekstual(
+    'Tanyakan "Siapa namamu?" dan simpan sebagai nama.\nTampilkan "Halo, " + nama.',
+    { ask: prompt => { prompts.push(prompt); return "Nala"; } }
+  );
+  assert.deepEqual(prompts, ["Siapa namamu?"]);
+  assert.deepEqual(result.output, ["Halo, Nala"]);
+});
+
+test("masukan kosong adalah teks sah", () => {
+  const result = runKontekstual(
+    'Tanyakan "Nama (boleh kosong):" dan simpan sebagai nama.\nTampilkan "[" + nama + "]".',
+    { inputs: [""] }
+  );
+  assert.deepEqual(result.output, ["[]"]);
+});
+
+test("pembatalan masukan menghentikan program dengan pesan yang jelas", () => {
+  assert.throws(
+    () => runKontekstual('Tanyakan "Siapa namamu?" dan simpan sebagai nama.', { ask: () => null }),
+    /Masukan untuk variabel 'nama' dibatalkan/
+  );
+});
+
+test("variabel dari Tanyakan bertipe teks", () => {
+  assert.throws(
+    () => runKontekstual('Tanyakan "Umurmu?" dan simpan sebagai umur.\nUbah umur menjadi 20.', { inputs: ["17"] }),
+    /tidak bisa diubah menjadi angka/
+  );
+});
+
+test("Tanyakan tidak boleh mendeklarasikan nama yang sudah dipakai", () => {
+  assert.throws(
+    () => runKontekstual('Tetapkan nama bernilai "Awal".\nTanyakan "Nama baru?" dan simpan sebagai nama.', { inputs: ["Baru"] }),
+    /sudah ditetapkan/
+  );
+});
+
+test("hasil sebelum Tanyakan dikirim ke panel sebelum dialog dibuka", () => {
+  const sequence = [];
+  const result = runKontekstual(
+    'Tampilkan "Sebelum".\nTanyakan "Lanjut?" dan simpan sebagai jawaban.\nTampilkan jawaban.',
+    {
+      inputs: ["Ya"],
+      onOutput: line => sequence.push(line)
+    }
+  );
+  assert.deepEqual(sequence, ["Sebelum", "Ya"]);
+  assert.deepEqual(result.output, ["Sebelum", "Ya"]);
+});
+
+test("eksekusi tanpa masukan yang disediakan tidak diam-diam memakai teks kosong", () => {
+  assert.throws(
+    () => runKontekstual('Tanyakan "Nama?" dan simpan sebagai nama.'),
+    /membutuhkan masukan/
+  );
+});
