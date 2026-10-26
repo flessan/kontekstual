@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runKontekstual } from "./interpreter.js";
+import { runKontekstual, runKontekstualAsync } from "./interpreter.js";
 test("contoh halo menghasilkan output yang diharapkan Rust",()=>{const r=runKontekstual('{- Contoh kecil -}\nTetapkan umur sebagai angka dengan nilai 20.\nJika umur lebih dari 17, maka:\n    Tampilkan teks "Halo dunia!".\nTampilkan teks "Program selesai.".');assert.deepEqual(r.output,["Halo dunia!","Program selesai."]);});
 test("variabel angka, teks, dan logika",()=>{const r=runKontekstual('Tetapkan umur sebagai angka dengan nilai 20.\nTetapkan nama sebagai teks dengan nilai "Thio".\nTetapkan aktif sebagai logika dengan nilai benar.\nTampilkan nilai umur.\nTampilkan nilai nama.\nTampilkan nilai aktif.');assert.deepEqual(r.output,["20","Thio","benar"]);});
 test("presedensi dan tanda kurung",()=>{const r=runKontekstual("Tetapkan a sebagai angka dengan nilai 10 ditambah 5 dikali 2.\nTetapkan b sebagai angka dengan nilai (10 ditambah 5) dikali 2.\nTampilkan nilai a.\nTampilkan nilai b.");assert.deepEqual(r.output,["20","30"]);});
@@ -191,4 +191,35 @@ test("eksekusi tanpa masukan yang disediakan tidak diam-diam memakai teks kosong
     () => runKontekstual('Tanyakan "Nama?" dan simpan sebagai nama.'),
     /membutuhkan masukan/
   );
+});
+
+
+test("runtime asinkron menunggu masukan inline tanpa merusak urutan hasil", async () => {
+  const sequence = [];
+  let resolveInput;
+  const inputPromise = new Promise(resolve => { resolveInput = resolve; });
+  const running = runKontekstualAsync(
+    'Tampilkan "Sebelum".\nTanyakan "Nama?" dan simpan sebagai nama.\nTampilkan "Halo, " + nama.',
+    {
+      ask: async prompt => {
+        sequence.push("prompt:" + prompt);
+        return inputPromise;
+      },
+      onOutput: line => sequence.push("output:" + line)
+    }
+  );
+
+  assert.deepEqual(sequence, ["output:Sebelum", "prompt:Nama?"]);
+  resolveInput("Nala");
+  const result = await running;
+  assert.deepEqual(result.output, ["Sebelum", "Halo, Nala"]);
+  assert.deepEqual(sequence, ["output:Sebelum", "prompt:Nama?", "output:Halo, Nala"]);
+});
+
+test("runtime asinkron menerima teks kosong dan tetap menjalankan program", async () => {
+  const result = await runKontekstualAsync(
+    'Tanyakan "Nama (boleh kosong):" dan simpan sebagai nama.\nTampilkan "[" + nama + "]".',
+    { ask: async () => "" }
+  );
+  assert.deepEqual(result.output, ["[]"]);
 });
