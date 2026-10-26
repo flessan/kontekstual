@@ -78,6 +78,17 @@ This roadmap separates language design from implementation so the grammar can be
 
 **Exit criteria:** shared syntax, scope, and type behavior is covered by common tests. Full parity is not claimed until precise diagnostic positions and the documented signed-64-bit versus JavaScript-safe-integer boundary are treated as explicit compatibility constraints.
 
+## Phase 4.2 — Interactive text input
+
+- [x] Parse `Tanyakan "pertanyaan?" dan simpan sebagai nama.`
+- [x] Type-check input variables as text and reject duplicate declarations
+- [x] Read one line interactively from standard input in the Rust CLI
+- [x] Add browser prompt input with cancellation diagnostics
+- [x] Add runtime tests, a runnable example, and a CI smoke test
+- [ ] Consider a non-blocking in-playground input panel after the synchronous prototype is proven
+
+**Exit criteria:** a `.konteks` program can request one line of text and use it in later expressions, with consistent text typing and explicit cancellation/EOF behavior.
+
 ## Phase 5 — Native executable backend
 
 - [ ] Select target operating systems and architectures
@@ -106,6 +117,5 @@ This roadmap separates language design from implementation so the grammar can be
 - Standard library
 - Modules and package management
 - Multiline text literals
-- User input
 - Debugger and language server
 - Additional target architectures

@@ -147,6 +147,17 @@ Tampilkan 10 + 5 * 2.
 
 The earlier forms `Tampilkan teks "Halo, dunia!".` and `Tampilkan nilai nama.` remain supported for compatibility. Each output instruction writes one line to standard output. Output is UTF-8.
 
+### Masukan teks
+
+Use `Tanyakan` to display a prompt and save the user's next line as a text variable:
+
+```text
+Tanyakan "Siapa namamu?" dan simpan sebagai nama.
+Tampilkan "Halo, " + nama.
+```
+
+The prompt must be a quoted text literal. The phrase `dan simpan sebagai` is followed by the variable name that receives the answer. `Tanyakan` declares that name with type `teks`, so it must not already be declared in the same scope. An empty line is valid text. In the Rust CLI, `run` reads one line from standard input and displays the prompt immediately; end-of-input before an answer is an error. The browser playground asks for the value in a browser prompt dialog; cancelling the dialog stops execution with a diagnostic. The `check` command validates the syntax and types without asking for a value.
+
 ## 10. Arithmetic, text, comparison, and logic
 
 Kontekstual supports a small set of familiar symbols where they make programs easier to read. Indonesian operator phrases remain supported for compatibility.
@@ -282,6 +293,6 @@ Before declaring v0.1 stable, the project must decide:
 4. Exact Unicode identifier rules.
 5. Whether to add chained alternatives such as `Jika ... atau jika ...`.
 6. String escape behavior beyond quote, backslash, newline, and tab.
-7. User input, loop-control statements, functions, and procedures for later versions.
+7. Input type conversion, loop-control statements, functions, and procedures for later versions.
 
 Syntax changes, examples, grammar, and tests must be updated together.
