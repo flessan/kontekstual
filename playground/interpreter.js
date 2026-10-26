@@ -27,6 +27,8 @@ function stripComments(source) {
         i++;
       }
       if (!closed) throw new KontekstualError("Komentar belum ditutup.");
+      // A comment behaves like whitespace, so tokens around it must not merge.
+      out += " ";
       continue;
     }
     out += c;
@@ -127,6 +129,17 @@ function expression(source, line) {
       const op = tokens[p++].value, prec = precedence[op];
       const right = parse(prec + 1);
       left = { kind: "binary", op, left, right };
+      if (
+        prec === 3 &&
+        tokens[p] &&
+        tokens[p].type === "op" &&
+        precedence[tokens[p].value] === 3
+      ) {
+        throw new KontekstualError(
+          "Perbandingan berantai tidak didukung. Gabungkan kondisi dengan 'dan' atau 'atau'.",
+          line
+        );
+      }
     }
     return left;
   }
@@ -138,7 +151,7 @@ function expression(source, line) {
 const valueType = value => typeof value === "number" ? "angka" : typeof value === "string" ? "teks" : "logika";
 const display = value => typeof value === "boolean" ? (value ? "benar" : "salah") : String(value);
 const validName = /^[\p{L}_][\p{L}\p{N}_]*$/u;
-const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah", "bernilai", "ubah", "menjadi", "tampilkan", "nilai", "jika", "maka", "selama", "lakukan", "dan", "atau", "tidak", "bukan"]);
+const reservedNames = new Set(["tetapkan", "sebagai", "angka", "teks", "logika", "benar", "salah", "bernilai", "dengan", "nilai", "ubah", "menjadi", "tampilkan", "jika", "maka", "selesai", "selama", "lakukan", "ditambah", "dikurangi", "dikali", "dibagi", "lebih", "dari", "kurang", "sama", "dan", "atau", "tidak", "bukan"]);
 
 function parseProgram(source) {
   const stripped = stripComments(source);
@@ -171,10 +184,20 @@ function parseProgram(source) {
     return statements;
   }
 
+  function splitLeadingIndentation(raw) {
+    let offset = 0;
+    let column = 0;
+    while (raw[offset] === " " || raw[offset] === "\t") {
+      if (raw[offset] === "\t") column += 4 - (column % 4);
+      else column += 1;
+      offset += 1;
+    }
+    return { body: raw.slice(offset), indent: column };
+  }
+
   const lines = stripped.split(/\r?\n/).flatMap((raw, index) => {
-    const expanded = raw.replace(/\t/g, "    ");
-    const indent = expanded.match(/^ */)[0].length;
-    return splitInlineStatements(expanded).map(segment => ({
+    const { body, indent } = splitLeadingIndentation(raw);
+    return splitInlineStatements(body).map(segment => ({
       raw: segment,
       text: segment.trim(),
       indent,
@@ -201,7 +224,6 @@ function parseProgram(source) {
           throw new KontekstualError("Blok Selama membutuhkan setidaknya satu instruksi yang lebih menjorok ke dalam.", line);
         }
         const childIndent = lines[next].indent;
-        if (childIndent !== item.indent + 4) throw new KontekstualError("Gunakan empat spasi untuk setiap tingkat indentasi.", lines[next].line);
         while (cursor < next) cursor++;
         const body = block(childIndent);
         if (body.length === 0) throw new KontekstualError("Blok Selama tidak boleh kosong.", line);
@@ -217,7 +239,6 @@ function parseProgram(source) {
           throw new KontekstualError("Blok Jika membutuhkan setidaknya satu instruksi yang lebih menjorok ke dalam.", line);
         }
         const childIndent = lines[next].indent;
-        if (childIndent !== item.indent + 4) throw new KontekstualError("Gunakan empat spasi untuk setiap tingkat indentasi.", lines[next].line);
         while (cursor < next) cursor++;
         const body = block(childIndent);
         if (body.length === 0) throw new KontekstualError("Blok Jika tidak boleh kosong.", line);
@@ -237,7 +258,6 @@ function parseProgram(source) {
             throw new KontekstualError("Blok Jika tidak membutuhkan setidaknya satu instruksi yang lebih menjorok ke dalam.", lines[elseHeader].line);
           }
           const elseIndent = lines[elseFirst].indent;
-          if (elseIndent !== item.indent + 4) throw new KontekstualError("Gunakan empat spasi untuk setiap tingkat indentasi.", lines[elseFirst].line);
           while (cursor < elseFirst) cursor++;
           elseBody = block(elseIndent);
           if (elseBody.length === 0) throw new KontekstualError("Blok Jika tidak tidak boleh kosong.", lines[elseHeader].line);
@@ -315,7 +335,12 @@ function lookup(scopes, name, line) {
 }
 
 function evaluate(tree, scopes, line) {
-  if (tree.kind === "value") return tree.value;
+  if (tree.kind === "value") {
+    if (typeof tree.value === "number" && !Number.isSafeInteger(tree.value)) {
+      throw new KontekstualError("Angka melampaui rentang angka aman JavaScript.", line);
+    }
+    return tree.value;
+  }
   if (tree.kind === "name") return lookup(scopes, tree.value, line);
   if (tree.kind === "unary") {
     const value = evaluate(tree.right, scopes, line);
@@ -365,6 +390,132 @@ function assignExisting(scopes, name, value, line) {
     }
   }
   throw new KontekstualError("Variabel '" + name + "' belum ditetapkan sebelum bisa diubah.", line);
+}
+
+
+function lookupType(scopes, name) {
+  for (let i = scopes.length - 1; i >= 0; i--) {
+    if (scopes[i].has(name)) return scopes[i].get(name);
+  }
+  return undefined;
+}
+
+function inferExpressionType(tree, scopes, line) {
+  if (tree.kind === "value") return valueType(tree.value);
+  if (tree.kind === "name") {
+    const type = lookupType(scopes, tree.value);
+    if (!type) throw new KontekstualError(
+      "Variabel '" + tree.value + "' belum ditetapkan sebelum digunakan.", line
+    );
+    return type;
+  }
+  if (tree.kind === "unary") {
+    const innerType = inferExpressionType(tree.right, scopes, line);
+    if (tree.op === "!" || tree.op === "tidak") {
+      if (innerType !== "logika") throw new KontekstualError(
+        "Operator 'tidak' hanya menerima nilai logika.", line
+      );
+      return "logika";
+    }
+    if (innerType !== "angka") throw new KontekstualError(
+      "Operator '-' hanya menerima angka.", line
+    );
+    return "angka";
+  }
+
+  const leftType = inferExpressionType(tree.left, scopes, line);
+  const rightType = inferExpressionType(tree.right, scopes, line);
+  if (tree.op === "+") {
+    if (leftType === rightType && (leftType === "angka" || leftType === "teks")) return leftType;
+    throw new KontekstualError(
+      "Operator '+' hanya menerima angka atau menggabungkan dua teks.", line
+    );
+  }
+  if (["-", "*", "/", "%"].includes(tree.op)) {
+    if (leftType !== "angka" || rightType !== "angka") throw new KontekstualError(
+      "Operator matematika '-', '*', '/', '%' hanya menerima angka.", line
+    );
+    return "angka";
+  }
+  if ([">", "<", ">=", "<="].includes(tree.op)) {
+    if (leftType !== "angka" || rightType !== "angka") throw new KontekstualError(
+      "Perbandingan urutan hanya menerima angka.", line
+    );
+    return "logika";
+  }
+  if (tree.op === "==" || tree.op === "!=") {
+    if (leftType !== rightType) throw new KontekstualError(
+      "Kedua nilai dalam perbandingan harus bertipe sama.", line
+    );
+    return "logika";
+  }
+  if (["dan", "&&", "atau", "||"].includes(tree.op)) {
+    if (leftType !== "logika" || rightType !== "logika") throw new KontekstualError(
+      "Operator logika 'dan/atau' hanya menerima nilai logika.", line
+    );
+    return "logika";
+  }
+  throw new KontekstualError("Operator tidak dikenal: " + tree.op, line);
+}
+
+function checkStatements(statements, scopes) {
+  for (const statement of statements) {
+    const { line } = statement;
+    if (statement.kind === "declare") {
+      const actualType = inferExpressionType(statement.value, scopes, line);
+      const declaredType = statement.type || actualType;
+      if (actualType !== declaredType) throw new KontekstualError(
+        "Nilai awal variabel '" + statement.name + "' bertipe " + actualType +
+        ", tetapi deklarasinya meminta " + declaredType + ".", line
+      );
+      const currentScope = scopes[scopes.length - 1];
+      if (currentScope.has(statement.name)) throw new KontekstualError(
+        "Variabel '" + statement.name + "' sudah ditetapkan pada blok ini.", line
+      );
+      currentScope.set(statement.name, declaredType);
+      continue;
+    }
+    if (statement.kind === "assign") {
+      const expectedType = lookupType(scopes, statement.name);
+      if (!expectedType) throw new KontekstualError(
+        "Variabel '" + statement.name + "' belum ditetapkan sebelum bisa diubah.", line
+      );
+      const actualType = inferExpressionType(statement.value, scopes, line);
+      if (expectedType !== actualType) throw new KontekstualError(
+        "Variabel '" + statement.name + "' bertipe " + expectedType +
+        ", jadi nilainya tidak bisa diubah menjadi " + actualType + ".", line
+      );
+      continue;
+    }
+    if (statement.kind === "print") {
+      inferExpressionType(statement.value, scopes, line);
+      continue;
+    }
+    if (statement.kind === "if") {
+      const conditionType = inferExpressionType(statement.condition, scopes, line);
+      if (conditionType !== "logika") throw new KontekstualError(
+        "Kondisi 'Jika' harus menghasilkan logika, bukan " + conditionType + ".", line
+      );
+      scopes.push(new Map());
+      try { checkStatements(statement.body, scopes); }
+      finally { scopes.pop(); }
+      if (statement.elseBody) {
+        scopes.push(new Map());
+        try { checkStatements(statement.elseBody, scopes); }
+        finally { scopes.pop(); }
+      }
+      continue;
+    }
+    if (statement.kind === "while") {
+      const conditionType = inferExpressionType(statement.condition, scopes, line);
+      if (conditionType !== "logika") throw new KontekstualError(
+        "Kondisi 'Selama' harus menghasilkan logika, bukan " + conditionType + ".", line
+      );
+      scopes.push(new Map());
+      try { checkStatements(statement.body, scopes); }
+      finally { scopes.pop(); }
+    }
+  }
 }
 
 const MAX_LOOP_ITERATIONS = 100_000;
@@ -417,6 +568,7 @@ function execute(statements, scopes, output, state) {
 
 export function runKontekstual(source) {
   const ast = parseProgram(source);
+  checkStatements(ast, [new Map()]);
   const output = [];
   execute(ast, [new Map()], output, { loopIterations: 0 });
   return { output, text: output.join("\n") };

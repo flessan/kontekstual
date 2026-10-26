@@ -3,3 +3,7 @@ Tetapkan skor bernilai 7. Tetapkan Skor bernilai 11.
 Tetapkan punya_tiket bernilai benar.
 Tampilkan skor. Tampilkan Skor. Tampilkan punya_tiket.
 Tampilkan "Titik. dan {- teks -} tetap literal.".
+Tampilkan{- komentar adalah spasi -}13.
+Jika benar, maka:
+   Tampilkan "Indentasi tiga spasi.".
+Tampilkan "Tab literal:	.".

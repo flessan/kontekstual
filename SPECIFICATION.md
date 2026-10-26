@@ -179,7 +179,7 @@ Jika skor >= 18 dan tidak salah, maka:
 
 The `+` operator adds two numbers or concatenates two text values. Mixed types such as `"Skor: " + 10` are rejected; convert-and-format support may be designed separately. A variable's type is fixed at declaration. Expressions follow conventional precedence: unary operators, multiplication/division/remainder, addition/subtraction, comparisons, logical AND, then logical OR. Parentheses override precedence.
 
-The interpreter uses signed 64-bit integers, truncating integer division, and reports division by zero, type errors, and arithmetic overflow. Order comparisons require numeric operands; equality comparisons require both operands to have the same type.
+The Rust interpreter uses signed 64-bit integers, truncating integer division, and reports division by zero, type errors, and arithmetic overflow. The browser playground uses JavaScript safe integers and rejects an evaluated integer literal or arithmetic result outside the exact range of −9,007,199,254,740,991 through 9,007,199,254,740,991 rather than silently rounding it. For exactly matching integer results in both environments, keep calculations within that range. Order comparisons require numeric operands; equality comparisons require both operands to have the same type.
 
 ## 11. Conditional and loop execution
 

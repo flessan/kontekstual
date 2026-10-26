@@ -70,9 +70,13 @@ This roadmap separates language design from implementation so the grammar can be
 - [x] Align browser variable lookup with case-sensitive identifier semantics
 - [x] Support multiple period-terminated instructions on one physical line in the browser runtime
 - [x] Run a shared `.konteks` conformance fixture in Rust and JavaScript tests
-- [ ] Audit the remaining grammar, static-checking, and runtime-diagnostic differences between both implementations
+- [x] Align comment removal with whitespace semantics, including comments between tokens
+- [x] Align tab stops and flexible but consistent indentation
+- [x] Run browser static checks for declarations, assignments, scopes, and expression types before execution
+- [x] Reject chained comparisons consistently and guard against silently rounded browser integers
+- [ ] Compare precise diagnostic positions and remaining intentional runtime differences between both implementations
 
-**Exit criteria:** behavior shared by both runtimes is covered by a common test fixture. Full parity is not claimed until the remaining syntax and diagnostic differences are audited.
+**Exit criteria:** shared syntax, scope, and type behavior is covered by common tests. Full parity is not claimed until precise diagnostic positions and the documented signed-64-bit versus JavaScript-safe-integer boundary are treated as explicit compatibility constraints.
 
 ## Phase 5 — Native executable backend
 

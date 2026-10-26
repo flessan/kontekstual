@@ -7,11 +7,11 @@ test("presedensi dan tanda kurung",()=>{const r=runKontekstual("Tetapkan a sebag
 test("kondisi salah dan blok bersarang",()=>{const r=runKontekstual('Tetapkan umur sebagai angka dengan nilai 20.\nJika umur lebih dari 17, maka:\n    Tampilkan teks "Dewasa".\n    Jika umur kurang dari 60, maka:\n        Tampilkan teks "Produktif".\nJika umur kurang dari 18, maka:\n    Tampilkan teks "Tidak muncul".');assert.deepEqual(r.output,["Dewasa","Produktif"]);});
 test("komentar dalam teks tetap literal",()=>{const r=runKontekstual('Tampilkan teks "Teks {- bukan komentar -}".');assert.deepEqual(r.output,["Teks {- bukan komentar -}"]);});
 test("variabel tidak dikenal ditolak",()=>assert.throws(()=>runKontekstual("Tampilkan nilai hantu."),/belum ditetapkan/));
-test("tipe awal yang tidak cocok ditolak",()=>assert.throws(()=>runKontekstual('Tetapkan umur sebagai angka dengan nilai "dua puluh".'),/memerlukan tipe/));
+test("tipe awal yang tidak cocok ditolak",()=>assert.throws(()=>runKontekstual('Tetapkan umur sebagai angka dengan nilai "dua puluh".'),/deklarasinya meminta angka/));
 test("pembagian nol ditolak",()=>assert.throws(()=>runKontekstual("Tetapkan hasil sebagai angka dengan nilai 10 dibagi (3 dikurangi 3)."),/Pembagian dengan nol/));
 test("deklarasi ganda dalam scope sama ditolak",()=>assert.throws(()=>runKontekstual("Tetapkan umur sebagai angka dengan nilai 20.\nTetapkan umur sebagai angka dengan nilai 21."),/sudah ditetapkan/));
 
-test("kondisi bersarang di dalam cabang salah tidak dievaluasi",()=>{const r=runKontekstual('Jika 1 lebih dari 2, maka:\n    Jika variabelhilang lebih dari 0, maka:\n        Tampilkan teks "Tidak muncul".\nTampilkan teks "Tetap jalan".');assert.deepEqual(r.output,["Tetap jalan"]);});
+test("pemeriksaan statis menolak variabel tak dikenal meskipun cabangnya tidak dipilih",()=>assert.throws(()=>runKontekstual('Jika 1 lebih dari 2, maka:\n    Jika variabelhilang lebih dari 0, maka:\n        Tampilkan teks "Tidak muncul".\nTampilkan teks "Tetap jalan".'),/belum ditetapkan sebelum digunakan/));
 test("indentasi tidak konsisten ditolak",()=>assert.throws(()=>runKontekstual('Jika benar sama dengan benar, maka:\n    Tampilkan teks "A".\n  Tampilkan teks "B".'),/Indentasi blok tidak konsisten/));
 
 test("deklarasi singkat menginferensikan tipe dan variabel dapat diubah",()=>{
@@ -35,7 +35,7 @@ test("operator simbolik dan perbandingan string",()=>{
   assert.deepEqual(r.output,["Sama","Berbeda"]);
 });
 test("variabel tidak boleh berubah menjadi tipe berbeda",()=>{
-  assert.throws(()=>runKontekstual('Tetapkan umur = 20.\numur = "dua puluh".'),/tidak dapat diubah/);
+  assert.throws(()=>runKontekstual('Tetapkan umur = 20.\numur = "dua puluh".'),/tidak bisa diubah menjadi/);
 });
 test("operator logika menolak operand yang bukan logika",()=>{
   assert.throws(()=>runKontekstual('Tampilkan 1 dan benar.'),/hanya menerima nilai logika/);
@@ -80,8 +80,55 @@ test("Selama melewati isi blok saat kondisi sejak awal salah",()=>{
   assert.deepEqual(r.output,["Selesai"]);
 });
 test("kondisi Selama harus menghasilkan nilai logika",()=>{
-  assert.throws(()=>runKontekstual('Selama 1, lakukan:\n    Tampilkan 1.'),/Kondisi Selama harus menghasilkan logika/);
+  assert.throws(()=>runKontekstual('Selama 1, lakukan:\n    Tampilkan 1.'),/Kondisi 'Selama' harus menghasilkan logika/);
 });
 test("Selama menghentikan perulangan yang tidak pernah selesai",()=>{
   assert.throws(()=>runKontekstual('Tetapkan hitungan bernilai 0.\nSelama benar, lakukan:\n    Ubah hitungan menjadi hitungan + 1.'),/batas 100000 putaran/);
+});
+
+
+test("komentar bertindak sebagai spasi antara dua token", () => {
+  const result = runKontekstual("Tampilkan{- komentar -}13.");
+  assert.deepEqual(result.output, ["13"]);
+});
+
+test("tab memengaruhi indentasi tetapi tetap literal di dalam teks", () => {
+  const source = "Jika benar, maka:\n\tTampilkan \"Tab literal:\t.\".";
+  const result = runKontekstual(source);
+  assert.deepEqual(result.output, ["Tab literal:\t."]);
+});
+
+test("indentasi konsisten tidak harus berjumlah tepat empat spasi", () => {
+  const result = runKontekstual('Jika benar, maka:\n   Tampilkan "Indentasi fleksibel".');
+  assert.deepEqual(result.output, ["Indentasi fleksibel"]);
+});
+
+test("perbandingan berantai ditolak saat parsing", () => {
+  assert.throws(
+    () => runKontekstual("Tampilkan 1 < 2 < 3."),
+    /Perbandingan berantai tidak didukung/
+  );
+});
+
+test("integer di luar rentang aman JavaScript tidak dicetak sebagai angka yang dibulatkan", () => {
+  assert.throws(
+    () => runKontekstual("Tampilkan 9007199254740992."),
+    /rentang angka aman JavaScript/
+  );
+});
+
+test("kata operator yang dicadangkan tidak boleh menjadi nama variabel", () => {
+  for (const name of ["dan", "bukan", "dengan", "ditambah", "lebih", "selesai"]) {
+    assert.throws(
+      () => runKontekstual("Tetapkan " + name + " bernilai 1."),
+      /kata khusus/
+    );
+  }
+});
+
+test("pemeriksaan statis menolak operator bertipe salah di cabang yang tidak dipilih", () => {
+  assert.throws(
+    () => runKontekstual('Jika salah, maka:\n    Tampilkan 1 + "dua".'),
+    /Operator '\+' hanya menerima angka atau menggabungkan dua teks/
+  );
 });
