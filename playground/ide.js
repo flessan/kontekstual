@@ -1,4 +1,4 @@
-import { runKontekstual, KontekstualError } from "./interpreter.js";
+import { runKontekstualAsync, KontekstualError } from "./interpreter.js";
 import { formatKontekstual } from "./formatter.js";
 import {
   autocompletion,
@@ -71,6 +71,12 @@ const examples = [
     code: 'Tetapkan nama bernilai "Dunia".\nTampilkan "Halo, " + nama + "!".'
   },
   {
+    id: "masukan",
+    label: "Sapaan interaktif",
+    hint: "Coba instruksi Tanyakan",
+    code: 'Tanyakan "Siapa namamu?" dan simpan sebagai nama.\nTampilkan "Halo, " + nama.'
+  },
+  {
     id: "variabel",
     label: "Variabel, logika & perulangan",
     hint: "Contoh lengkap · 3 menit",
@@ -104,6 +110,7 @@ const examples = [
 
 const snippets = [
   { label: "Tampilkan", code: 'Tampilkan "Halo!".', desc: "Menampilkan teks" },
+  { label: "Tanyakan", code: 'Tanyakan "Siapa namamu?" dan simpan sebagai nama.', desc: "Meminta masukan teks" },
   { label: "Tetapkan", code: 'Tetapkan nama bernilai "Dunia".', desc: "Deklarasi variabel" },
   { label: "Ubah", code: 'Ubah nama menjadi "Indonesia".', desc: "Ubah nilai" },
   { label: "Jika", code: 'Jika kondisi benar, maka:\n    Tampilkan "Cabang utama".', desc: "Blok kondisi" },
@@ -119,6 +126,8 @@ const BLOCK_HEADER = /^(?:Jika\s+.+,\s*maka|Selama\s+.+,\s*lakukan|Jika\s+tidak,
 const keywordDocs = {
   tetapkan: "Tetapkan — deklarasi variabel. Contoh: Tetapkan nama bernilai \"Dunia\".",
   tampilkan: "Tampilkan — menampilkan hasil. Contoh: Tampilkan \"Halo!\".",
+  tanyakan: "Tanyakan — meminta satu baris teks kepada pengguna. Contoh: Tanyakan \"Siapa namamu?\" dan simpan sebagai nama.",
+  simpan: "simpan — bagian dari frasa \"dan simpan sebagai\" yang menyimpan jawaban sebagai variabel teks.",
   ubah: "Ubah — ubah nilai variabel. Contoh: Ubah umur menjadi 20.",
   jika: "Jika — kondisi. Pola: Jika <kondisi>, maka: (indentasi 4 spasi).",
   selama: "Selama — perulangan. Pola: Selama <kondisi>, lakukan: (maks 100.000 iterasi).",
@@ -232,6 +241,9 @@ document.querySelector("#app").innerHTML = `
           <button class="console-tab is-active" id="output-tab" role="tab" aria-selected="true" aria-controls="output-view" data-panel="output-view">
             <i class="bi bi-terminal" aria-hidden="true"></i> Hasil
           </button>
+          <button class="console-tab" id="interaction-tab" role="tab" aria-selected="false" aria-controls="interaction-view" data-panel="interaction-view">
+            <i class="bi bi-keyboard" aria-hidden="true"></i> Interaksi <span id="interaction-count" class="problem-count" hidden>0</span>
+          </button>
           <button class="console-tab" id="problems-tab" role="tab" aria-selected="false" aria-controls="problems-view" data-panel="problems-view">
             <i class="bi bi-exclamation-circle" aria-hidden="true"></i> Masalah <span id="problem-count" class="problem-count" aria-label="Jumlah masalah">0</span>
           </button>
@@ -248,6 +260,27 @@ document.querySelector("#app").innerHTML = `
             <strong>Tidak ada masalah</strong>
             <p>Pesan kesalahan akan muncul di sini saat program dijalankan, lengkap dengan nomor barisnya.</p>
           </div>
+        </div>
+        <div id="interaction-view" class="console-view interaction-view" role="tabpanel" aria-labelledby="interaction-tab" hidden>
+          <div id="interaction-idle" class="interaction-idle">
+            <span class="interaction-idle-icon" aria-hidden="true"><i class="bi bi-keyboard"></i></span>
+            <strong>Program belum meminta masukan</strong>
+            <p>Instruksi <code>Tanyakan</code> akan muncul di panel ini. Jawaban tetap berada di dalam playground, tanpa pop-up peramban.</p>
+          </div>
+          <form id="interaction-form" class="interaction-form" hidden>
+            <div class="interaction-form-heading">
+              <span class="interaction-kicker">MASUKAN PROGRAM</span>
+              <h3 id="interaction-prompt">Pertanyaan program</h3>
+              <p id="interaction-variable">Jawaban disimpan sebagai variabel teks.</p>
+            </div>
+            <label for="interaction-input">Jawabanmu</label>
+            <input id="interaction-input" name="answer" type="text" autocomplete="off" spellcheck="false" placeholder="Ketik jawaban di sini">
+            <div class="interaction-actions">
+              <button id="interaction-cancel" class="ws-btn ws-btn-quiet" type="button">Batalkan</button>
+              <button id="interaction-submit" class="interaction-submit" type="submit"><i class="bi bi-arrow-return-left" aria-hidden="true"></i> Kirim jawaban</button>
+            </div>
+            <p class="interaction-footnote">Tekan Enter untuk mengirim. Teks kosong juga diperbolehkan.</p>
+          </form>
         </div>
       </div>
       <div class="console-footer" role="status" aria-live="polite">
@@ -274,12 +307,14 @@ function extractVariables(docText) {
     const name = m[1];
     if (!["Tampilkan","Jika","Selama"].includes(name)) vars.add(name);
   }
+  const inputs = /Tanyakan\s+"(?:\\.|[^"\\])*"\s+dan\s+simpan\s+sebagai\s+([\p{L}_][\p{L}\p{N}_]*)/giu;
+  while ((m = inputs.exec(docText)) !== null) vars.add(m[1]);
   return Array.from(vars);
 }
 
 function tokenForIdentifier(word) {
   const lower = word.toLocaleLowerCase("id");
-  if (["tetapkan", "ubah", "tampilkan", "jika", "selama", "maka", "lakukan", "bernilai", "dengan", "nilai", "sebagai"].includes(lower)) return "keyword";
+  if (["tetapkan", "ubah", "tampilkan", "tanyakan", "simpan", "jika", "selama", "maka", "lakukan", "bernilai", "dengan", "nilai", "sebagai"].includes(lower)) return "keyword";
   if (["angka", "teks", "logika"].includes(lower)) return "typeName";
   if (["benar", "salah"].includes(lower)) return "bool";
   if (["dan", "atau", "tidak", "bukan"].includes(lower)) return "operator";
@@ -348,6 +383,7 @@ const editorTheme = EditorView.theme({
 const baseCompletions = [
   { label: "Tetapkan", type: "keyword", detail: "Deklarasi variabel", info: "Tetapkan nama bernilai \"Dunia\". — buat variabel baru", apply: "Tetapkan " },
   { label: "Tampilkan", type: "keyword", detail: "Tampilkan hasil", info: "Tampilkan \"Halo!\" — tampilkan teks atau variabel", apply: "Tampilkan " },
+  { label: "Tanyakan ... simpan sebagai", type: "keyword", detail: "Masukan teks", info: "Tanyakan \"Siapa namamu?\" dan simpan sebagai nama. — minta satu baris teks", apply: "Tanyakan \"Siapa namamu?\" dan simpan sebagai nama." },
   { label: "Ubah", type: "keyword", detail: "Ubah nilai variabel", info: "Ubah umur menjadi umur + 1 — perbarui variabel", apply: "Ubah " },
   { label: "Jika ... maka:", type: "keyword", detail: "Blok kondisi", info: "Jika kondisi benar, maka: — butuh indentasi 4 spasi", apply: "Jika kondisi benar, maka:\n    " },
   { label: "Jika tidak, maka:", type: "keyword", detail: "Cabang alternatif", info: "Jika tidak, maka: — alternatif dari Jika", apply: "Jika tidak, maka:\n    " },
@@ -495,6 +531,8 @@ function keywordHover(context, from, to) {
 }
 
 let editorView;
+let pendingInputResolve = null;
+let executionPending = false;
 const sourceInput = EditorState.create({
   doc: sourceFromStorage,
   extensions: [
@@ -716,11 +754,49 @@ function setConsolePanel(panelId) {
     button.setAttribute("aria-selected", String(active));
     button.tabIndex = active ? 0 : -1;
   }
-  document.querySelector("#output-view").hidden = panelId !== "output-view";
-  document.querySelector("#problems-view").hidden = panelId !== "problems-view";
+  for (const viewId of ["output-view", "interaction-view", "problems-view"]) {
+    const view = document.getElementById(viewId);
+    if (view) view.hidden = viewId !== panelId;
+  }
 }
 
-function runProgram({ focusResults = true } = {}) {
+function requestInlineInput(promptText, variableName) {
+  return new Promise(resolve => {
+    pendingInputResolve = resolve;
+    document.querySelector("#interaction-prompt").textContent = promptText;
+    document.querySelector("#interaction-variable").textContent =
+      'Jawaban akan disimpan sebagai variabel teks "' + variableName + '".';
+    document.querySelector("#interaction-input").value = "";
+    document.querySelector("#interaction-idle").hidden = true;
+    document.querySelector("#interaction-form").hidden = false;
+    const count = document.querySelector("#interaction-count");
+    count.textContent = "1";
+    count.hidden = false;
+    setConsolePanel("interaction-view");
+    if (window.matchMedia("(max-width: 860px)").matches) setMobileWorkspacePanel("console");
+    requestAnimationFrame(() => document.querySelector("#interaction-input").focus());
+  });
+}
+
+function finishInlineInput(value) {
+  if (typeof pendingInputResolve !== "function") return;
+  const resolve = pendingInputResolve;
+  pendingInputResolve = null;
+  document.querySelector("#interaction-form").hidden = true;
+  document.querySelector("#interaction-idle").hidden = false;
+  document.querySelector("#interaction-count").hidden = true;
+  resolve(value);
+}
+
+document.querySelector("#interaction-form").addEventListener("submit", event => {
+  event.preventDefault();
+  finishInlineInput(document.querySelector("#interaction-input").value);
+});
+document.querySelector("#interaction-cancel").addEventListener("click", () => finishInlineInput(null));
+
+async function runProgram({ focusResults = true } = {}) {
+  if (executionPending) return;
+  executionPending = true;
   runButton.disabled = true;
   runButton.classList.add("is-running");
   const label = runButton.querySelector(".run-label");
@@ -730,14 +806,15 @@ function runProgram({ focusResults = true } = {}) {
   output.replaceChildren();
   clearProblems();
   try {
-    const result = runKontekstual(editorView.state.doc.toString());
+    const result = await runKontekstualAsync(editorView.state.doc.toString(), {
+      ask: requestInlineInput,
+      onOutput: appendOutputLine
+    });
     if (!result.output.length) {
       const empty = document.createElement("div");
       empty.className = "console-empty";
       empty.innerHTML = "<strong>Program selesai tanpa hasil.</strong><br>Tambahkan <code>Tampilkan \"Halo!\"</code> untuk melihat hasilnya.";
       output.append(empty);
-    } else {
-      result.output.forEach((line, index) => appendOutputLine(line, index));
     }
     const statusMessage = document.createElement("div");
     statusMessage.className = "execution-success";
@@ -770,6 +847,7 @@ function runProgram({ focusResults = true } = {}) {
     executionTime.textContent = (performance.now() - startedAt).toFixed(1) + " ms · gagal";
     setConsolePanel("problems-view");
   } finally {
+    executionPending = false;
     runButton.disabled = false;
     runButton.classList.remove("is-running");
     const label2 = runButton.querySelector(".run-label");

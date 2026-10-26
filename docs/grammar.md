@@ -30,6 +30,7 @@ program           = { NEWLINE }, statement,
 statement         = declaration
                   | assignment
                   | output
+                  | input_instruction
                   | conditional
                   | while_loop ;
 
@@ -45,6 +46,7 @@ type              = "angka" | "teks" | "logika" ;
 output            = "tampilkan", expression, "."
                   | "tampilkan teks", STRING, "."
                   | "tampilkan nilai", identifier, "." ;
+input_instruction = "tanyakan", STRING, "dan", "simpan", "sebagai", identifier, "." ;
 
 conditional       = "jika", expression, ",", "maka", ":", block,
                     [ "jika", "tidak", ",", "maka", ":", block ] ;
@@ -146,3 +148,4 @@ Tampilkan teks "Halo".
 6. Identifiers support Unicode letters, digits, and underscores; names are case-sensitive while reserved words are case-insensitive.
 7. `Jika tidak, maka:` must immediately follow its matching `Jika` block at the same indentation level, and its body must not be empty.
 8. `Selama kondisi, lakukan:` checks a logical condition before each iteration; its body must not be empty.
+9. `Tanyakan "pertanyaan?" dan simpan sebagai nama.` reads one line of user input and declares `nama` as type `teks`.

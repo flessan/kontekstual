@@ -11,6 +11,7 @@ Tampilkan ekspresi.
 Tetapkan nama bernilai ekspresi.
 Tetapkan nama dengan nilai ekspresi.
 Ubah nama menjadi ekspresi.
+Tanyakan "Siapa namamu?" dan simpan sebagai nama.
 Jika kondisi, maka:
     instruksi.
 Jika tidak, maka:
@@ -25,7 +26,7 @@ Subset yang didukung mencakup hasil teks, deklarasi, perubahan nilai variabel, a
 Interpreter Rust menggunakan bilangan bulat bertanda 64-bit, memeriksa luapan, dan melaporkan kesalahan pembagian dengan nol. Runtime peramban memakai rentang bilangan bulat aman JavaScript. Kedua runtime membatasi program hingga 100.000 total iterasi.
 
 ## Batasan yang dinyatakan jelas
-Fungsi buatan pengguna, modul, input interaktif, instruksi kendali perulangan, dan pembuatan executable native masih direncanakan. Jangan menyatakan fitur tersebut sudah berjalan. Jika permintaan memerlukannya, jelaskan sebagai usulan desain, bukan sintaks yang valid saat ini.
+Fungsi buatan pengguna, modul, konversi tipe masukan, instruksi kendali perulangan, dan pembuatan executable native masih direncanakan. Masukan teks satu baris melalui `Tanyakan` sudah tersedia. Jangan menyatakan fitur tersebut sudah berjalan. Jika permintaan memerlukannya, jelaskan sebagai usulan desain, bukan sintaks yang valid saat ini.
 
 ## Validasi
 Gunakan `cargo test --all-targets` untuk Rust. Contoh program dapat diperiksa dengan `cargo run -- check examples/halo.konteks` dan dijalankan dengan `cargo run -- run examples/halo.konteks`. Untuk aplikasi peramban, jalankan `pnpm install --frozen-lockfile`, `pnpm test`, lalu `pnpm build`. Buat contoh sekecil mungkin dan periksa hasil yang diharapkan. Jika repositori atau lingkungan tidak tersedia, nyatakan batasan tersebut.

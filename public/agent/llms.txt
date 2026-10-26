@@ -9,7 +9,7 @@ Gunakan panduan ini untuk agen pemrograman dan sistem pencarian informasi yang m
 5. Baca https://github.com/flessan/kontekstual/blob/main/SPECIFICATION.md untuk spesifikasi bahasa yang terus berkembang.
 6. Validasi hasil dengan interpreter dan pengujian otomatis di repositori.
 
-Jangan perlakukan Kontekstual sebagai bahasa alami bebas. Setiap instruksi lengkap diakhiri tanda titik; teks diapit tanda kutip; isi kondisi dan perulangan menggunakan indentasi. Jangan mengarang fitur bahasa yang belum didukung.
+Jangan perlakukan Kontekstual sebagai bahasa alami bebas. Setiap instruksi lengkap diakhiri tanda titik; teks diapit tanda kutip; isi kondisi dan perulangan menggunakan indentasi. Perintah `Tanyakan "pertanyaan?" dan simpan sebagai nama.` menerima satu baris masukan bertipe teks. Jangan mengarang fitur bahasa yang belum didukung.
 
 Implementasi acuan: https://github.com/flessan/kontekstual
 Situs: https://dotkonteks.pages.dev/

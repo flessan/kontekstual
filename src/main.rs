@@ -1,7 +1,8 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::env;
 use std::fmt;
 use std::fs;
+use std::io::{self, Write};
 use std::path::Path;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -379,6 +380,7 @@ enum Statement {
         location: Location,
     },
     DeclareInferred { name: String, initial_value: Expression, location: Location },
+    Input { prompt: String, name: String, location: Location },
     PrintText(String),
     PrintValue {
         name: String,
@@ -539,7 +541,7 @@ impl Parser {
                     "bernilai", "dengan", "nilai", "ubah", "menjadi", "tampilkan", "jika", "maka", "selesai",
                     "selama", "lakukan",
                     "ditambah", "dikurangi", "dikali", "dibagi", "lebih", "dari",
-                    "kurang", "sama", "tidak", "atau", "dan", "bukan",
+                    "kurang", "sama", "tidak", "atau", "dan", "bukan", "tanyakan", "simpan",
                 ];
                 if reserved.contains(&lower.as_str()) {
                     return Err(Diagnostic::new(
@@ -596,6 +598,8 @@ impl Parser {
     fn parse_statement(&mut self) -> Result<Statement, Diagnostic> {
         if self.phrase_at("tetapkan") {
             self.parse_declaration()
+        } else if self.phrase_at("tanyakan") {
+            self.parse_input()
         } else if self.phrase_at("tampilkan teks") {
             self.parse_text_output()
         } else if self.phrase_at("tampilkan nilai") {
@@ -685,6 +689,28 @@ impl Parser {
         let value = self.parse_expression()?;
         self.expect_period()?;
         Ok(Statement::Assign { name, value, location: token.location })
+    }
+
+    fn parse_input(&mut self) -> Result<Statement, Diagnostic> {
+        let location = self.current().location.clone();
+        self.expect_phrase("tanyakan", "Diharapkan 'Tanyakan'.")?;
+        let prompt_token = self.current().clone();
+        let prompt = match prompt_token.kind {
+            TokenKind::Text(value) => {
+                self.position += 1;
+                value
+            }
+            _ => return Err(self.error_here(
+                "Setelah 'Tanyakan', tulis pertanyaan di dalam tanda kutip ganda.",
+            )),
+        };
+        self.expect_phrase(
+            "dan simpan sebagai",
+            "Setelah pertanyaan, gunakan frasa 'dan simpan sebagai'.",
+        )?;
+        let name = self.expect_identifier()?;
+        self.expect_period()?;
+        Ok(Statement::Input { prompt, name, location })
     }
 
     fn parse_expression_output(&mut self) -> Result<Statement, Diagnostic> {
@@ -1051,6 +1077,16 @@ fn execute_source(source: &str) -> Result<Vec<String>, Diagnostic> {
     Interpreter::new().execute_program(&program)
 }
 
+fn execute_source_with_inputs(source: &str, inputs: Vec<String>) -> Result<Vec<String>, Diagnostic> {
+    let program = check_source(source)?;
+    Interpreter::with_inputs(inputs).execute_program(&program)
+}
+
+fn execute_source_interactive(source: &str) -> Result<(), Diagnostic> {
+    let program = check_source(source)?;
+    Interpreter::interactive().execute_program(&program).map(|_| ())
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum RuntimeValue {
     Number(i64),
@@ -1074,11 +1110,40 @@ struct Interpreter {
     scopes: Vec<HashMap<String, RuntimeValue>>,
     output: Vec<String>,
     loop_iterations: usize,
+    inputs: VecDeque<String>,
+    interactive_mode: bool,
 }
 
 impl Interpreter {
     fn new() -> Self {
-        Self { scopes: vec![HashMap::new()], output: Vec::new(), loop_iterations: 0 }
+        Self {
+            scopes: vec![HashMap::new()],
+            output: Vec::new(),
+            loop_iterations: 0,
+            inputs: VecDeque::new(),
+            interactive_mode: false,
+        }
+    }
+
+    fn with_inputs(inputs: Vec<String>) -> Self {
+        Self {
+            inputs: VecDeque::from(inputs),
+            ..Self::new()
+        }
+    }
+
+    fn interactive() -> Self {
+        Self {
+            interactive_mode: true,
+            ..Self::new()
+        }
+    }
+
+    fn emit_output(&mut self, line: String) {
+        if self.interactive_mode {
+            println!("{}", line);
+        }
+        self.output.push(line);
     }
 
     fn execute_program(mut self, program: &Program) -> Result<Vec<String>, Diagnostic> {
@@ -1105,8 +1170,49 @@ impl Interpreter {
                     }
                     scope.insert(name.clone(), value);
                 }
-                Statement::PrintText(value) => self.output.push(value.clone()),
-                Statement::PrintExpression(expression) => self.output.push(self.evaluate(expression)?.display()),
+                Statement::Input { prompt, name, location } => {
+                    let value = if let Some(value) = self.inputs.pop_front() {
+                        value
+                    } else if self.interactive_mode {
+                        print!("{}", prompt);
+                        io::stdout().flush().map_err(|error| {
+                            Diagnostic::new(location.clone(), format!("Pertanyaan tidak dapat ditampilkan: {}.", error))
+                        })?;
+                        let mut value = String::new();
+                        let bytes = io::stdin().read_line(&mut value).map_err(|error| {
+                            Diagnostic::new(location.clone(), format!("Masukan tidak dapat dibaca: {}.", error))
+                        })?;
+                        if bytes == 0 {
+                            return Err(Diagnostic::new(
+                                location.clone(),
+                                format!("Tidak ada masukan yang diterima untuk variabel '{}'.", name),
+                            ));
+                        }
+                        while value.ends_with('\n') || value.ends_with('\r') {
+                            value.pop();
+                        }
+                        value
+                    } else {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Instruksi 'Tanyakan' membutuhkan masukan untuk variabel '{}'. Jalankan program dengan perintah 'run' atau berikan masukan pada pengujian.", name),
+                        ));
+                    };
+
+                    let scope = self.scopes.last_mut().expect("scope global selalu ada");
+                    if scope.contains_key(name) {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Variabel '{}' sudah ditetapkan pada blok ini.", name),
+                        ));
+                    }
+                    scope.insert(name.clone(), RuntimeValue::Text(value));
+                }
+                Statement::PrintText(value) => self.emit_output(value.clone()),
+                Statement::PrintExpression(expression) => {
+                    let value = self.evaluate(expression)?.display();
+                    self.emit_output(value);
+                }
                 Statement::Assign { name, value, location } => {
                     let new_value = self.evaluate(value)?;
                     let mut assigned = false;
@@ -1125,7 +1231,7 @@ impl Interpreter {
                     let value = self.lookup(name).cloned().ok_or_else(|| {
                         Diagnostic::new(location.clone(), format!("Variabel '{}' belum ditetapkan sebelum digunakan.", name))
                     })?;
-                    self.output.push(value.display());
+                    self.emit_output(value.display());
                 }
                 Statement::If { condition, body, else_body, location } => {
                     match self.evaluate(condition)? {
@@ -1296,6 +1402,16 @@ impl SemanticAnalyzer {
                         return Err(Diagnostic::new(location.clone(), format!("Variabel '{}' sudah ditetapkan pada blok ini.", name)));
                     }
                     current_scope.insert(name.clone(), inferred_type);
+                }
+                Statement::Input { name, location, .. } => {
+                    let current_scope = self.scopes.last_mut().expect("scope global selalu ada");
+                    if current_scope.contains_key(name) {
+                        return Err(Diagnostic::new(
+                            location.clone(),
+                            format!("Variabel '{}' sudah ditetapkan pada blok ini.", name),
+                        ));
+                    }
+                    current_scope.insert(name.clone(), ValueType::Text);
                 }
                 Statement::PrintText(_) => {}
                 Statement::PrintExpression(expression) => { self.infer_expression(expression)?; }
@@ -1476,11 +1592,7 @@ fn main() {
             );
         })
     } else {
-        execute_source(&source).map(|lines| {
-            for line in lines {
-                println!("{}", line);
-            }
-        })
+        execute_source_interactive(&source)
     };
 
     if let Err(diagnostic) = result {
@@ -2008,6 +2120,59 @@ Selama benar, lakukan:
         let output = execute_source("Jika benar, maka:\n   Tampilkan \"Berhasil\".")
             .expect("indentasi yang lebih dalam dan konsisten harus diterima");
         assert_eq!(output, vec!["Berhasil"]);
+    }
+
+
+    #[test]
+    fn input_prompt_creates_a_text_variable_and_can_be_printed() {
+        let output = execute_source_with_inputs(
+            r#"Tanyakan "Siapa namamu?" dan simpan sebagai nama.
+Tampilkan "Halo, " + nama."#,
+            vec!["Nala".to_string()],
+        )
+        .expect("masukan pengguna harus tersedia sebagai teks");
+        assert_eq!(output, vec!["Halo, Nala"]);
+    }
+
+    #[test]
+    fn input_accepts_an_empty_text_line() {
+        let output = execute_source_with_inputs(
+            r#"Tanyakan "Nama (boleh kosong):" dan simpan sebagai nama.
+Tampilkan "[" + nama + "]"."#,
+            vec![String::new()],
+        )
+        .expect("baris kosong tetap merupakan masukan teks yang sah");
+        assert_eq!(output, vec!["[]"]);
+    }
+
+    #[test]
+    fn input_variable_is_statically_typed_as_text() {
+        let error = check_source(
+            r#"Tanyakan "Berapa umurmu?" dan simpan sebagai umur.
+Ubah umur menjadi 20."#,
+        )
+        .expect_err("variabel masukan teks tidak boleh diubah menjadi angka");
+        assert!(error.message.contains("tidak bisa diubah menjadi angka"));
+    }
+
+    #[test]
+    fn input_rejects_duplicate_variable_declarations() {
+        let error = check_source(
+            r#"Tanyakan "Namamu?" dan simpan sebagai nama.
+Tetapkan nama bernilai "Lain"."#,
+        )
+        .expect_err("nama masukan tidak boleh dideklarasikan ulang pada cakupan yang sama");
+        assert!(error.message.contains("sudah ditetapkan"));
+    }
+
+    #[test]
+    fn noninteractive_execution_reports_missing_input_instead_of_blocking() {
+        let error = execute_source(
+            r#"Tanyakan "Namamu?" dan simpan sebagai nama.
+Tampilkan nama."#,
+        )
+        .expect_err("pengujian tanpa input tidak boleh menunggu stdin");
+        assert!(error.message.contains("membutuhkan masukan"));
     }
 
 
