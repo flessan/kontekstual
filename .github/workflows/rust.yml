@@ -38,6 +38,14 @@ jobs:
           printf '%s\n' "$actual"
       - name: Validate the while loop example
         run: cargo run -- check examples/perulangan.konteks
+      - name: Validate the interactive input example
+        run: cargo run -- check examples/masukan.konteks
+      - name: Run the interactive input example
+        run: |
+          actual="$(printf 'Nala\n' | cargo run --quiet -- run examples/masukan.konteks)"
+          expected="Siapa namamu?Halo, Nala"
+          test "$actual" = "$expected"
+          printf '%s\n' "$actual"
       - name: Run the while loop example
         run: |
           actual="$(cargo run --quiet -- run examples/perulangan.konteks)"
