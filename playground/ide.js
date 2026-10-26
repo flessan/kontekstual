@@ -71,6 +71,12 @@ const examples = [
     code: 'Tetapkan nama bernilai "Dunia".\nTampilkan "Halo, " + nama + "!".'
   },
   {
+    id: "masukan",
+    label: "Sapaan interaktif",
+    hint: "Coba instruksi Tanyakan",
+    code: 'Tanyakan "Siapa namamu?" dan simpan sebagai nama.\nTampilkan "Halo, " + nama.'
+  },
+  {
     id: "variabel",
     label: "Variabel, logika & perulangan",
     hint: "Contoh lengkap · 3 menit",
@@ -104,6 +110,7 @@ const examples = [
 
 const snippets = [
   { label: "Tampilkan", code: 'Tampilkan "Halo!".', desc: "Menampilkan teks" },
+  { label: "Tanyakan", code: 'Tanyakan "Siapa namamu?" dan simpan sebagai nama.', desc: "Meminta masukan teks" },
   { label: "Tetapkan", code: 'Tetapkan nama bernilai "Dunia".', desc: "Deklarasi variabel" },
   { label: "Ubah", code: 'Ubah nama menjadi "Indonesia".', desc: "Ubah nilai" },
   { label: "Jika", code: 'Jika kondisi benar, maka:\n    Tampilkan "Cabang utama".', desc: "Blok kondisi" },
@@ -119,6 +126,8 @@ const BLOCK_HEADER = /^(?:Jika\s+.+,\s*maka|Selama\s+.+,\s*lakukan|Jika\s+tidak,
 const keywordDocs = {
   tetapkan: "Tetapkan — deklarasi variabel. Contoh: Tetapkan nama bernilai \"Dunia\".",
   tampilkan: "Tampilkan — menampilkan hasil. Contoh: Tampilkan \"Halo!\".",
+  tanyakan: "Tanyakan — meminta satu baris teks kepada pengguna. Contoh: Tanyakan \"Siapa namamu?\" dan simpan sebagai nama.",
+  simpan: "simpan — bagian dari frasa \"dan simpan sebagai\" yang menyimpan jawaban sebagai variabel teks.",
   ubah: "Ubah — ubah nilai variabel. Contoh: Ubah umur menjadi 20.",
   jika: "Jika — kondisi. Pola: Jika <kondisi>, maka: (indentasi 4 spasi).",
   selama: "Selama — perulangan. Pola: Selama <kondisi>, lakukan: (maks 100.000 iterasi).",
@@ -274,12 +283,14 @@ function extractVariables(docText) {
     const name = m[1];
     if (!["Tampilkan","Jika","Selama"].includes(name)) vars.add(name);
   }
+  const inputs = /Tanyakan\s+"(?:\\.|[^"\\])*"\s+dan\s+simpan\s+sebagai\s+([\p{L}_][\p{L}\p{N}_]*)/giu;
+  while ((m = inputs.exec(docText)) !== null) vars.add(m[1]);
   return Array.from(vars);
 }
 
 function tokenForIdentifier(word) {
   const lower = word.toLocaleLowerCase("id");
-  if (["tetapkan", "ubah", "tampilkan", "jika", "selama", "maka", "lakukan", "bernilai", "dengan", "nilai", "sebagai"].includes(lower)) return "keyword";
+  if (["tetapkan", "ubah", "tampilkan", "tanyakan", "simpan", "jika", "selama", "maka", "lakukan", "bernilai", "dengan", "nilai", "sebagai"].includes(lower)) return "keyword";
   if (["angka", "teks", "logika"].includes(lower)) return "typeName";
   if (["benar", "salah"].includes(lower)) return "bool";
   if (["dan", "atau", "tidak", "bukan"].includes(lower)) return "operator";
@@ -348,6 +359,7 @@ const editorTheme = EditorView.theme({
 const baseCompletions = [
   { label: "Tetapkan", type: "keyword", detail: "Deklarasi variabel", info: "Tetapkan nama bernilai \"Dunia\". — buat variabel baru", apply: "Tetapkan " },
   { label: "Tampilkan", type: "keyword", detail: "Tampilkan hasil", info: "Tampilkan \"Halo!\" — tampilkan teks atau variabel", apply: "Tampilkan " },
+  { label: "Tanyakan ... simpan sebagai", type: "keyword", detail: "Masukan teks", info: "Tanyakan \"Siapa namamu?\" dan simpan sebagai nama. — minta satu baris teks", apply: "Tanyakan \"Siapa namamu?\" dan simpan sebagai nama." },
   { label: "Ubah", type: "keyword", detail: "Ubah nilai variabel", info: "Ubah umur menjadi umur + 1 — perbarui variabel", apply: "Ubah " },
   { label: "Jika ... maka:", type: "keyword", detail: "Blok kondisi", info: "Jika kondisi benar, maka: — butuh indentasi 4 spasi", apply: "Jika kondisi benar, maka:\n    " },
   { label: "Jika tidak, maka:", type: "keyword", detail: "Cabang alternatif", info: "Jika tidak, maka: — alternatif dari Jika", apply: "Jika tidak, maka:\n    " },
@@ -730,14 +742,15 @@ function runProgram({ focusResults = true } = {}) {
   output.replaceChildren();
   clearProblems();
   try {
-    const result = runKontekstual(editorView.state.doc.toString());
+    const result = runKontekstual(editorView.state.doc.toString(), {
+      ask: promptText => window.prompt(promptText),
+      onOutput: appendOutputLine
+    });
     if (!result.output.length) {
       const empty = document.createElement("div");
       empty.className = "console-empty";
       empty.innerHTML = "<strong>Program selesai tanpa hasil.</strong><br>Tambahkan <code>Tampilkan \"Halo!\"</code> untuk melihat hasilnya.";
       output.append(empty);
-    } else {
-      result.output.forEach((line, index) => appendOutputLine(line, index));
     }
     const statusMessage = document.createElement("div");
     statusMessage.className = "execution-success";
