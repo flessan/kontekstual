@@ -625,3 +625,89 @@ export function runKontekstual(source, options = {}) {
   execute(ast, [new Map()], output, state);
   return { output, text: output.join("\n") };
 }
+
+
+async function executeAsync(statements, scopes, output, state) {
+  for (const statement of statements) {
+    const line = statement.line;
+    if (statement.kind === "declare") {
+      const value = evaluate(statement.value, scopes, line);
+      const type = statement.type || valueType(value);
+      if (valueType(value) !== type) throw new KontekstualError("Nilai awal bertipe " + valueType(value) + ", sedangkan variabel '" + statement.name + "' memerlukan tipe " + type + ".", line);
+      const scope = scopes[scopes.length - 1], key = statement.name;
+      if (scope.has(key)) throw new KontekstualError("Variabel '" + statement.name + "' sudah ditetapkan pada blok ini.", line);
+      scope.set(key, value);
+    } else if (statement.kind === "input") {
+      let answer;
+      if (state.inputs.length > 0) {
+        answer = state.inputs.shift();
+      } else if (typeof state.ask === "function") {
+        answer = await state.ask(statement.prompt, statement.name, line);
+      } else {
+        throw new KontekstualError(
+          "Instruksi 'Tanyakan' membutuhkan masukan. Berikan options.inputs atau options.ask.",
+          line
+        );
+      }
+      if (answer === null || answer === undefined) {
+        throw new KontekstualError(
+          "Masukan untuk variabel '" + statement.name + "' dibatalkan.",
+          line
+        );
+      }
+      const scope = scopes[scopes.length - 1];
+      if (scope.has(statement.name)) {
+        throw new KontekstualError("Variabel '" + statement.name + "' sudah ditetapkan pada blok ini.", line);
+      }
+      scope.set(statement.name, String(answer));
+    } else if (statement.kind === "assign") {
+      assignExisting(scopes, statement.name, evaluate(statement.value, scopes, line), line);
+    } else if (statement.kind === "print") {
+      const value = display(evaluate(statement.value, scopes, line));
+      output.push(value);
+      if (typeof state.onOutput === "function") state.onOutput(value, output.length - 1);
+    } else if (statement.kind === "if") {
+      const condition = evaluate(statement.condition, scopes, line);
+      if (typeof condition !== "boolean") throw new KontekstualError("Kondisi Jika harus menghasilkan logika.", line);
+      const selected = condition ? statement.body : statement.elseBody;
+      if (selected) {
+        scopes.push(new Map());
+        try {
+          await executeAsync(selected, scopes, output, state);
+        } finally {
+          scopes.pop();
+        }
+      }
+    } else if (statement.kind === "while") {
+      while (true) {
+        const condition = evaluate(statement.condition, scopes, line);
+        if (typeof condition !== "boolean") throw new KontekstualError("Kondisi Selama harus menghasilkan logika.", line);
+        if (!condition) break;
+        if (state.loopIterations >= MAX_LOOP_ITERATIONS) {
+          throw new KontekstualError("Perulangan melewati batas " + MAX_LOOP_ITERATIONS + " putaran. Pastikan kondisi Selama akhirnya menjadi salah.", line);
+        }
+        state.loopIterations++;
+        scopes.push(new Map());
+        try {
+          await executeAsync(statement.body, scopes, output, state);
+        } finally {
+          scopes.pop();
+        }
+      }
+    }
+  }
+}
+
+export async function runKontekstualAsync(source, options = {}) {
+  const ast = parseProgram(source);
+  checkStatements(ast, [new Map()]);
+  const output = [];
+  const state = {
+    loopIterations: 0,
+    inputs: Array.isArray(options.inputs) ? [...options.inputs] : [],
+    ask: typeof options.ask === "function" ? options.ask : null,
+    onOutput: typeof options.onOutput === "function" ? options.onOutput : null
+  };
+  await executeAsync(ast, [new Map()], output, state);
+  return { output, text: output.join("\n") };
+}
